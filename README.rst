@@ -3,7 +3,9 @@ pypuppetdb
 ##########
 
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
-using the requests library.
+using the `requests`_ library.
+
+.. _requests: http://docs.python-requests.org/en/latest/
 
 This library is a thin wrapper around the REST API providing some convinience
 functions and objects to request and hold data from PuppetDB.
@@ -36,9 +38,11 @@ The first thing you need to do is to connect with PuppetDB:
    >>> from pypuppetdb import connect
    >>> db = connect()
 
-
 Nodes
 -----
+
+The following will return a generator object yielding Node objects for every
+returned node from PuppetDB.
 
 .. code-block:: python
 
@@ -48,9 +52,6 @@ Nodes
    host1
    host2
    ...
-
-This will return a generator object yielding Node objects for every returned
-node from PuppetDB.
 
 To query a single node the singular `node()` can be used:
 
@@ -69,8 +70,8 @@ add a query to the request scoping the request to the node.
 
 .. code-block:: python
 
-   >>> nodes = db.node('hostname')
-   >>> print node.fact('osfamily')
+   >>> node = db.node('hostname')
+   >>> print(node.fact('osfamily'))
    osfamily/hostname
 
 Facts
