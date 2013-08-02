@@ -3,6 +3,10 @@
 # C extensions
 *.so
 
+# Pytest
+.cache
+__pycache__
+
 # Packages
 *.egg
 *.egg-info
@@ -29,7 +33,13 @@ nosetests.xml
 # Translations
 *.mo
 
+# Sphinx
+docs/_build
+
 # Mr Developer
 .mr.developer.cfg
 .project
 .pydevproject
+
+# OS X
+.DS_*
