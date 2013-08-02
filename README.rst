@@ -10,6 +10,8 @@ using the `requests`_ library.
 This library is a thin wrapper around the REST API providing some convinience
 functions and objects to request and hold data from PuppetDB.
 
+To use this library **Python 2.6** or higher is required.
+
 Installation
 ============
 
