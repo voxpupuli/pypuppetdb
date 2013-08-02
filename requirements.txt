@@ -1,0 +1,3 @@
+-r requirements/pypuppetdb.txt
+-r requirements/tests.txt
+-r requirements/docs.txt

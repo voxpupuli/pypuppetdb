@@ -1,0 +1,2 @@
+pytz==2013b
+requests==1.2.3
