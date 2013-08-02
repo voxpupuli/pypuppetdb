@@ -25,10 +25,10 @@ class PyTest(TestCommand):
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
-with codecs.open('README.rst') as f:
+with codecs.open('README.rst', encoding='utf-8') as f:
     README = f.read()
 
-with codecs.open('CHANGELOG.rst') as f:
+with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
     CHANGELOG = f.read()
 
 packages = [
@@ -53,7 +53,7 @@ setup(
     url='https://github.com/nedap/pypuppetdb',
     license=open('LICENSE').read(),
     description='Library for working with the PuppetDB REST API.',
-    long_description=README + '\n' + CHANGELOG,
+    long_description=README + u'\n' + CHANGELOG,
     package_data={'': ['LICENSE', 'CHANGELOG.rst', ], },
     include_package_data=True,
     keywords='puppet puppetdb',
@@ -72,6 +72,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Software Development :: Libraries'
         ],
     )
