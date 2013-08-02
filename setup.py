@@ -34,7 +34,6 @@ with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
 packages = [
     'pypuppetdb',
     'pypuppetdb.api',
-    'tests',
     ]
 
 test_requires = [
