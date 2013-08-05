@@ -198,19 +198,6 @@ To run the unit tests (the ones that don't require a live PuppetDB):
    
    $ py.test -v -m unit
 
-To run the intergration tests:
-
-.. code-block:: bash
-
-   $ py.test -v -m integration
-
-The integration tests require a running instance of PuppetDB listening without
-SSL on http://localhost:8080 with the provided test data.
-
-Have a look at the ``puppetdb_travis.sh`` in ``ext/`` on how we do this. The
-script will probably work with little modifications for you locally if you have
-`Java`_ and `Leiningen`_ installed and found within your ``$PATH``.
-
 If the tests pass, you're golden. If not we'll have to figure out why and
 fix that. Feel free to ask for help on this.
 
