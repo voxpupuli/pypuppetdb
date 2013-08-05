@@ -6,6 +6,6 @@ python:
 install:
   - pip install -r requirements/pypuppetdb.txt --use-mirrors
   - pip install -r requirements/tests.txt --use-mirrors
-script: python setup.py test
+script: py.test --pep8 -m 'not integration'
 notifications:
   email: false

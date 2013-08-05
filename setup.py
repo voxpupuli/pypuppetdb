@@ -12,17 +12,17 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 
-class PyTest(TestCommand):
+class Tox(TestCommand):
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['-pep8 -m unit', ]
+        self.test_args = []
         self.test_suite = True
 
     def run_tests(self):
         #import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.test_args)
+        import tox
+        errno = tox.cmdline(self.test_args)
         sys.exit(errno)
 
 with codecs.open('README.rst', encoding='utf-8') as f:
@@ -36,13 +36,6 @@ packages = [
     'pypuppetdb.api',
     ]
 
-test_requires = [
-    'pytest',
-    'pytest-pep8',
-    'httpretty',
-    'pytest-httpretty',
-]
-
 setup(
     name='pypuppetdb',
     version=__version__,
@@ -52,12 +45,12 @@ setup(
     url='https://github.com/nedap/pypuppetdb',
     license=open('LICENSE').read(),
     description='Library for working with the PuppetDB REST API.',
-    long_description=README + u'\n' + CHANGELOG,
+    long_description='\n'.join((README, CHANGELOG)),
     package_data={'': ['LICENSE', 'CHANGELOG.rst', ], },
     include_package_data=True,
     keywords='puppet puppetdb',
-    tests_require=test_requires,
-    cmdclass={'test': PyTest},
+    tests_require=['tox'],
+    cmdclass={'test': Tox},
     install_requires=[
         "requests >= 1.2.3",
         "pytz == 2013b",
