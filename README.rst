@@ -17,14 +17,25 @@ To use this library you will need:
 Installation
 ============
 
-Since this is still under heavy development there's currently no setup.py
-available nor is this package pushed to PyPi. For now, you'll have to install
-from source.
+You can install this package from source or from PyPi.
+
+.. code-block:: bash
+
+   $ pip install pypuppetdb
 
 .. code-block:: bash
 
    $ git clone https://github.com/nedap/pypuppetdb
+   $ python setup.py install
+
+If you wish to hack on it clone the repository but after that run:
+
+.. code-block:: bash
+
    $ pip install -r requirements.txt
+
+This will install all the runtime requirements of pypuppetdb and the
+dependencies for the test suite and generation of documentation.
 
 Usage
 =====
