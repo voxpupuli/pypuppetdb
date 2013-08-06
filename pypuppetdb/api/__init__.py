@@ -225,10 +225,12 @@ class BaseAPI(object):
             log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['timeout'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
+            raise
         except requests.exceptions.ConnectionError:
             log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['refused'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
+            raise
 
     # Method stubs
 
