@@ -2,6 +2,9 @@
 pypuppetdb
 ##########
 
+.. image:: https://api.travis-ci.org/nedap/pypuppetdb.png
+   :target: https://travis-ci.org/nedap/pypuppetdb
+
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 
