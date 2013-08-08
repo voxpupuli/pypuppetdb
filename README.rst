@@ -153,7 +153,7 @@ through:
 
 .. code-block:: bash
 
-   $ pip install -r requirements/docs.txt
+   $ pip install -r requirements.txt
 
 Contributing
 ============

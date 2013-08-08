@@ -1,3 +1,0 @@
-pytest==2.3.5
-pytest-pep8==1.0.4
--e git+https://github.com/papaeye/pytest-httpretty.git#egg=pytest-httpretty
