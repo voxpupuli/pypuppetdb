@@ -5,12 +5,9 @@ import codecs
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
-from pypuppetdb import __version__
-
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     sys.exit()
-
 
 class Tox(TestCommand):
 
@@ -38,7 +35,7 @@ packages = [
 
 setup(
     name='pypuppetdb',
-    version=__version__,
+    version='0.0.2',
     author='Daniele Sluijters',
     author_email='daniele.sluijters+pypi@gmail.com',
     packages=packages,
