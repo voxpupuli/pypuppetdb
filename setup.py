@@ -9,6 +9,7 @@ if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     sys.exit()
 
+
 class Tox(TestCommand):
 
     def finalize_options(self):
