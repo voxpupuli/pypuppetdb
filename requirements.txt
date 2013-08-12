@@ -11,7 +11,6 @@ pytest==2.3.5
 pytest-cache==1.0
 -e git+https://github.com/papaeye/pytest-httpretty.git@f5eea4e2688ffb6d26674413640ee1a90ae804d6#egg=pytest_httpretty-master
 pytest-pep8==1.0.4
-pytz==2013b
 requests==1.2.3
 tox==1.5.0
 virtualenv==1.10

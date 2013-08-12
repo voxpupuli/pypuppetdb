@@ -5,14 +5,27 @@ import warnings
 import datetime
 from functools import wraps
 
-import pytz
-
 from pypuppetdb.errors import ExperimentalDisabledError
+
+
+# A UTC class, see:
+# http://docs.python.org/2/library/datetime.html#tzinfo-objects
+class UTC(datetime.tzinfo):
+    """UTC"""
+
+    def utcoffset(self, dt):
+        return datetime.timedelta(0)
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return datetime.timedelta(0)
 
 
 def json_to_datetime(date):
     """Tranforms a JSON datetime string into a timezone aware datetime
-    object we can use in.
+    object with a UTC tzinfo object.
 
     :param date: The datetime representation.
     :type date: :obj:`string`
@@ -20,9 +33,8 @@ def json_to_datetime(date):
     :returns: A timezone aware datetime object.
     :rtype: :class:`datetime.datetime`
     """
-    naive = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ')
-    utc = pytz.timezone("UTC")
-    return utc.localize(naive, is_dst=None)
+    return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(
+        tzinfo=UTC())
 
 
 def experimental(func):

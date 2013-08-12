@@ -51,7 +51,6 @@ setup(
     cmdclass={'test': Tox},
     install_requires=[
         "requests >= 1.2.3",
-        "pytz == 2013b",
         ],
     classifiers=[
         'Development Status :: 3 - Alpha',

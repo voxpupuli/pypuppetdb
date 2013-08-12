@@ -2,6 +2,10 @@
 Changelog
 #########
 
+0.0.3
+=====
+* Removed pytz.
+
 0.0.2
 =====
 * Fix a bug in ``setup.py`` preventing successful installation.
