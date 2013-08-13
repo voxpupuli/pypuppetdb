@@ -236,7 +236,7 @@ class Node(object):
         if catalog_timestamp is not None:
             self.catalog_timestamp = json_to_datetime(catalog_timestamp)
         else:
-            self.catalog_timestamp = catalog_timestmap
+            self.catalog_timestamp = catalog_timestamp
 
         self.__api = api
         self.__query_scope = '["=", "certname", "{0}"]'.format(self.name)

@@ -10,16 +10,30 @@ pytestmark = pytest.mark.unit
 
 
 def test_node():
-    node = Node('_', 'node1.puppet.board',
-                report_timestamp='2013-08-01T09:57:00.000Z',
-                catalog_timestamp='2013-08-01T09:57:00.000Z',
-                facts_timestamp='2013-08-01T09:57:00.000Z',
-                )
-    assert node.name == 'node1.puppet.board'
-    assert node.deactivated is False
-    assert node.report_timestamp is not None
-    assert node.facts_timestamp is not None
-    assert node.catalog_timestamp is not None
+    node1 = Node('_', 'node1.puppet.board',
+                 report_timestamp='2013-08-01T09:57:00.000Z',
+                 catalog_timestamp='2013-08-01T09:57:00.000Z',
+                 facts_timestamp='2013-08-01T09:57:00.000Z',
+                 )
+
+    node2 = Node('_', 'node2.puppet.board',
+                 deactivated='2013-08-01T09:57:00.000Z',
+                 report_timestamp=None,
+                 catalog_timestamp=None,
+                 facts_timestamp=None,
+                 )
+
+    assert node1.name == 'node1.puppet.board'
+    assert node1.deactivated is False
+    assert node1.report_timestamp is not None
+    assert node1.facts_timestamp is not None
+    assert node1.catalog_timestamp is not None
+
+    assert node2.name == 'node2.puppet.board'
+    assert node2.deactivated is not False
+    assert node2.report_timestamp is None
+    assert node2.catalog_timestamp is None
+    assert node2.facts_timestamp is None
 
 
 def test_fact():
@@ -72,6 +86,7 @@ def test_event():
                   'present', 'absent', 'file')
 
     assert event.node == 'node1.puppet.board'
+    assert event.status == 'failure'
     assert event.failed is True
     assert event.timestamp == json_to_datetime('2013-08-01T10:57:00.000Z')
     assert event.hash_ == 'hash#'
