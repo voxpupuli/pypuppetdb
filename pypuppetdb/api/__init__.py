@@ -159,8 +159,7 @@ class BaseAPI(object):
             endpoint=endpoint,
             )
 
-        if (path is not None and endpoint != 'fact-names' and
-                not endpoint in self.experimental_endpoints):
+        if path is not None:
             url = '{0}/{1}'.format(url, path)
 
         return url

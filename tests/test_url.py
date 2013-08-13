@@ -56,7 +56,7 @@ def test_url_facts_path(api2):
 
 def test_url_fact_names_path(api2):
     url = api2._url('fact-names', path='what_ever')
-    assert url == 'http://localhost:8080/v2/fact-names'
+    assert url == 'http://localhost:8080/v2/fact-names/what_ever'
 
 
 def test_resources_path(api2):
@@ -66,9 +66,9 @@ def test_resources_path(api2):
 
 def test_url_events_path(api2e):
     url = api2e._url('events', path='what_ever')
-    assert url == 'http://localhost:8080/experimental/events'
+    assert url == 'http://localhost:8080/experimental/events/what_ever'
 
 
 def test_url_reports_path(api2e):
     url = api2e._url('reports', path='what_ever')
-    assert url == 'http://localhost:8080/experimental/reports'
+    assert url == 'http://localhost:8080/experimental/reports/what_ever'
