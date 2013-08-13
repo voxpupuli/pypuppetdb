@@ -1,5 +1,5 @@
 import pytest
-from pypuppetdb.errors import ExperimentalDisabledError
+from pypuppetdb.errors import APIError, ExperimentalDisabledError
 
 pytestmark = pytest.mark.unit
 
@@ -7,6 +7,11 @@ pytestmark = pytest.mark.unit
 def test_url_experimental_raises(api2):
     with pytest.raises(ExperimentalDisabledError):
         api2._url('reports')
+
+
+def test_url_invalid_endpoint(api2):
+    with pytest.raises(APIError):
+        api2._url('I-will_never+exist%really')
 
 
 def test_url_experimental(api2e):
