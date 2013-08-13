@@ -5,6 +5,8 @@ Changelog
 0.0.3
 =====
 * Removed pytz.
+* Fix the behaviour of ``facts()`` and ``resources()``. We can now correctly
+  query for all facts or resources.
 
 0.0.2
 =====

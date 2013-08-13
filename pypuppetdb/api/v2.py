@@ -80,6 +80,7 @@ class API(BaseAPI):
             path = name
         else:
             log.debug("We want to query for all facts.")
+            query = ''
             path = None
 
         facts = self._query('facts', path=path, query=query)
@@ -111,6 +112,7 @@ class API(BaseAPI):
             log.debug('Going to query for all resources. This is usually a '
                       'bad idea as it might return enormous amounts of '
                       'resources.')
+            query = ''
             path = None
 
         resources = self._query('resources', path=path, query=query)
