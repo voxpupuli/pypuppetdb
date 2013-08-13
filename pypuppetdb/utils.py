@@ -17,10 +17,19 @@ class UTC(datetime.tzinfo):
         return datetime.timedelta(0)
 
     def tzname(self, dt):
-        return "UTC"
+        return 'UTC'
 
     def dst(self, dt):
         return datetime.timedelta(0)
+
+    def __repr__(self):
+        return str('<UTC>')
+
+    def __str__(self):
+        return str('UTC')
+
+    def __unicode__(self):
+        return 'UTC'
 
 
 def json_to_datetime(date):
