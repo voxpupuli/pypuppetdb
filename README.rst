@@ -126,6 +126,9 @@ For bug reports you can file an `issue`_. If you need help with something
 feel free to hit up `@daenney`_ by e-mail or find him on IRC. He can usually
 be found on `IRCnet`_ and `Freenode`_ and idles in #puppet.
 
+There's now also the #puppetboard channel on `Freenode`_ where we hang out
+and answer questions related to pypuppetdb and Puppetboard.
+
 .. _issue: https://github.com/nedap/pypuppetdb/issues
 .. _@daenney: https://github.com/daenney
 .. _IRCnet: http://www.ircnet.org
