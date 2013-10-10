@@ -67,6 +67,7 @@ __copyright__ = 'Copyright 2013 Daniele Sluijters'
 import logging
 
 from pypuppetdb.api import v2
+from pypuppetdb.api import v3
 from pypuppetdb.errors import UnsupportedVersionError
 
 try:  # Python 2.7+
@@ -79,8 +80,8 @@ except ImportError:
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
-def connect(api_version=2, host='localhost', port=8080, ssl=False,
-            ssl_key=None, ssl_cert=None, timeout=10, experimental=False):
+def connect(api_version=3, host='localhost', port=8080, ssl=False,
+            ssl_key=None, ssl_cert=None, timeout=10):
     """Connect with PuppetDB. This will return an object allowing you
     to query the API through its methods.
 
@@ -92,9 +93,6 @@ def connect(api_version=2, host='localhost', port=8080, ssl=False,
 
     :param port: (optional) Port on which to talk to PuppetDB.
     :type port: :obj:`int`
-
-    :param timeout: (optional) Timeout for contacting PuppetDB.
-    :type timeout: :obj:`int`
 
     :param ssl: (optional) Talk with PuppetDB over SSL.
     :type ssl: :obj:`bool`
@@ -110,13 +108,14 @@ def connect(api_version=2, host='localhost', port=8080, ssl=False,
     :param timeout: (optional) Number of seconds to wait for a response.
     :type timeout: :obj:`int`
 
-    :param experimental: (optional) Enable experimental API features.
-    :type experimental: :obj:`bool`
-
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
+    if api_version == 3:
+        return v3.API(host=host, port=port,
+                      timeout=timeout, ssl=ssl, ssl_key=ssl_key,
+                      ssl_cert=ssl_cert)
     if api_version == 2:
-        return v2.API(experimental=experimental, host=host, port=port,
+        return v2.API(host=host, port=port,
                       timeout=timeout, ssl=ssl, ssl_key=ssl_key,
                       ssl_cert=ssl_cert)
     else:

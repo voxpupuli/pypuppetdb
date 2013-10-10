@@ -9,7 +9,6 @@ from pypuppetdb.errors import (
     ImproperlyConfiguredError,
     EmptyResponseError,
     UnsupportedVersionError,
-    ExperimentalDisabledError,
     APIError,
     )
 
@@ -17,6 +16,28 @@ log = logging.getLogger(__name__)
 
 API_VERSIONS = {
     2: 'v2',
+    3: 'v3',
+}
+
+ENDPOINTS = {
+    2: {
+        'facts': 'facts',
+        'fact-names': 'fact-names',
+        'nodes': 'nodes',
+        'resources': 'resources',
+        'metrics': 'metrics',
+        'mbean': 'metrics/mbean',
+    },
+    3: {
+        'facts': 'facts',
+        'fact-names': 'fact-names',
+        'nodes': 'nodes',
+        'resources': 'resources',
+        'metrics': 'metrics',
+        'mbean': 'metrics/mbean',
+        'reports': 'reports',
+        'events': 'events',
+    },
 }
 
 ERROR_STRINGS = {
@@ -78,17 +99,7 @@ class BaseAPI(object):
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.timeout = timeout
-        self.endpoints = {
-            'facts': 'facts',
-            'nodes': 'nodes',
-            'resources': 'resources',
-            'metrics': 'metrics',
-            'mbean': 'metrics/mbean',
-            }
-        self.experimental_endpoints = {
-            'reports': 'reports',
-            'events': 'events',
-            }
+        self.endpoints = ENDPOINTS[api_version]
 
         if not self.ssl:
             self.protocol = 'http'
@@ -103,7 +114,7 @@ class BaseAPI(object):
         """The version of the API we're querying against.
 
         :returns: Current API version.
-        :rtype: :obj:`int`"""
+        :rtype: :obj:`string`"""
         return self.api_version
 
     @property
@@ -122,8 +133,8 @@ class BaseAPI(object):
 
     def _url(self, endpoint, path=None):
         """The complete URL we will end up querying. Depending on the
-        endpoint we pass in and wether or not experimental features are
-        enabled this will result in different URL's with different prefixes.
+        endpoint we pass in  this will result in different URL's with
+        different prefixes.
 
         :param endpoint: The PuppetDB API endpoint we want to query.
         :type endpoint: :obj:`string`
@@ -140,12 +151,7 @@ class BaseAPI(object):
         log.debug('_url called with endpoint: {0} and path: {1}'.format(
             endpoint, path))
 
-        if endpoint in self.experimental_endpoints and not self.experimental:
-            raise ExperimentalDisabledError
-        elif endpoint in self.experimental_endpoints:
-            api_prefix = 'experimental'
-            endpoint = self.experimental_endpoints[endpoint]
-        elif endpoint in self.endpoints:
+        if endpoint in self.endpoints:
             api_prefix = self.api_version
             endpoint = self.endpoints[endpoint]
         else:

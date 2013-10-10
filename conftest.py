@@ -6,13 +6,12 @@ from pypuppetdb import connect
 @pytest.fixture(scope='session')
 def api2():
     """Set up a connection to PuppetDB with API version 2."""
-    puppetdb = connect()
+    puppetdb = connect(api_version=2)
     return puppetdb
 
 
 @pytest.fixture(scope='session')
-def api2e():
-    """Set up a connection to PuppetDB with API version 2 and experimental
-    features enabled."""
-    puppetdb = connect(experimental=True)
+def api3():
+    """Set up a connection to PuppetDB with API version 3."""
+    puppetdb = connect(api_version=3)
     return puppetdb

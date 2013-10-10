@@ -68,7 +68,8 @@ def test_resource():
 def test_report():
     report = Report('node1.puppet.board', 'hash#', '2013-08-01T09:57:00.000Z',
                     '2013-08-01T10:57:00.000Z', '2013-08-01T10:58:00.000Z',
-                    '1351535883', 3, '3.2.1')
+                    '1351535883', 3, '3.2.1',
+                    'af9f16e3-75f6-4f90-acc6-f83d6524a6f3')
     assert report.node == 'node1.puppet.board'
     assert report.hash_ == 'hash#'
     assert report.start == json_to_datetime('2013-08-01T09:57:00.000Z')
@@ -78,6 +79,7 @@ def test_report():
     assert report.format_ == 3
     assert report.agent_version == '3.2.1'
     assert report.run_time == report.end - report.start
+    assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
 
 
 def test_event():

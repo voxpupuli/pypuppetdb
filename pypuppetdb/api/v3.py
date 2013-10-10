@@ -6,14 +6,15 @@ import logging
 from pypuppetdb.api import BaseAPI
 from pypuppetdb.types import (
     Node, Fact, Resource,
+    Report, Event,
     )
 
 log = logging.getLogger(__name__)
 
 
 class API(BaseAPI):
-    """The API object for version 2 of the PuppetDB API. This object contains
-    all v2 specific methods and ways of doing things.
+    """The API object for version 3 of the PuppetDB API. This object contains
+    all v3 specific methods and ways of doing things.
 
     :param \*\*kwargs: Rest of the keywoard arguments passed on to our parent\
             :class:`~pypuppetdb.api.BaseAPI`.
@@ -21,8 +22,8 @@ class API(BaseAPI):
 
     def __init__(self, *args, **kwargs):
         """Initialise the API object."""
-        super(API, self).__init__(api_version=2, **kwargs)
-        log.debug('API initialised with {0}'.format(kwargs))
+        super(API, self).__init__(api_version=3, **kwargs)
+        log.debug('API initialised with {0}.'.format(kwargs))
 
     def node(self, name):
         """Gets a single node from PuppetDB."""
@@ -116,4 +117,44 @@ class API(BaseAPI):
                 resource['sourcefile'],
                 resource['sourceline'],
                 resource['parameters'],
+                )
+
+    def reports(self, query):
+        """Get reports for our infrastructure. Currently reports can only
+        be filtered through a query which requests a specific certname.
+        If not it will return all reports.
+
+        This yields a Report object for every returned report."""
+        reports = self._query('reports', query=query)
+        for report in reports:
+            yield Report(
+                report['certname'],
+                report['hash'],
+                report['start-time'],
+                report['end-time'],
+                report['receive-time'],
+                report['configuration-version'],
+                report['report-format'],
+                report['puppet-version'],
+                report['transaction-uuid']
+                )
+
+    def events(self, query):
+        """A report is made up of events. This allows to query for events
+        based on the reprt hash.
+        This yields an Event object for every returned event."""
+
+        events = self._query('events', query=query)
+        for event in events:
+            yield Event(
+                event['certname'],
+                event['status'],
+                event['timestamp'],
+                event['report'],
+                event['resource-title'],
+                event['property'],
+                event['message'],
+                event['new-value'],
+                event['old-value'],
+                event['resource-type'],
                 )

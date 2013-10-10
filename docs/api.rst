@@ -45,9 +45,7 @@ features.
 API objects
 -----------
 
-The PuppetDB API is versioned. We currently have a v1 and v2 and an additional
-'experimental' version containing features that are worked on and will become
-available in (probably) a newer version of the API.
+The PuppetDB API is versioned. We currently have a v1, v2 and v3.
 
 In order to work with this structure PyPuppetDB consists of a :class:`BaseAPI
 <BaseAPI>` class that factors out identical code between different versions.
@@ -73,6 +71,14 @@ BaseAPI
 v2.API
 ^^^^^^
 .. autoclass:: pypuppetdb.api.v2.API
+   :members:
+   :inherited-members:
+   :private-members:
+   :show-inheritance:
+
+v3.API
+^^^^^^
+.. autoclass:: pypuppetdb.api.v3.API
    :members:
    :inherited-members:
    :private-members:
@@ -106,8 +112,6 @@ In that case, we'll throw an exception at you.
 .. autoexception:: pypuppetdb.errors.ImproperlyConfiguredError
    :show-inheritance:
 .. autoexception:: pypuppetdb.errors.UnsupportedVersionError
-   :show-inheritance:
-.. autoexception:: pypuppetdb.errors.ExperimentalDisabledError
    :show-inheritance:
 .. autoexception:: pypuppetdb.errors.DoesNotComputeError
    :show-inheritance:

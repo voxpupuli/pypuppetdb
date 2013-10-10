@@ -22,12 +22,6 @@ class UnsupportedVersionError(APIError):
     pass
 
 
-class ExperimentalDisabledError(APIError):
-    """Is raised when an experimental method is called but the
-    experimental features are not enabled."""
-    pass
-
-
 class DoesNotComputeError(APIError):
     """This error will be thrown when a function is called with
     an incompatible set of optional parameters. This is the 'you are

@@ -5,8 +5,6 @@ import warnings
 import datetime
 from functools import wraps
 
-from pypuppetdb.errors import ExperimentalDisabledError
-
 
 # A UTC class, see:
 # http://docs.python.org/2/library/datetime.html#tzinfo-objects
@@ -44,28 +42,3 @@ def json_to_datetime(date):
     """
     return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(
         tzinfo=UTC())
-
-
-def experimental(func):
-    """This decorator checks if the experimental features of the API are
-    enabled. If so it will execute the function and return it's result, if
-    not it raises.
-
-    :param func: The function to decorate.
-    :type func: :obj:`function`
-
-    :raises: :class:`~pypuppetdb.errors.ExperimentalDisabledError`
-
-    :returns: The result of the decorated function.
-    """
-    @wraps(func)
-    def _experimental(self, *args, **kwargs):
-        if self.experimental:
-            warnings.warn('This is an experimental feature. Therefor the '
-                          'function signature will change when the API '
-                          'is finalised.', PendingDeprecationWarning,
-                          stacklevel=3)
-            return func(self, *args, **kwargs)
-        else:
-            raise ExperimentalDisabledError
-    return _experimental
