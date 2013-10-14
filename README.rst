@@ -208,7 +208,7 @@ run:
 
 .. code-block:: bash
 
-   $ pip install -r requirements/tests.txt
+   $ pip install -r requirements.txt
 
 .. _pytest: http://pytest.org/latest/
 .. _pytest-pep8: https://pypi.python.org/pypi/pytest-pep8
