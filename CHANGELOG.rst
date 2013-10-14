@@ -26,6 +26,7 @@ will be the focus of the next release.
 * Pass along the ``timeout`` option to ``connect()``.
 * Added preliminary PuppetDB API v3 support.
 * Removed support for the experimental endpoints.
+* The ``connect()`` method defaults to API v3 now.
 
 0.0.2
 =====
