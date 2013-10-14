@@ -2,6 +2,18 @@
 Changelog
 #########
 
+0.0.4
+=====
+
+Due to a fairly serious bug 0.0.3 was pulled from PyPi minutes after release.
+
+When a bug was fixed to be able to query for all facts we accidentally
+introduced a different bug that caused the ``facts()`` call on a node to
+query for all facts because we were resetting the query.
+
+* Fix a bug where ``node.facts()`` was causing us to query all facts because
+  the query to scope our request was being reset.
+
 0.0.3
 =====
 

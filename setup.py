@@ -36,7 +36,7 @@ packages = [
 
 setup(
     name='pypuppetdb',
-    version='0.0.3',
+    version='0.0.4',
     author='Daniele Sluijters',
     author_email='daniele.sluijters+pypi@gmail.com',
     packages=packages,
