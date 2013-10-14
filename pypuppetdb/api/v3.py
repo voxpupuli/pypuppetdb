@@ -62,13 +62,15 @@ class API(BaseAPI):
 
     def facts(self, name=None, value=None, query=None):
         """Query for facts limited by either name, value and/or query.
-        This will yield a single Fact object at a ti."""
+        This will yield a single Fact object at a time."""
 
         log.debug('{0}, {1}, {2}'.format(name, value, query))
         if name is not None and value is not None:
             path = '{0}/{1}'.format(name, value)
         elif name is not None and value is None:
             path = name
+        elif name is None and value is None and query is not None:
+            path = None
         else:
             log.debug("We want to query for all facts.")
             query = ''
