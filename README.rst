@@ -5,6 +5,12 @@ pypuppetdb
 .. image:: https://api.travis-ci.org/nedap/pypuppetdb.png
    :target: https://travis-ci.org/nedap/pypuppetdb
 
+.. image:: https://pypip.in/d/pypuppetdb/badge.png
+   :target: https://crate.io/packages/pypuppetdb
+
+.. image:: https://pypip.in/v/pypuppetdb/badge.png
+   :target: https://crate.io/packages/pypuppetdb
+
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 
@@ -217,6 +223,3 @@ To run the unit tests (the ones that don't require a live PuppetDB):
 
 If the tests pass, you're golden. If not we'll have to figure out why and
 fix that. Feel free to ask for help on this.
-
-.. _Java: http://www.java.com/en/
-.. _Leiningen: https://github.com/technomancy/leiningen/wiki/Packaging
