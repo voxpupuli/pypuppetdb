@@ -116,8 +116,8 @@ class API(BaseAPI):
                 resource['type'],
                 resource['tags'],
                 resource['exported'],
-                resource['sourcefile'],
-                resource['sourceline'],
+                resource['file'],
+                resource['line'],
                 resource['parameters'],
                 )
 
