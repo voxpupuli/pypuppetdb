@@ -93,14 +93,15 @@ class API(BaseAPI):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
-        # Need to capitalize the resource type since PuppetDB doesn't
-        # answer to lower case type names.
-        # bugs.puppetlabs.com/some_value
-        type_ = type_.capitalize()
-        if type_ is not None and title is not None:
-            path = '{0}/{1}'.format(type_, title)
-        elif type_ is not None and title is None:
-            path = type_
+        if type_ is not None:
+            # Need to capitalize the resource type since PuppetDB doesn't
+            # answer to lower case type names.
+            # bugs.puppetlabs.com/some_value
+            type_ = type_.capitalize()
+            if title is not None:
+                path = '{0}/{1}'.format(type_, title)
+            elif title is None:
+                path = type_
         else:
             log.debug('Going to query for all resources. This is usually a '
                       'bad idea as it might return enormous amounts of '
