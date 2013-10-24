@@ -161,3 +161,16 @@ class API(BaseAPI):
                 event['old-value'],
                 event['resource-type'],
                 )
+
+    def event_counts(self, query, summarize_by, count_by=None, count_filter=None):
+        """Get event counts from puppetdb"""
+        return self._query('event-counts', query=query, summarize_by=summarize_by, count_by=count_by, count_filter=count_filter)
+	
+    def aggregate_event_counts(self, query, summarize_by, count_by=None, count_filter=None):
+        """Get event counts from puppetdb"""
+        return self._query('aggregate-event-counts', query=query, summarize_by=summarize_by, count_by=count_by, count_filter=count_filter)
+	
+    def server_time(self):
+        """Get the current time of the clock on the PuppetDB server"""
+        return self._query('server-time')['server-time']
+        

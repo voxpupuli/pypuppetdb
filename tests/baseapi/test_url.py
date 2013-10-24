@@ -104,3 +104,19 @@ def test_url_events(api3):
 def test_url_reports(api3):
     url = api3._url('reports')
     assert url == 'http://localhost:8080/v3/reports'
+
+
+def test_url_event_counts(api3):
+    url = api3._url('event-counts')
+    assert url == 'http://localhost:8080/v3/event-counts'
+
+
+def test_url_aggregate_event_counts(api3):
+    url = api3._url('aggregate-event-counts')
+    assert url == 'http://localhost:8080/v3/aggregate-event-counts'
+
+
+def test_url_server_time(api3):
+    url = api3._url('server-time')
+    assert url == 'http://localhost:8080/v3/server-time'
+
