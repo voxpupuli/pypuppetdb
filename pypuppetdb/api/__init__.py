@@ -37,9 +37,9 @@ ENDPOINTS = {
         'mbean': 'metrics/mbean',
         'reports': 'reports',
         'events': 'events',
-	'event-counts': 'event-counts',
-	'aggregate-event-counts': 'aggregate-event-counts',
-	'server-time': 'server-time',
+        'event-counts': 'event-counts',
+        'aggregate-event-counts': 'aggregate-event-counts',
+        'server-time': 'server-time',
     },
 }
 
@@ -138,7 +138,7 @@ class BaseAPI(object):
     def total(self):
         """The total-count of the last request to PuppetDB
         if enabled as parameter in _query method
-        
+
         :returns Number of total results
         :rtype :obj:`int`
         """
@@ -184,7 +184,9 @@ class BaseAPI(object):
 
         return url
 
-    def _query(self, endpoint, path=None, query=None, order_by=None, limit=None, offset=None, include_total=None, summarize_by=None, count_by=None, count_filter=None):
+    def _query(self, endpoint, path=None, query=None,
+               order_by=None, limit=None, offset=None, include_total=None,
+               summarize_by=None, count_by=None, count_filter=None):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -225,8 +227,9 @@ class BaseAPI(object):
         """
         log.debug('_query called with endpoint: {0}, path: {1}, query: {2}, '
                   'limit: {3}, offset: {4}, summarize_by {5}, count_by {6}, '
-		  'count_filter: {7}'.format(endpoint, path, query, limit, 
-			  offset, summarize_by, count_by, count_filter))
+                  'count_filter: {7}'.format(endpoint, path, query, limit,
+                                             offset, summarize_by, count_by,
+                                             count_filter))
 
         url = self._url(endpoint, path=path)
         headers = {
@@ -255,7 +258,7 @@ class BaseAPI(object):
 
         if not (payload):
             payload = None
-        
+
         try:
             r = requests.get(url, params=payload, headers=headers,
                              verify=self.ssl, cert=(self.ssl_cert,
@@ -266,7 +269,7 @@ class BaseAPI(object):
             # get total number of results if requested with include-total
             # just a quick hack - needs improvement
             if 'X-Records' in r.headers:
-                self.last_total = r.headers['X-Records']        
+                self.last_total = r.headers['X-Records']
             else:
                 self.last_total = None
 

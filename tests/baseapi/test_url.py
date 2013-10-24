@@ -119,4 +119,3 @@ def test_url_aggregate_event_counts(api3):
 def test_url_server_time(api3):
     url = api3._url('server-time')
     assert url == 'http://localhost:8080/v3/server-time'
-
