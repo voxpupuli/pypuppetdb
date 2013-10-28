@@ -14,7 +14,6 @@ def test_utc():
     assert utc.dst(None) == datetime.timedelta(0)
     assert repr(utc) == str('<UTC>')
     assert str(utc) == str('UTC')
-    assert unicode(utc) == unicode('UTC')
 
 
 def test_json_to_datetime():
