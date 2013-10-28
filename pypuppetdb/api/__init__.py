@@ -37,6 +37,9 @@ ENDPOINTS = {
         'mbean': 'metrics/mbean',
         'reports': 'reports',
         'events': 'events',
+        'event-counts': 'event-counts',
+        'aggregate-event-counts': 'aggregate-event-counts',
+        'server-time': 'server-time',
     },
 }
 
@@ -131,6 +134,17 @@ class BaseAPI(object):
             port=self.port,
             )
 
+    @property
+    def total(self):
+        """The total-count of the last request to PuppetDB
+        if enabled as parameter in _query method
+
+        :returns Number of total results
+        :rtype :obj:`int`
+        """
+        if self.last_total is not None:
+            return int(self.last_total)
+
     def _url(self, endpoint, path=None):
         """The complete URL we will end up querying. Depending on the
         endpoint we pass in  this will result in different URL's with
@@ -170,7 +184,9 @@ class BaseAPI(object):
 
         return url
 
-    def _query(self, endpoint, path=None, query=None, limit=None, offset=None):
+    def _query(self, endpoint, path=None, query=None,
+               order_by=None, limit=None, offset=None, include_total=None,
+               summarize_by=None, count_by=None, count_filter=None):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -184,13 +200,25 @@ class BaseAPI(object):
         :type path: :obj:`string`
         :param query: (optional) A query to further narrow down the resultset.
         :type query: :obj:`string`
+        :param order_by: (optional) Set the order parameters for the resultset.
+        :type order_by: :obj:`string`
         :param limit: (optional) Tell PuppetDB to limit it's response to this\
                 number of objects.
         :type limit: :obj:`int`
         :param offset: (optional) Tell PuppetDB to start it's response from\
                 the given offset. This is useful for implementing pagination\
                 but is not supported just yet.
-        :type offset: :obj:`string`
+        :type offset: :obj:`string`A
+        :param include_total: (optional) Include the total number of results
+        :type order_by: bool
+        :param summarize_by: (optional) Specify what type of object you'd like\
+                to see counts at the event-counts and aggregate-event-counts \
+                endpoints
+        :type summarize_by: :obj:`string`
+        :param count_by: (optional) Specify what type of object is counted
+        :type count_by: :obj:`string`
+        :param count_filter: (optional) Specify a filter for the results
+        :type count_filter: :obj:`string`
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
@@ -198,8 +226,10 @@ class BaseAPI(object):
         :rtype: :obj:`dict` or :obj:`list`
         """
         log.debug('_query called with endpoint: {0}, path: {1}, query: {2}, '
-                  'limit: {3}, offset: {4}'.format(endpoint, path, query,
-                                                   limit, offset))
+                  'limit: {3}, offset: {4}, summarize_by {5}, count_by {6}, '
+                  'count_filter: {7}'.format(endpoint, path, query, limit,
+                                             offset, summarize_by, count_by,
+                                             count_filter))
 
         url = self._url(endpoint, path=path)
         headers = {
@@ -208,17 +238,41 @@ class BaseAPI(object):
             'accept-charset': 'utf-8'
             }
 
-        payload = None
+        payload = {}
         if query is not None:
-            payload = {'query': query}
+            payload['query'] = query
+        if order_by is not None:
+            payload['order-by'] = order_by
+        if limit is not None:
+            payload['limit'] = limit
+        if include_total is not None:
+            payload['include-total'] = include_total
+        if offset is not None:
+            payload['offset'] = offset
+        if summarize_by is not None:
+            payload['summarize-by'] = summarize_by
+        if count_by is not None:
+            payload['count-by'] = summarize_by
+        if count_filter is not None:
+            payload['count-filter'] = summarize_by
+
+        if not (payload):
+            payload = None
 
         try:
             r = requests.get(url, params=payload, headers=headers,
                              verify=self.ssl, cert=(self.ssl_cert,
                                                     self.ssl_key),
                              timeout=self.timeout)
-
             r.raise_for_status()
+
+            # get total number of results if requested with include-total
+            # just a quick hack - needs improvement
+            if 'X-Records' in r.headers:
+                self.last_total = r.headers['X-Records']
+            else:
+                self.last_total = None
+
             json_body = r.json()
             if json_body is not None:
                 return json_body

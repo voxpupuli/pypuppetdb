@@ -87,3 +87,19 @@ def test_query_endpoint_path_query(api3, stub_get):
     response = api3._query('nodes', path='host1',
                            query='["=", "name", "host1"]')
     assert response == []
+
+
+def test_query_endpoint_query(api3, stub_get):
+    url = ('http://localhost:8080/v3/nodes?query=%5B%22%3D%22%2C'
+           '+%22name%22%2C+%22host1%22%5D')
+    stub_get('{0}'.format(url), body='[]')
+    response = api3._query('nodes', query='["=", "name", "host1"]')
+    assert response == []
+
+
+def test_query_endpoint_query(api3, stub_get):
+    url = ('http://localhost:8080/v3/nodes?query=%5B%22%3D%22%2C'
+           '+%22name%22%2C+%22host1%22%5D')
+    stub_get('{0}'.format(url), body='[]')
+    response = api3._query('nodes', query='["=", "name", "host1"]')
+    assert response == []
