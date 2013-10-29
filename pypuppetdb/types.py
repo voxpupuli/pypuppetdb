@@ -210,6 +210,13 @@ class Node(object):
             collected.
     :type facts_timestamp: :obj:`string` formatted as\
             ``%Y-%m-%dT%H:%M:%S.%fZ``
+    :param status: (default `None`) Status of the node\
+            changed | unchanged | unreported | failed
+    :type status: :obj:`string`
+    :param events: (default `None`) Counted events from latest Report
+    :type events: :obj:`dict`
+    :param unreported_time: (default `None`) Time since last report
+    :type unreported_time: :obj:`string`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -222,8 +229,12 @@ class Node(object):
             collected or `None`.
     """
     def __init__(self, api, name, deactivated=None, report_timestamp=None,
-                 catalog_timestamp=None, facts_timestamp=None):
+                 catalog_timestamp=None, facts_timestamp=None,
+                 status=None, events=None, unreported_time=None):
         self.name = name
+        self.status = status
+        self.events = events
+        self.unreported_time = unreported_time
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)

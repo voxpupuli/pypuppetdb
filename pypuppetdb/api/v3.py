@@ -4,6 +4,8 @@ from __future__ import absolute_import
 import logging
 
 from pypuppetdb.api import BaseAPI
+from pypuppetdb.utils import json_to_datetime
+from datetime import datetime, timedelta
 from pypuppetdb.types import (
     Node, Fact, Resource,
     Report, Event,
@@ -58,6 +60,76 @@ class API(BaseAPI):
                        report_timestamp=node['report_timestamp'],
                        catalog_timestamp=node['catalog_timestamp'],
                        facts_timestamp=node['facts_timestamp'],
+                       )
+
+    def nodes_with_status(self, name=None, query=None, unreported=2):
+        """Query for nodes by either name or query. If both aren't
+        provided this will return a list of all nodes. This method
+        also fetches the nodes status and event counts of the latest
+        report from puppetdb.
+
+        :param name: (optional)
+        :type name: :obj:`None` or :obj:`string`
+        :param query: (optional)
+        :type query: :obj:`None` or :obj:`string`
+        :param unreported: (optional) amount of hours when anode gets
+                           marked as unreported
+        :type unreported: :obj:`None` or integer
+
+        :returns: A generator yieling Nodes.
+        :rtype: :class:`pypuppetdb.types.Node`
+        """
+        nodes = self._query('nodes', path=name, query=query)
+        if type(nodes) == dict:
+            nodes = [nodes, ]
+
+        latest_events = self._query(
+            'event-counts',
+            query='["=","latest-report?",true]',
+            summarize_by='certname')
+
+        for node in nodes:
+            node['unreported_time'] = None
+            status = [s for s in latest_events
+                      if s['subject']['title'] == node['name']]
+            # node status from events
+            if status:
+                node['events'] = status = status[0]
+                if status['successes'] > 0:
+                    node['status'] = 'changed'
+                if status['failures'] > 0:
+                    node['status'] = 'failed'
+            else:
+                node['status'] = 'unchanged'
+                node['events'] = None
+
+            # node report age
+            if node['report_timestamp'] is not None:
+                try:
+                    last_report = json_to_datetime(node['report_timestamp'])
+                    last_report = last_report.replace(tzinfo=None)
+                    now = datetime.utcnow()
+                    unreported_border = now-timedelta(hours=unreported)
+                    if last_report < unreported_border:
+                        delta = (datetime.utcnow()-last_report)
+                        node['status'] = 'unreported'
+                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                            delta.days,
+                            int(delta.seconds/3600),
+                            int((delta.seconds % 3600)/60)
+                            )
+                except AttributeError:
+                    node['status'] = 'unreported'
+
+            yield Node(self,
+                       node['name'],
+                       deactivated=node['deactivated'],
+                       report_timestamp=node['report_timestamp'],
+                       catalog_timestamp=node['catalog_timestamp'],
+                       facts_timestamp=node['facts_timestamp'],
+                       status=node['status'],
+                       events=node['events'],
+                       unreported_time=node['unreported_time']
                        )
 
     def facts(self, name=None, value=None, query=None):
