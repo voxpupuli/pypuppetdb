@@ -32,37 +32,7 @@ class API(BaseAPI):
         nodes = self.nodes(name=name)
         return next(node for node in nodes)
 
-    def nodes(self, name=None, query=None):
-        """Query for nodes by either name or query. If both aren't
-        provided this will return a list of all nodes.
-
-        :param name: (optional)
-        :type name: :obj:`None` or :obj:`string`
-        :param query: (optional)
-        :type query: :obj:`None` or :obj:`string`
-
-        :returns: A generator yieling Nodes.
-        :rtype: :class:`pypuppetdb.types.Node`
-        """
-
-        nodes = self._query('nodes', path=name, query=query)
-        # If we happen to only get one node back it
-        # won't be inside a list so iterating over it
-        # goes boom. Therefor we wrap a list around it.
-        if type(nodes) == dict:
-            log.debug("Request returned a single node.")
-            nodes = [nodes, ]
-
-        for node in nodes:
-            yield Node(self,
-                       node['name'],
-                       deactivated=node['deactivated'],
-                       report_timestamp=node['report_timestamp'],
-                       catalog_timestamp=node['catalog_timestamp'],
-                       facts_timestamp=node['facts_timestamp'],
-                       )
-
-    def nodes_with_status(self, name=None, query=None, unreported=2):
+    def nodes(self, name=None, query=None, unreported=2, with_status=False):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also fetches the nodes status and event counts of the latest
@@ -72,6 +42,9 @@ class API(BaseAPI):
         :type name: :obj:`None` or :obj:`string`
         :param query: (optional)
         :type query: :obj:`None` or :obj:`string`
+        :param with_status: (optional) include the node status in the\
+                           returned nodes
+        :type with_status: :bool:
         :param unreported: (optional) amount of hours when anode gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
@@ -80,20 +53,26 @@ class API(BaseAPI):
         :rtype: :class:`pypuppetdb.types.Node`
         """
         nodes = self._query('nodes', path=name, query=query)
+        # If we happen to only get one node back it
+        # won't be inside a list so iterating over it
+        # goes boom. Therefor we wrap a list around it.
         if type(nodes) == dict:
             nodes = [nodes, ]
 
-        latest_events = self._query(
-            'event-counts',
-            query='["=","latest-report?",true]',
-            summarize_by='certname')
+        if with_status:
+            latest_events = self._query(
+                'event-counts',
+                query='["=","latest-report?",true]',
+                summarize_by='certname')
 
         for node in nodes:
             node['unreported_time'] = None
-            status = [s for s in latest_events
-                      if s['subject']['title'] == node['name']]
+            if with_status:
+                status = [s for s in latest_events
+                          if s['subject']['title'] == node['name']]
+
             # node status from events
-            if status:
+            if with_status and status:
                 node['events'] = status = status[0]
                 if status['successes'] > 0:
                     node['status'] = 'changed'
@@ -104,7 +83,7 @@ class API(BaseAPI):
                 node['events'] = None
 
             # node report age
-            if node['report_timestamp'] is not None:
+            if with_status and node['report_timestamp'] is not None:
                 try:
                     last_report = json_to_datetime(node['report_timestamp'])
                     last_report = last_report.replace(tzinfo=None)
@@ -120,6 +99,9 @@ class API(BaseAPI):
                             )
                 except AttributeError:
                     node['status'] = 'unreported'
+
+            if not with_status:
+                node['status'] = None
 
             yield Node(self,
                        node['name'],
