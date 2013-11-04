@@ -14,6 +14,8 @@ def test_node():
                  report_timestamp='2013-08-01T09:57:00.000Z',
                  catalog_timestamp='2013-08-01T09:57:00.000Z',
                  facts_timestamp='2013-08-01T09:57:00.000Z',
+                 status='unreported',
+                 unreported_time='0d 5h 20m',
                  )
 
     node2 = Node('_', 'node2.puppet.board',
@@ -28,6 +30,8 @@ def test_node():
     assert node1.report_timestamp is not None
     assert node1.facts_timestamp is not None
     assert node1.catalog_timestamp is not None
+    assert node1.status is 'unreported'
+    assert node1.unreported_time is '0d 5h 20m'
     assert str(node1) == str('node1.puppet.board')
     assert repr(node1) == str('<Node: node1.puppet.board>')
 
