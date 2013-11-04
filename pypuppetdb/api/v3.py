@@ -100,6 +100,9 @@ class API(BaseAPI):
                 except AttributeError:
                     node['status'] = 'unreported'
 
+            if not node['report_timestamp']:
+                node['status'] = 'unreported'
+
             if not with_status:
                 node['status'] = None
 
