@@ -67,6 +67,8 @@ class API(BaseAPI):
 
         for node in nodes:
             node['unreported_time'] = None
+            node['status'] = None
+
             if with_status:
                 status = [s for s in latest_events
                           if s['subject']['title'] == node['name']]
@@ -102,9 +104,6 @@ class API(BaseAPI):
 
             if not node['report_timestamp']:
                 node['status'] = 'unreported'
-
-            if not with_status or not 'status' in node:
-                node['status'] = None
 
             yield Node(self,
                        node['name'],
