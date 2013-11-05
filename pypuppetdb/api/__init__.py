@@ -252,9 +252,9 @@ class BaseAPI(object):
         if summarize_by is not None:
             payload['summarize-by'] = summarize_by
         if count_by is not None:
-            payload['count-by'] = summarize_by
+            payload['count-by'] = count_by
         if count_filter is not None:
-            payload['count-filter'] = summarize_by
+            payload['count-filter'] = count_filter
 
         if not (payload):
             payload = None
