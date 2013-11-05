@@ -103,7 +103,7 @@ class API(BaseAPI):
             if not node['report_timestamp']:
                 node['status'] = 'unreported'
 
-            if not with_status:
+            if not with_status or not 'status' in node:
                 node['status'] = None
 
             yield Node(self,
