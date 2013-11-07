@@ -45,7 +45,7 @@ class API(BaseAPI):
         :param with_status: (optional) include the node status in the\
                            returned nodes
         :type with_status: :bool:
-        :param unreported: (optional) amount of hours when anode gets
+        :param unreported: (optional) amount of hours when a node gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
 
