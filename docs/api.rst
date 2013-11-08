@@ -98,6 +98,8 @@ endpoints data.
 .. autoclass:: pypuppetdb.types.Resource
 .. autoclass:: pypuppetdb.types.Event
 .. autoclass:: pypuppetdb.types.Report
+.. autoclass:: pypuppetdb.types.Catalog
+.. autoclass:: pypuppetdb.types.Edge
 
 Errors
 ------

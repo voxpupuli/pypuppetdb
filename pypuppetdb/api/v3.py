@@ -8,7 +8,7 @@ from pypuppetdb.utils import json_to_datetime
 from datetime import datetime, timedelta
 from pypuppetdb.types import (
     Node, Fact, Resource,
-    Report, Event,
+    Report, Event, Catalog
     )
 
 log = logging.getLogger(__name__)
@@ -237,3 +237,16 @@ class API(BaseAPI):
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server"""
         return self._query('server-time')['server-time']
+
+    def current_version(self):
+        """Get version information about the running PuppetDB server"""
+        return self._query('version')['version']
+
+    def catalog(self, node):
+        """Get the most recent catalog for a given node"""
+        c = self._query('catalogs', path=node)
+        return Catalog(c['data']['name'],
+                       c['data']['edges'],
+                       c['data']['resources'],
+                       c['data']['version'],
+                       c['data']['transaction-uuid'])

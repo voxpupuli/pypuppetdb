@@ -33,6 +33,7 @@ ENDPOINTS = {
         'fact-names': 'fact-names',
         'nodes': 'nodes',
         'resources': 'resources',
+        'catalogs': 'catalogs',
         'metrics': 'metrics',
         'mbean': 'metrics/mbean',
         'reports': 'reports',
@@ -40,6 +41,7 @@ ENDPOINTS = {
         'event-counts': 'event-counts',
         'aggregate-event-counts': 'aggregate-event-counts',
         'server-time': 'server-time',
+        'version': 'version',
     },
 }
 

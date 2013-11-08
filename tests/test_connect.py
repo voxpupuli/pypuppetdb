@@ -17,4 +17,6 @@ def test_connect_api_v2():
 
 def test_connect_api_v3():
     puppetdb = connect(api_version=3)
+    print puppetdb
+    print puppetdb.version
     assert puppetdb.version == 'v3'
