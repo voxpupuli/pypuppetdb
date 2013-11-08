@@ -130,7 +130,7 @@ def test_catalog():
     catalog = Catalog('node1.puppet.board', [], [], 'unique', None)
     assert catalog.node == 'node1.puppet.board'
     assert catalog.version == 'unique'
-    assert catalog.transaction_uuid == None
+    assert catalog.transaction_uuid is None
     assert catalog.resources == {}
     assert catalog.edges == []
     assert str(catalog) == str('node1.puppet.board/None')
@@ -141,12 +141,12 @@ def test_catalog():
 def test_edge():
 
     resource_a = Resource('node1.puppet.board', '/etc/ssh/sshd_config', 'file',
-                        ['class', 'ssh'], False, '/ssh/manifests/init.pp',
-                        15, parameters={})
+                          ['class', 'ssh'], False, '/ssh/manifests/init.pp',
+                          15, parameters={})
     resource_b = Resource('node1.puppet.board', 'sshd', 'service',
-                        ['class', 'ssh'], False, '/ssh/manifests/init.pp',
-                        30, parameters={})
-    edge = Edge(resource_a,resource_b,'notify')
+                          ['class', 'ssh'], False, '/ssh/manifests/init.pp',
+                          30, parameters={})
+    edge = Edge(resource_a, resource_b, 'notify')
     assert edge.source == resource_a
     assert edge.target == resource_b
     assert edge.relationship == 'notify'

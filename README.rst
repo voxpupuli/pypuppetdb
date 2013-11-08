@@ -123,6 +123,18 @@ Will return a generator object containing all file resources you're managing
 across your infrastructure. This is probably a bad idea if you have a big
 number of nodes as the response will be huge.
 
+Catalogs
+---------
+
+.. code-block:: python
+
+   >>> catalog = db.catalog('hostname')
+   >>> for res in catalog.get_resources():
+   >>>     print(res)
+
+Will return a Catalog object with the latest Catalog of the definded host. This
+catalog contains the defined Resources and Edges.
+
 Getting Help
 ============
 This project is still very new so it's not inconceivable you'll run into
