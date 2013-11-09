@@ -290,6 +290,11 @@ class BaseAPI(object):
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
+        except requests.exceptions.HTTPError as err:
+            log.error("{0} {1}:{2} over {3}.".format(err.response.text,
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
 
     # Method stubs
 
