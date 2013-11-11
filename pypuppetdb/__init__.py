@@ -58,7 +58,7 @@ number of nodes as the response will be huge.
 """
 
 __title__ = 'pypuppetdb'
-__version_info__ = (0, 0, 4)
+__version_info__ = (0, 1, 0)
 __version__ = '.'.join("{0}".format(num) for num in __version_info__)
 __author__ = 'Daniele Sluijters'
 __license__ = 'Apache 2.0'
