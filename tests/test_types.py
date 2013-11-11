@@ -3,7 +3,7 @@ import pytest
 from pypuppetdb.utils import json_to_datetime
 from pypuppetdb.types import (
     Node, Fact, Resource,
-    Report, Event,
+    Report, Event, Catalog, Edge
     )
 
 pytestmark = pytest.mark.unit
@@ -73,9 +73,9 @@ def test_resource():
     assert resource.parameters['owner'] == 'root'
     assert resource.parameters['group'] == 'root'
     assert resource.parameters['mode'] == '0600'
-    assert str(resource) == str('/etc/ssh/sshd_config/node1.puppet.board')
+    assert str(resource) == str('file[/etc/ssh/sshd_config]')
     assert repr(resource) == str(
-        '<Resource: /etc/ssh/sshd_config/node1.puppet.board>')
+        '<Resource: file[/etc/ssh/sshd_config]>')
 
 
 def test_report():
@@ -124,3 +124,33 @@ def test_event_failed():
 
     assert event.status == 'success'
     assert event.failed is False
+
+
+def test_catalog():
+    catalog = Catalog('node1.puppet.board', [], [], 'unique', None)
+    assert catalog.node == 'node1.puppet.board'
+    assert catalog.version == 'unique'
+    assert catalog.transaction_uuid is None
+    assert catalog.resources == {}
+    assert catalog.edges == []
+    assert str(catalog) == str('node1.puppet.board/None')
+    assert repr(catalog) == str(
+        '<Catalog: node1.puppet.board/None>')
+
+
+def test_edge():
+
+    resource_a = Resource('node1.puppet.board', '/etc/ssh/sshd_config', 'file',
+                          ['class', 'ssh'], False, '/ssh/manifests/init.pp',
+                          15, parameters={})
+    resource_b = Resource('node1.puppet.board', 'sshd', 'service',
+                          ['class', 'ssh'], False, '/ssh/manifests/init.pp',
+                          30, parameters={})
+    edge = Edge(resource_a, resource_b, 'notify')
+    assert edge.source == resource_a
+    assert edge.target == resource_b
+    assert edge.relationship == 'notify'
+    assert str(edge) == str(
+        'file[/etc/ssh/sshd_config] - notify - service[sshd]')
+    assert repr(edge) == str(
+        '<Edge: file[/etc/ssh/sshd_config] - notify - service[sshd]>')

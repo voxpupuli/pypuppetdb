@@ -179,7 +179,7 @@ class Resource(object):
         self.sourcefile = sourcefile
         self.sourceline = sourceline
         self.parameters = parameters
-        self.__string = '{0}/{1}'.format(self.name, self.node)
+        self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
         return str('<Resource: {0}>').format(self.__string)
@@ -294,3 +294,112 @@ class Node(object):
     def reports(self):
         """Get all reports for this node."""
         return self.__api.reports(self.__query_scope)
+
+
+class Catalog(object):
+    """
+    This object represents a compiled catalog from puppet. It contains Resource
+    and Edge object that represent the dependency graph.
+
+    :param node: Name of the host
+    :type edges: :obj:`string`
+    :param edges: Edges returned from Catalog data
+    :type edges: :obj:`list` containing :obj:`dict` with Edge information
+    :param resources: Resources returned from Catalog data
+    :type resources: :obj:`list` containing :obj:`dict` with Resources
+    :param version: Catalog version from Puppet (unique for each node)
+    :type version: :obj:`string`
+    :param transaction_uuid: A string used to match the catalog with the
+                             corresponding report that was issued during
+                             the same puppet run
+    :type transaction_uuid: :obj:`string`
+
+    :ivar node: :obj:`string` Name of the host
+    :ivar version: :obj:`string` Catalog version from Puppet
+                                 (unique for each node)
+    :ivar transaction_uuid: :obj:`string` used to match the catalog with
+                                          corresponding report
+    :ivar edges: :obj:`list` of :obj:`Edge` The source Resource object\
+                 of the relationship
+    :ivar resources: :obj:`dict` of :obj:`Resource` The source Resource\
+                     object of the relationship
+    """
+    def __init__(self, node, edges, resources,
+                 version, transaction_uuid):
+
+        self.node = node
+        self.version = version
+        self.transaction_uuid = transaction_uuid
+
+        self.resources = dict()
+        for resource in resources:
+            if 'file' not in resource:
+                resource['file'] = None
+            if 'line' not in resource:
+                resource['line'] = None
+            identifier = resource['type']+'['+resource['title']+']'
+            res = Resource(node, resource['title'],
+                           resource['type'], resource['tags'],
+                           resource['exported'], resource['file'],
+                           resource['line'], resource['parameters'])
+            self.resources[identifier] = res
+
+        self.edges = []
+        for edge in edges:
+            identifier_source = edge['source']['type'] + \
+                '[' + edge['source']['title'] + ']'
+            identifier_target = edge['target']['type'] + \
+                '[' + edge['target']['title'] + ']'
+            self.edges.append(Edge(self.resources[identifier_source],
+                              self.resources[identifier_target],
+                              edge['relationship']))
+
+        self.__string = '{0}/{1}'.format(self.node, self.transaction_uuid)
+
+    def __repr__(self):
+        return str('<Catalog: {0}>').format(self.__string)
+
+    def __str__(self):
+        return str('{0}').format(self.__string)
+
+    def __unicode__(self):
+        return self.__string
+
+    def get_resources(self):
+        return self.resources.itervalues()
+
+    def get_edges(self):
+        return iter(self.edges)
+
+
+class Edge(object):
+    """
+    This object represents the connection between two Resource objects
+
+    :param source: The source Resource object of the relationship
+    :type source: :obj:`Resource`
+    :param target: The target Resource object of the relationship
+    :type target: :obj:`Resource`
+    :param relaptionship: Name of the Puppet Ressource Relationship
+    :type relationship: :obj:`string`
+
+    :ivar source: :obj:`Resource` The source Resource object
+    :ivar target: :obj:`Resource` The target Resource object
+    :ivar relationship: :obj:`string` Name of the Puppet Resource relationship
+    """
+    def __init__(self, source, target, relationship):
+        self.source = source
+        self.target = target
+        self.relationship = relationship
+        self.__string = '{0} - {1} - {2}'.format(self.source,
+                                                 self.relationship,
+                                                 self.target)
+
+    def __repr__(self):
+        return str('<Edge: {0}>').format(self.__string)
+
+    def __str__(self):
+        return str('{0}').format(self.__string)
+
+    def __unicode__(self):
+        return self.__string
