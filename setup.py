@@ -2,8 +2,10 @@ import sys
 import os
 import codecs
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
+
+import pypuppetdb.package
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
@@ -29,23 +31,19 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
     CHANGELOG = f.read()
 
-packages = [
-    'pypuppetdb',
-    'pypuppetdb.api',
-    ]
+with codecs.open('LICENSE', encoding='utf-8') as f:
+    LICENSE = f.read()
 
 setup(
-    name='pypuppetdb',
-    version='0.1.0',
-    author='Daniele Sluijters',
+    name=pypuppetdb.package.__title__,
+    version=pypuppetdb.package.__version__,
+    author=pypuppetdb.package.__author__,
     author_email='daniele.sluijters+pypi@gmail.com',
-    packages=packages,
+    packages=find_packages(),
     url='https://github.com/nedap/pypuppetdb',
-    license=open('LICENSE').read(),
+    license=LICENSE,
     description='Library for working with the PuppetDB REST API.',
     long_description='\n'.join((README, CHANGELOG)),
-    package_data={'': ['LICENSE', 'CHANGELOG.rst', ], },
-    include_package_data=True,
     keywords='puppet puppetdb',
     tests_require=['tox'],
     cmdclass={'test': Tox},
@@ -53,7 +51,7 @@ setup(
         "requests >= 1.2.3",
         ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',

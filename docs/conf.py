@@ -3,7 +3,7 @@ import sys, os
 
 pypuppetdb_root = os.path.dirname(os.path.abspath('.'))
 sys.path.insert(0, pypuppetdb_root)
-from pypuppetdb import __version__
+import pypuppetdb.package
 
 # -- General configuration -----------------------------------------------------
 
@@ -15,10 +15,11 @@ source_suffix = '.rst'
 
 master_doc = 'index'
 
-project = u'pypuppetdb'
-copyright = u'2013, Daniele Sluijters'
+project = pypuppetdb.package.__title__
+copyright = '{0}, {1}'.format(pypuppetdb.package.__year__,
+                              pypuppetdb.package.__author__)
 
-version = __version__
+version = pypuppetdb.package.__version__
 release = version
 
 language = 'en'
