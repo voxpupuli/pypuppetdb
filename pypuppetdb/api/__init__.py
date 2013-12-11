@@ -73,8 +73,8 @@ class BaseAPI(object):
     :type host: :obj:`string`
     :param port: (optional) Port on which to talk to PuppetDB.
     :type port: :obj:`int`
-    :param ssl: (optional) Talk with PuppetDB over SSL.
-    :type ssl: :obj:`bool`
+    :param ssl_verify: (optional) Verify PuppetDB server certificate.
+    :type ssl_verify: :obj:`bool`
     :param ssl_key: (optional) Path to our client secret key.
     :type ssl_key: :obj:`None` or :obj:`string` representing a filesystem\
             path.
@@ -88,7 +88,7 @@ class BaseAPI(object):
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
     def __init__(self, api_version, host='localhost', port=8080,
-                 ssl=False, ssl_key=None, ssl_cert=None, timeout=10):
+                 ssl_verify=True, ssl_key=None, ssl_cert=None, timeout=10):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
@@ -100,19 +100,16 @@ class BaseAPI(object):
 
         self.host = host
         self.port = port
-        self.ssl = ssl
+        self.ssl_verify = ssl_verify
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.timeout = timeout
         self.endpoints = ENDPOINTS[api_version]
 
-        if not self.ssl:
-            self.protocol = 'http'
-        elif (self.ssl and self.ssl_key is not None and
-              self.ssl_cert is not None):
+        if self.ssl_key is not None and self.ssl_cert is not None:
             self.protocol = 'https'
         else:
-            raise ImproperlyConfiguredError
+            self.protocol = 'http'
 
     @property
     def version(self):
@@ -263,8 +260,8 @@ class BaseAPI(object):
 
         try:
             r = requests.get(url, params=payload, headers=headers,
-                             verify=self.ssl, cert=(self.ssl_cert,
-                                                    self.ssl_key),
+                             verify=self.ssl_verify, cert=(self.ssl_cert,
+                                                           self.ssl_key),
                              timeout=self.timeout)
             r.raise_for_status()
 

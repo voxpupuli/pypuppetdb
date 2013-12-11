@@ -58,7 +58,7 @@ number of nodes as the response will be huge.
 """
 
 __title__ = 'pypuppetdb'
-__version_info__ = (0, 0, 4)
+__version_info__ = (0, 1, 0)
 __version__ = '.'.join("{0}".format(num) for num in __version_info__)
 __author__ = 'Daniele Sluijters'
 __license__ = 'Apache 2.0'
@@ -80,7 +80,7 @@ except ImportError:  # pragma: notest
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
-def connect(api_version=3, host='localhost', port=8080, ssl=False,
+def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
             ssl_key=None, ssl_cert=None, timeout=10):
     """Connect with PuppetDB. This will return an object allowing you
     to query the API through its methods.
@@ -112,11 +112,11 @@ def connect(api_version=3, host='localhost', port=8080, ssl=False,
     """
     if api_version == 3:
         return v3.API(host=host, port=port,
-                      timeout=timeout, ssl=ssl, ssl_key=ssl_key,
+                      timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
                       ssl_cert=ssl_cert)
     if api_version == 2:
         return v2.API(host=host, port=port,
-                      timeout=timeout, ssl=ssl, ssl_key=ssl_key,
+                      timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
                       ssl_cert=ssl_cert)
     else:
         raise UnsupportedVersionError
