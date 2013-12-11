@@ -149,6 +149,7 @@ class API(BaseAPI):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
+        log.debug('YOLO')
         if type_ is not None:
             # Need to capitalize the resource type since PuppetDB doesn't
             # answer to lower case type names.

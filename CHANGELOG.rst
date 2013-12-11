@@ -2,6 +2,62 @@
 Changelog
 #########
 
+0.1.0
+=====
+Significant changes have been made in this release. The complete v3 API is
+now supported except for query pagination.
+
+Most changes are backwards compatible except for a change in the SSL
+configuration. The previous behaviour was buggy and slightly misleading in
+the names the options took:
+
+* ``ssl`` has been renamed to ``ssl_verify`` and now defaults to ``True``.
+* Automatically use HTTPS if ``ssl_key`` and ``ssl_cert`` are provided.
+
+Deprecation
+------------
+Support for API v2 will be dropped in the next release.
+
+New features
+------------
+
+The following features are **only** supported for **API v3**.
+
+The ``node()`` and ``nodes()`` function have gained the following options:
+
+  * ``with_status=False``
+  * ``unreported=2``
+
+When ``with_status`` is set to ``True`` an additional query will be made using
+the ``events-count`` endpoint scoped to the latest report. This will result in
+an additional ``events`` and ``status`` keys on the node object. ``status``
+will be either of ``changed``, ``unchanged`` or ``failed`` depending on if
+``events`` contains ``successes`` or ``failures`` or none.
+
+By default ``unreported`` is set to ``2``. This is only in effect when
+``with_status`` is set to ``True``. It means that if a node hasn't checked in
+for two hours it will get a ``status`` of ``unreported`` instead.
+
+New endpoints:
+
+  * ``events-count``: ``events_count()``
+  * ``aggregate-event-counts``: ``aggregate_event_counts()``
+  * ``server-time``: ``server_time()``
+  * ``version``: ``current_version()``
+  * ``catalog``: ``catalog()``
+
+New types:
+
+  * ``pypuppetdb.types.Catalog``
+  * ``pypuppetdb.types.Edge``
+
+Changes to types:
+
+  * ``pypuppetdb.types.Node`` now has:
+    * ``status`` defaulting to ``None``
+    * ``events`` defaulting to ``None``
+    * ``unreported_time`` defaulting to ``None``
+
 0.0.4
 =====
 
