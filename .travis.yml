@@ -4,7 +4,7 @@ python:
   - 2.7
   - 3.3
 install:
-  - pip install -q -r requirements.txt --use-mirrors --use-wheel
-script: py.test --pep8 -m 'not integration'
+  - pip install -q -r test-requirements.txt --use-mirrors --use-wheel
+script: py.test --pep8
 notifications:
   email: false

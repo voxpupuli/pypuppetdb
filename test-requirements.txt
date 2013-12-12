@@ -1,0 +1,6 @@
+requests==2.1.0
+pytest==2.5.0
+mock==1.0.1
+httpretty==0.7.0
+pytest-pep8==1.0.5
+coverage==3.7
