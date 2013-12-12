@@ -318,6 +318,4 @@ class BaseAPI(object):
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        endpoint = 'mbean'
-        path = metric
-        return self._query(endpoint, path=path)
+        return self._query('mbean', path=metric)
