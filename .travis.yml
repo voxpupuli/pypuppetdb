@@ -4,8 +4,8 @@ python:
   - 2.7
   - 3.3
 install:
-  - pip install -q -r test-requirements.txt --use-mirrors --use-wheel
-  - pip install -q coverage coveralls --use-mirrors --use-wheel
+  - pip install -q -r test-requirements.txt --use-wheel
+  - pip install -q coverage coveralls --use-wheel
 script: coverage run --source pypuppetdb -m py.test --pep8
 after_success:
   - coveralls
