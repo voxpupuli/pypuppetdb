@@ -29,9 +29,14 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
+htmlcov
 
 # Translations
 *.mo
+
+# Virtualenv / pyenv
+.python-version
+.venv
 
 # Sphinx
 docs/_build
