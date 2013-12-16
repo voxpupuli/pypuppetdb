@@ -129,10 +129,10 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/v3/nodes')
         baseapi._query('nodes')  # need to query some endpoint
         request_headers = dict(httpretty.last_request().headers)
-        assert request_headers['accept'] == 'application/json'
-        assert request_headers['content-type'] == 'application/json'
-        assert request_headers['accept-charset'] == 'utf-8'
-        assert request_headers['host'] == 'localhost:8080'
+        assert request_headers['Accept'] == 'application/json'
+        assert request_headers['Content-Type'] == 'application/json'
+        assert request_headers['Accept-Charset'] == 'utf-8'
+        assert request_headers['Host'] == 'localhost:8080'
         assert httpretty.last_request().path == '/v3/nodes'
         httpretty.disable()
         httpretty.reset()
