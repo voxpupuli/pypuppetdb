@@ -56,14 +56,6 @@ Will return a generator object containing all file resources you're managing
 across your infrastructure. This is probably a bad idea if you have a big
 number of nodes as the response will be huge.
 """
-
-__title__ = 'pypuppetdb'
-__version_info__ = (0, 1, 0)
-__version__ = '.'.join("{0}".format(num) for num in __version_info__)
-__author__ = 'Daniele Sluijters'
-__license__ = 'Apache 2.0'
-__copyright__ = 'Copyright 2013 Daniele Sluijters'
-
 import logging
 
 from pypuppetdb.api import v2

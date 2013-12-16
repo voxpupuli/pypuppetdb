@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import logging
 
+import json
 import requests
 
 from pypuppetdb.errors import (
@@ -184,7 +185,7 @@ class BaseAPI(object):
         return url
 
     def _query(self, endpoint, path=None, query=None,
-               order_by=None, limit=None, offset=None, include_total=None,
+               order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
@@ -244,8 +245,8 @@ class BaseAPI(object):
             payload['order-by'] = order_by
         if limit is not None:
             payload['limit'] = limit
-        if include_total is not None:
-            payload['include-total'] = include_total
+        if include_total is True:
+            payload['include-total'] = json.dumps(include_total)
         if offset is not None:
             payload['offset'] = offset
         if summarize_by is not None:
@@ -317,6 +318,4 @@ class BaseAPI(object):
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        endpoint = 'mbean'
-        path = metric
-        return self._query(endpoint, path=path)
+        return self._query('mbean', path=metric)

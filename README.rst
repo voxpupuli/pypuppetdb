@@ -5,6 +5,9 @@ pypuppetdb
 .. image:: https://api.travis-ci.org/nedap/pypuppetdb.png
    :target: https://travis-ci.org/nedap/pypuppetdb
 
+.. image:: https://coveralls.io/repos/nedap/pypuppetdb/badge.png
+   :target: https://coeralls.io/r/nedap/pypuppetdb
+
 .. image:: https://pypip.in/d/pypuppetdb/badge.png
    :target: https://crate.io/packages/pypuppetdb
 

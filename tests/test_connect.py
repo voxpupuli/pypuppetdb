@@ -1,20 +1,17 @@
 import pytest
-from pypuppetdb.errors import UnsupportedVersionError
-from pypuppetdb import connect
-
-pytestmark = pytest.mark.unit
+import pypuppetdb
 
 
 def test_connect_unknown_api_version():
-    with pytest.raises(UnsupportedVersionError):
-        connect(api_version=1)
+    with pytest.raises(pypuppetdb.errors.UnsupportedVersionError):
+        pypuppetdb.connect(api_version=1)
 
 
 def test_connect_api_v2():
-    puppetdb = connect(api_version=2)
+    puppetdb = pypuppetdb.connect(api_version=2)
     assert puppetdb.version == 'v2'
 
 
 def test_connect_api_v3():
-    puppetdb = connect(api_version=3)
+    puppetdb = pypuppetdb.connect(api_version=3)
     assert puppetdb.version == 'v3'

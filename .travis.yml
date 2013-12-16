@@ -4,7 +4,10 @@ python:
   - 2.7
   - 3.3
 install:
-  - pip install -r requirements.txt --use-mirrors
-script: py.test --pep8 -m 'not integration'
+  - pip install -q -r test-requirements.txt --use-mirrors --use-wheel
+  - pip install -q coverage coveralls --use-mirrors --use-wheel
+script: coverage run --source pypuppetdb -m py.test --pep8
+after_success:
+  - coveralls
 notifications:
   email: false

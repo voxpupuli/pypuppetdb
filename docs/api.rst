@@ -124,4 +124,5 @@ Utilities
 A few functions that are used across this library have been put
 into their own :mod:`utils` module.
 
+.. autoclass::    pypuppetdb.utils.UTC
 .. autofunction:: pypuppetdb.utils.json_to_datetime
