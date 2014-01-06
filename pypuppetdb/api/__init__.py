@@ -208,9 +208,9 @@ class BaseAPI(object):
         :param offset: (optional) Tell PuppetDB to start it's response from\
                 the given offset. This is useful for implementing pagination\
                 but is not supported just yet.
-        :type offset: :obj:`string`A
+        :type offset: :obj:`string`
         :param include_total: (optional) Include the total number of results
-        :type order_by: bool
+        :type order_by: :obj:`bool`
         :param summarize_by: (optional) Specify what type of object you'd like\
                 to see counts at the event-counts and aggregate-event-counts \
                 endpoints
