@@ -123,5 +123,11 @@ likely your Puppet Master, must be part of the trusted set of certificates for
 your OS or must be added to that set. Those certificates are usually found in
 ``/etc/ssl/certs`` on Linux-y machines.
 
+For Debian, install your Puppet Master's certificate in
+``/usr/local/share/ca-certifiactes`` with a ``.crt`` extension and then run
+``dpkg-reconfigure ca-certificates`` as per
+``/usr/share/doc/ca-certificates/README.Debian``. This of course requires the
+``ca-certificates`` package to be installed.
+
 If you do not wish to do so or for whatever reason want to disable the
 verification of PuppetDB's certificate you can pass in ``ssl_verify=False``.
