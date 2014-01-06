@@ -14,6 +14,9 @@ the names the options took:
 * ``ssl`` has been renamed to ``ssl_verify`` and now defaults to ``True``.
 * Automatically use HTTPS if ``ssl_key`` and ``ssl_cert`` are provided.
 
+For additional instructions about getting SSL to work see the Quickstart
+in the documentation.
+
 Deprecation
 ------------
 Support for API v2 will be dropped in the 0.2.x release series.
