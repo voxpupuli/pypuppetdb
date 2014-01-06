@@ -5,7 +5,6 @@ import codecs
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-import pypuppetdb.package
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
@@ -35,9 +34,9 @@ with codecs.open('LICENSE', encoding='utf-8') as f:
     LICENSE = f.read()
 
 setup(
-    name=pypuppetdb.package.__title__,
-    version=pypuppetdb.package.__version__,
-    author=pypuppetdb.package.__author__,
+    name='pypuppetdb',
+    version='dev',
+    author='Daniele Sluijters',
     author_email='daniele.sluijters+pypi@gmail.com',
     packages=find_packages(),
     url='https://github.com/nedap/pypuppetdb',
