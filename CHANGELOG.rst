@@ -16,7 +16,7 @@ the names the options took:
 
 Deprecation
 ------------
-Support for API v2 will be dropped in the next release.
+Support for API v2 will be dropped in the 0.2.x release series.
 
 New features
 ------------
