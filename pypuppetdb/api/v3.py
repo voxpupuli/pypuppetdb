@@ -81,7 +81,8 @@ class API(BaseAPI):
                 if status['failures'] > 0:
                     node['status'] = 'failed'
             else:
-                node['status'] = 'unchanged'
+                if with_status:
+                    node['status'] = 'unchanged'
                 node['events'] = None
 
             # node report age
@@ -102,7 +103,7 @@ class API(BaseAPI):
                 except AttributeError:
                     node['status'] = 'unreported'
 
-            if not node['report_timestamp']:
+            if not node['report_timestamp'] and with_status:
                 node['status'] = 'unreported'
 
             yield Node(self,
