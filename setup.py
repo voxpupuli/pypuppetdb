@@ -35,7 +35,7 @@ with codecs.open('LICENSE', encoding='utf-8') as f:
 
 setup(
     name='pypuppetdb',
-    version='dev',
+    version='0.1.0',
     author='Daniele Sluijters',
     author_email='daniele.sluijters+pypi@gmail.com',
     packages=find_packages(),
