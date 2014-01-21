@@ -2,6 +2,13 @@
 Changelog
 #########
 
+0.1.1
+=====
+
+* Fix the license in our ``setup.py``. The license shouldn't be longer than
+  200 characters. We were including the full license tripping up tools like
+  bdist_rpm.
+
 0.1.0
 =====
 Significant changes have been made in this release. The complete v3 API is

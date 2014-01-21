@@ -30,9 +30,6 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
     CHANGELOG = f.read()
 
-with codecs.open('LICENSE', encoding='utf-8') as f:
-    LICENSE = f.read()
-
 setup(
     name='pypuppetdb',
     version='0.1.0',
@@ -40,7 +37,7 @@ setup(
     author_email='daniele.sluijters+pypi@gmail.com',
     packages=find_packages(),
     url='https://github.com/nedap/pypuppetdb',
-    license=LICENSE,
+    license='Apache License 2.0',
     description='Library for working with the PuppetDB REST API.',
     long_description='\n'.join((README, CHANGELOG)),
     keywords='puppet puppetdb',
