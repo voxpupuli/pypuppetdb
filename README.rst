@@ -49,6 +49,31 @@ If you wish to hack on it clone the repository but after that run:
 This will install all the runtime requirements of pypuppetdb and the
 dependencies for the test suite and generation of documentation.
 
+Packages
+--------
+Native packages for your operating system will be provided in the near future.
+
++==================+===========+============================================+
+| OS               | Status    |                                            |
++==================+===========+============================================+
+| Debian 6/Squeeze | planned   | Requires Backports                         |
++------------------+-----------+--------------------------------------------+
+| Debian 7/Wheezy  | planned   |                                            |
++------------------+-----------+--------------------------------------------+
+| Ubuntu 13.04     | planned   |                                            |
++------------------+-----------+--------------------------------------------+
+| Ubuntu 13.10     | planned   |                                            |
++------------------+-----------+--------------------------------------------+
+| CentOS/RHEL 5    | n/a       | Python 2.4                                 |
++------------------+-----------+--------------------------------------------+
+| CentOS/RHEL 6    | planned   |                                            |
++------------------+-----------+--------------------------------------------+
+| `OpenBSD`_       | available | Maintained by `Jasper Lievisse Adriaanse`_ |
++------------------+-----------+--------------------------------------------+
+
+.. _Jasper Lievisse Adriaanse: https://github.com/jasperla
+.. _OpenBSD: http://www.openbsd.org/cgi-bin/cvsweb/ports/databases/py-puppetdb/
+
 Usage
 =====
 
