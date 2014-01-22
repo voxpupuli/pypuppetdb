@@ -53,7 +53,7 @@ Packages
 --------
 Native packages for your operating system will be provided in the near future.
 
-+==================+===========+============================================+
++------------------+-----------+--------------------------------------------+
 | OS               | Status    |                                            |
 +==================+===========+============================================+
 | Debian 6/Squeeze | planned   | Requires Backports                         |
