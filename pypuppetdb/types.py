@@ -168,6 +168,8 @@ class Resource(object):
     :ivar sourcefile: The Puppet manifest this resource is declared in.
     :ivar sourceline: The line this resource is declared at.
     :ivar parameters: :obj:`dict` with key:value pairs of parameters.
+    :ivar relationships: :obj:`list` Contains all relationships to other\
+        resources
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
                  sourceline, parameters={}):
@@ -179,6 +181,7 @@ class Resource(object):
         self.sourcefile = sourcefile
         self.sourceline = sourceline
         self.parameters = parameters
+        self.relationships = []
         self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
@@ -353,9 +356,12 @@ class Catalog(object):
                 '[' + edge['source']['title'] + ']'
             identifier_target = edge['target']['type'] + \
                 '[' + edge['target']['title'] + ']'
-            self.edges.append(Edge(self.resources[identifier_source],
-                              self.resources[identifier_target],
-                              edge['relationship']))
+            e = Edge(self.resources[identifier_source],
+                     self.resources[identifier_target],
+                     edge['relationship'])
+            self.edges.append(e)
+            self.resources[identifier_source].relationships.append(e)
+            self.resources[identifier_target].relationships.append(e)
 
         self.__string = '{0}/{1}'.format(self.node, self.transaction_uuid)
 
@@ -370,6 +376,11 @@ class Catalog(object):
 
     def get_resources(self):
         return self.resources.itervalues()
+
+    def get_resource(self, resource_type, resource_title):
+        identifier = resource_type + \
+            '[' + resource_title + ']'
+        return self.resources[identifier]
 
     def get_edges(self):
         return iter(self.edges)
