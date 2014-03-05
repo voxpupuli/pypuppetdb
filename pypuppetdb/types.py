@@ -94,7 +94,7 @@ class Report(object):
     :ivar transaction: UUID identifying this transaction.
 
     """
-    def __init__(self, node, hash_, start, end, received, version,
+    def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction):
 
         self.node = node
@@ -108,6 +108,8 @@ class Report(object):
         self.run_time = self.end - self.start
         self.transaction = transaction
         self.__string = '{0}'.format(self.hash_)
+        self.__api = api
+        self.__query_scope = '["=", "report", "{0}"]'.format(self.hash_)
 
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))
@@ -117,6 +119,10 @@ class Report(object):
 
     def __unicode__(self):
         return self.__string
+
+    def events(self):
+        """Get all events for this report."""
+        return self.__api.events(self.__query_scope)
 
 
 class Fact(object):

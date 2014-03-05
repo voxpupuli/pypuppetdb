@@ -93,7 +93,7 @@ class TestResource(object):
 class TestReport(object):
     """Test the Report object."""
     def test_report(self):
-        report = Report('node1.puppet.board', 'hash#',
+        report = Report('_', 'node1.puppet.board', 'hash#',
                         '2013-08-01T09:57:00.000Z',
                         '2013-08-01T10:57:00.000Z',
                         '2013-08-01T10:58:00.000Z',
@@ -113,6 +113,7 @@ class TestReport(object):
         assert str(report) == str('hash#')
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
+        assert report._Report__query_scope == '["=", "report", "hash#"]'
 
 
 class TestEvent(object):
