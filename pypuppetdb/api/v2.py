@@ -93,10 +93,8 @@ class API(BaseAPI):
         This will yield a Resources object for every returned resource."""
 
         if type_ is not None:
-            # Need to capitalize the resource type since PuppetDB doesn't
-            # answer to lower case type names.
-            # bugs.puppetlabs.com/some_value
-            type_ = type_.capitalize()
+            type_ = self._normalize_resource_type(type_)
+
             if title is not None:
                 path = '{0}/{1}'.format(type_, title)
             elif title is None:
