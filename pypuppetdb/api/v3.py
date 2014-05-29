@@ -156,7 +156,7 @@ class API(BaseAPI):
 
         if type_ is not None:
             type_ = self._normalize_resource_type(type_)
-            
+
             if title is not None:
                 path = '{0}/{1}'.format(type_, title)
             elif title is None:
