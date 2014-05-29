@@ -78,6 +78,8 @@ class API(BaseAPI):
                 node['events'] = status = status[0]
                 if status['successes'] > 0:
                     node['status'] = 'changed'
+                if status['noops'] > 0:
+                    node['status'] = 'noop'
                 if status['failures'] > 0:
                     node['status'] = 'failed'
             else:
@@ -150,22 +152,19 @@ class API(BaseAPI):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
-        log.debug('YOLO')
+        path = None
+
         if type_ is not None:
-            # Need to capitalize the resource type since PuppetDB doesn't
-            # answer to lower case type names.
-            # bugs.puppetlabs.com/some_value
-            type_ = type_.capitalize()
+            type_ = self._normalize_resource_type(type_)
+            
             if title is not None:
                 path = '{0}/{1}'.format(type_, title)
             elif title is None:
                 path = type_
-        else:
+        elif query is None:
             log.debug('Going to query for all resources. This is usually a '
                       'bad idea as it might return enormous amounts of '
                       'resources.')
-            query = ''
-            path = None
 
         resources = self._query('resources', path=path, query=query)
         for resource in resources:

@@ -167,6 +167,20 @@ Catalogs
 Will return a Catalog object with the latest Catalog of the definded host. This
 catalog contains the defined Resources and Edges.
 
+.. code-block:: python
+
+   >>> catalog = db.catalog('hostname')
+   >>> resource = catalog.get_resource('Service','ntp')
+   >>> for rel in resource.relationships:
+   >>>     print(rel)
+   Class[Ntp] - contains - Service[ntp]
+   File[/etc/ntp.conf] - notifies - Service[ntp]
+   File[/etc/ntp.conf] - required-by - Service[ntp]
+
+
+Will return all Relationships of a given Resource defined by type and title.
+This will list all linked other Resources and the type of relationship.
+
 Getting Help
 ============
 This project is still very new so it's not inconceivable you'll run into

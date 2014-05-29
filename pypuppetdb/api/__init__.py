@@ -145,6 +145,16 @@ class BaseAPI(object):
         if self.last_total is not None:
             return int(self.last_total)
 
+    def _normalize_resource_type(self, type_):
+        """Normalizes the type passed to the api by capitalizing each part
+        of the type. For example:
+
+        sysctl::value -> Sysctl::Value
+        user -> User
+
+        """
+        return '::'.join([s.capitalize() for s in type_.split('::')])
+
     def _url(self, endpoint, path=None):
         """The complete URL we will end up querying. Depending on the
         endpoint we pass in  this will result in different URL's with
