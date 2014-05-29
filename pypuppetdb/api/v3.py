@@ -78,6 +78,8 @@ class API(BaseAPI):
                 node['events'] = status = status[0]
                 if status['successes'] > 0:
                     node['status'] = 'changed'
+                if status['noops'] > 0:
+                    node['status'] = 'noop'
                 if status['failures'] > 0:
                     node['status'] = 'failed'
             else:
