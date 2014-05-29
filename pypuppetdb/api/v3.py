@@ -150,6 +150,8 @@ class API(BaseAPI):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
+        path = None
+
         if type_ is not None:
             type_ = self._normalize_resource_type(type_)
             
@@ -157,12 +159,10 @@ class API(BaseAPI):
                 path = '{0}/{1}'.format(type_, title)
             elif title is None:
                 path = type_
-        else:
+        elif query is None:
             log.debug('Going to query for all resources. This is usually a '
                       'bad idea as it might return enormous amounts of '
                       'resources.')
-            query = ''
-            path = None
 
         resources = self._query('resources', path=path, query=query)
         for resource in resources:
