@@ -18,11 +18,7 @@ class API(BaseAPI):
     :param \*\*kwargs: Rest of the keywoard arguments passed on to our parent\
             :class:`~pypuppetdb.api.BaseAPI`.
     """
-
-    def __init__(self, *args, **kwargs):
-        """Initialise the API object."""
-        super(API, self).__init__(api_version=2, **kwargs)
-        log.debug('API initialised with {0}'.format(kwargs))
+    api_version = 2
 
     def node(self, name):
         """Gets a single node from PuppetDB."""

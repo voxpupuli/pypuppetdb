@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 API_VERSIONS = {
     2: 'v2',
     3: 'v3',
+    4: 'v4',
 }
 
 ENDPOINTS = {
@@ -43,6 +44,22 @@ ENDPOINTS = {
         'aggregate-event-counts': 'aggregate-event-counts',
         'server-time': 'server-time',
         'version': 'version',
+    },
+    4: {
+        'facts': 'facts',
+        'fact-names': 'fact-names',
+        'nodes': 'nodes',
+        'resources': 'resources',
+        'catalogs': 'catalogs',
+        'metrics': 'metrics',
+        'mbean': 'metrics/mbean',
+        'reports': 'reports',
+        'events': 'events',
+        'event-counts': 'event-counts',
+        'aggregate-event-counts': 'aggregate-event-counts',
+        'server-time': 'server-time',
+        'version': 'version',
+        'environments': 'environments',
     },
 }
 
@@ -88,16 +105,19 @@ class BaseAPI(object):
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
-    def __init__(self, api_version, host='localhost', port=8080,
+    api_version = None
+
+    def __init__(self, host='localhost', port=8080,
                  ssl_verify=True, ssl_key=None, ssl_cert=None, timeout=10):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
 
-        if api_version in API_VERSIONS:
-            self.api_version = API_VERSIONS[api_version]
+        if self.api_version in API_VERSIONS:
+            self.api_prefix = API_VERSIONS[self.api_version]
         else:
             raise UnsupportedVersionError
+        log.debug('API initialised with {0}'.format(self.api_version))
 
         self.host = host
         self.port = port
@@ -105,7 +125,7 @@ class BaseAPI(object):
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.timeout = timeout
-        self.endpoints = ENDPOINTS[api_version]
+        self.endpoints = ENDPOINTS[self.api_version]
 
         if self.ssl_key is not None and self.ssl_cert is not None:
             self.protocol = 'https'
@@ -118,7 +138,7 @@ class BaseAPI(object):
 
         :returns: Current API version.
         :rtype: :obj:`string`"""
-        return self.api_version
+        return self.api_prefix
 
     @property
     def base_url(self):
@@ -155,7 +175,7 @@ class BaseAPI(object):
         """
         return '::'.join([s.capitalize() for s in type_.split('::')])
 
-    def _url(self, endpoint, path=None):
+    def _url(self, endpoint, path=None, environment=None):
         """The complete URL we will end up querying. Depending on the
         endpoint we pass in  this will result in different URL's with
         different prefixes.
@@ -176,7 +196,7 @@ class BaseAPI(object):
             endpoint, path))
 
         if endpoint in self.endpoints:
-            api_prefix = self.api_version
+            api_prefix = self.api_prefix
             endpoint = self.endpoints[endpoint]
         else:
             # If we reach this we're trying to query an endpoint that doesn't
@@ -196,7 +216,8 @@ class BaseAPI(object):
 
     def _query(self, endpoint, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
-               summarize_by=None, count_by=None, count_filter=None):
+               summarize_by=None, count_by=None, count_filter=None,
+               environment=None):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -241,7 +262,7 @@ class BaseAPI(object):
                                              offset, summarize_by, count_by,
                                              count_filter))
 
-        url = self._url(endpoint, path=path)
+        url = self._url(endpoint, path=path, environment=environment)
         headers = {
             'content-type': 'application/json',
             'accept': 'application/json',

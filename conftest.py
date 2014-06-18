@@ -15,9 +15,13 @@ def api3():
     return pypuppetdb.connect(api_version=3)
 
 
+class TestAPI(pypuppetdb.api.BaseAPI):
+    api_version = 3
+
+
 @pytest.fixture
 def baseapi():
-    return pypuppetdb.api.BaseAPI(3)
+    return TestAPI()
 
 
 @pytest.fixture

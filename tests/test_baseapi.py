@@ -16,18 +16,8 @@ def stub_request(url, data=None, **kwargs):
                                   **kwargs)
 
 
-class TestBaseAPIVersion(object):
-    def test_init_v2_defaults(self):
-        v2 = pypuppetdb.api.BaseAPI(2)
-        assert v2.api_version == 'v2'
-
-    def test_init_v3_defaults(self):
-        v3 = pypuppetdb.api.BaseAPI(3)
-        assert v3.api_version == 'v3'
-
-    def test_init_invalid_version(self):
-        with pytest.raises(pypuppetdb.errors.UnsupportedVersionError):
-            vderp = pypuppetdb.api.BaseAPI(10000)
+class TestAPI(pypuppetdb.api.BaseAPI):
+    api_version = 2
 
 
 class TestBaseAPIInitOptions(object):
@@ -41,37 +31,37 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.protocol == 'http'
 
     def test_host(self):
-        api = pypuppetdb.api.BaseAPI(3, host='127.0.0.1')
+        api = TestAPI(host='127.0.0.1')
         assert api.host == '127.0.0.1'
 
     def test_port(self):
-        api = pypuppetdb.api.BaseAPI(3, port=8081)
+        api = TestAPI(port=8081)
         assert api.port == 8081
 
     def test_ssl_verify(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_verify=False)
+        api = TestAPI(ssl_verify=False)
         assert api.ssl_verify is False
         assert api.protocol == 'http'
 
     def test_ssl_key(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_key='/a/b/c.pem')
+        api = TestAPI(ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.protocol == 'http'
 
     def test_ssl_cert(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_cert='/d/e/f.pem')
+        api = TestAPI(ssl_cert='/d/e/f.pem')
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'http'
 
     def test_ssl_key_and_cert(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_cert='/d/e/f.pem',
-                                     ssl_key='/a/b/c.pem')
+        api = TestAPI(ssl_cert='/d/e/f.pem',
+                      ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'https'
 
     def test_timeout(self):
-        api = pypuppetdb.api.BaseAPI(3, timeout=20)
+        api = TestAPI(timeout=20)
         assert api.timeout == 20
 
 

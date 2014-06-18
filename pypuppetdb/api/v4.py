@@ -3,30 +3,67 @@ from __future__ import absolute_import
 
 import logging
 
-from pypuppetdb.api import BaseAPI
-from pypuppetdb.utils import json_to_datetime
-from datetime import datetime, timedelta
+from pypuppetdb.api.v3 import API as BaseAPI
 from pypuppetdb.types import (
     Node, Fact, Resource,
-    Report, Event, Catalog
     )
 
 log = logging.getLogger(__name__)
 
 
 class API(BaseAPI):
-    """The API object for version 3 of the PuppetDB API. This object contains
-    all v3 specific methods and ways of doing things.
+    """The API object for version 4 of the PuppetDB API. This object contains
+    all v4 specific methods and ways of doing things.
 
     :param \*\*kwargs: Rest of the keywoard arguments passed on to our parent\
             :class:`~pypuppetdb.api.BaseAPI`.
     """
-    api_version = 3
+    api_version = 4
 
-    def node(self, name):
-        """Gets a single node from PuppetDB."""
-        nodes = self.nodes(name=name)
-        return next(node for node in nodes)
+    def _url(self, endpoint, path=None, environment=None):
+        """The complete URL we will end up querying. Depending on the
+        endpoint we pass in  this will result in different URL's with
+        different prefixes.
+
+        :param endpoint: The PuppetDB API endpoint we want to query.
+        :type endpoint: :obj:`string`
+        :param path: An additional path if we don't wish to query the\
+                bare endpoint.
+        :type path: :obj:`string`
+
+        :returns: A URL constructed from :func:`base_url` with the\
+                apropraite API version/prefix and the rest of the path added\
+                to it.
+        :rtype: :obj:`string`
+        """
+
+        log.debug('_url called with endpoint: {0} and path: {1}'.format(
+            endpoint, path))
+
+        if endpoint in self.endpoints:
+            api_prefix = self.api_prefix
+            endpoint = self.endpoints[endpoint]
+        else:
+            # If we reach this we're trying to query an endpoint that doesn't
+            # exist. This shouldn't happen unless someone made a booboo.
+            raise APIError
+
+        if environment:
+            endpoint = "environments/{environment}/{endpoint}".format(
+                environment=environment,
+                endpoint=endpoint,
+            )
+
+        url = '{base_url}/{api_prefix}/{endpoint}'.format(
+            base_url=self.base_url,
+            api_prefix=api_prefix,
+            endpoint=endpoint,
+            )
+
+        if path is not None:
+            url = '{0}/{1}'.format(url, path)
+
+        return url
 
     def nodes(self, name=None, query=None, unreported=2, with_status=False):
         """Query for nodes by either name or query. If both aren't
@@ -84,16 +121,16 @@ class API(BaseAPI):
                 node['events'] = None
 
             # node report age
-            if with_status and node['report_timestamp'] is not None:
+            if with_status and node['report-timestamp'] is not None:
                 try:
-                    last_report = json_to_datetime(node['report_timestamp'])
+                    last_report = json_to_datetime(node['report-timestamp'])
                     last_report = last_report.replace(tzinfo=None)
                     now = datetime.utcnow()
                     unreported_border = now-timedelta(hours=unreported)
                     if last_report < unreported_border:
                         delta = (datetime.utcnow()-last_report)
                         node['status'] = 'unreported'
-                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                        node['unreported-time'] = '{0}d {1}h {2}m'.format(
                             delta.days,
                             int(delta.seconds/3600),
                             int((delta.seconds % 3600)/60)
@@ -101,21 +138,21 @@ class API(BaseAPI):
                 except AttributeError:
                     node['status'] = 'unreported'
 
-            if not node['report_timestamp'] and with_status:
+            if not node['report-timestamp'] and with_status:
                 node['status'] = 'unreported'
 
             yield Node(self,
                        node['name'],
                        deactivated=node['deactivated'],
-                       report_timestamp=node['report_timestamp'],
-                       catalog_timestamp=node['catalog_timestamp'],
-                       facts_timestamp=node['facts_timestamp'],
+                       report_timestamp=node['report-timestamp'],
+                       catalog_timestamp=node['catalog-timestamp'],
+                       facts_timestamp=node['facts-timestamp'],
                        status=node['status'],
                        events=node['events'],
                        unreported_time=node['unreported_time']
                        )
 
-    def facts(self, name=None, value=None, query=None):
+    def facts(self, name=None, value=None, query=None, environment=None):
         """Query for facts limited by either name, value and/or query.
         This will yield a single Fact object at a time."""
 
@@ -131,7 +168,8 @@ class API(BaseAPI):
             query = ''
             path = None
 
-        facts = self._query('facts', path=path, query=query)
+        facts = self._query('facts', path=path, query=query,
+                            environment=environment)
         for fact in facts:
             yield Fact(
                 fact['certname'],
@@ -139,12 +177,7 @@ class API(BaseAPI):
                 fact['value'],
                 )
 
-    def fact_names(self):
-        """Get a list of all known facts."""
-
-        return self._query('fact-names')
-
-    def resources(self, type_=None, title=None, query=None):
+    def resources(self, type_=None, title=None, query=None, environment=None):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
@@ -162,7 +195,9 @@ class API(BaseAPI):
                       'bad idea as it might return enormous amounts of '
                       'resources.')
 
-        resources = self._query('resources', path=path, query=query)
+        resources = self._query('resources', path=path, query=query,
+                                environment=environment)
+
         for resource in resources:
             yield Resource(
                 resource['certname'],
@@ -173,15 +208,17 @@ class API(BaseAPI):
                 resource['file'],
                 resource['line'],
                 resource['parameters'],
+                resource['environment'],
                 )
 
-    def reports(self, query):
+    def reports(self, query, environment=None):
         """Get reports for our infrastructure. Currently reports can only
         be filtered through a query which requests a specific certname.
         If not it will return all reports.
 
         This yields a Report object for every returned report."""
-        reports = self._query('reports', query=query)
+        reports = self._query('reports', query=query,
+                              environment=environment)
         for report in reports:
             yield Report(
                 report['certname'],
@@ -195,12 +232,13 @@ class API(BaseAPI):
                 report['transaction-uuid']
                 )
 
-    def events(self, query):
+    def events(self, query, environments=None):
         """A report is made up of events. This allows to query for events
         based on the reprt hash.
         This yields an Event object for every returned event."""
 
-        events = self._query('events', query=query)
+        events = self._query('events', query=query,
+                             environment=environment)
         for event in events:
             yield Event(
                 event['certname'],
@@ -214,36 +252,3 @@ class API(BaseAPI):
                 event['old-value'],
                 event['resource-type'],
                 )
-
-    def event_counts(self, query, summarize_by,
-                     count_by=None, count_filter=None):
-        """Get event counts from puppetdb"""
-        return self._query('event-counts',
-                           query=query,
-                           summarize_by=summarize_by,
-                           count_by=count_by,
-                           count_filter=count_filter)
-
-    def aggregate_event_counts(self, query, summarize_by,
-                               count_by=None, count_filter=None):
-        """Get event counts from puppetdb"""
-        return self._query('aggregate-event-counts',
-                           query=query, summarize_by=summarize_by,
-                           count_by=count_by, count_filter=count_filter)
-
-    def server_time(self):
-        """Get the current time of the clock on the PuppetDB server"""
-        return self._query('server-time')['server-time']
-
-    def current_version(self):
-        """Get version information about the running PuppetDB server"""
-        return self._query('version')['version']
-
-    def catalog(self, node):
-        """Get the most recent catalog for a given node"""
-        c = self._query('catalogs', path=node)
-        return Catalog(c['data']['name'],
-                       c['data']['edges'],
-                       c['data']['resources'],
-                       c['data']['version'],
-                       c['data']['transaction-uuid'])
