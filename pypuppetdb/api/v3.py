@@ -156,7 +156,7 @@ class API(BaseAPI):
 
         if type_ is not None:
             type_ = self._normalize_resource_type(type_)
-            
+
             if title is not None:
                 path = '{0}/{1}'.format(type_, title)
             elif title is None:
@@ -199,12 +199,13 @@ class API(BaseAPI):
                 report['transaction-uuid']
                 )
 
-    def events(self, query):
+    def events(self, query, order_by=None, limit=None):
         """A report is made up of events. This allows to query for events
         based on the reprt hash.
         This yields an Event object for every returned event."""
 
-        events = self._query('events', query=query)
+        events = self._query('events', query=query,
+                             order_by=order_by, limit=limit)
         for event in events:
             yield Event(
                 event['certname'],
