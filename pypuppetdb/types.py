@@ -172,7 +172,7 @@ class Resource(object):
         resources
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, parameters={}):
+                 sourceline, parameters={}, environment=None):
         self.node = node
         self.name = name
         self.type_ = type_
@@ -182,6 +182,7 @@ class Resource(object):
         self.sourceline = sourceline
         self.parameters = parameters
         self.relationships = []
+        self.environment = environment
         self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
