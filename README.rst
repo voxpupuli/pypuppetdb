@@ -190,6 +190,8 @@ License
 This project is licensed under the Apache v2.0 License. As such, your
 contributions, once accepted, are automatically covered by this license.
 
+Copyright (c) 2013-2014 Daniele Sluijters
+
 Commit messages
 ---------------
 Write decent commit messages. Don't use swear words and refrain from
