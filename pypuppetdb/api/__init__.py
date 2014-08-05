@@ -106,6 +106,12 @@ class BaseAPI(object):
         self.ssl_cert = ssl_cert
         self.timeout = timeout
         self.endpoints = ENDPOINTS[api_version]
+        self._session = requests.Session()
+        self._session.headers = {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+            'accept-charset': 'utf-8'
+        }
 
         if self.ssl_key is not None and self.ssl_cert is not None:
             self.protocol = 'https'
@@ -242,11 +248,6 @@ class BaseAPI(object):
                                              count_filter))
 
         url = self._url(endpoint, path=path)
-        headers = {
-            'content-type': 'application/json',
-            'accept': 'application/json',
-            'accept-charset': 'utf-8'
-            }
 
         payload = {}
         if query is not None:
@@ -270,10 +271,9 @@ class BaseAPI(object):
             payload = None
 
         try:
-            r = requests.get(url, params=payload, headers=headers,
-                             verify=self.ssl_verify, cert=(self.ssl_cert,
-                                                           self.ssl_key),
-                             timeout=self.timeout)
+            r = self._session.get(url, params=payload, verify=self.ssl_verify,
+                                  cert=(self.ssl_cert, self.ssl_key),
+                                  timeout=self.timeout)
             r.raise_for_status()
 
             # get total number of results if requested with include-total

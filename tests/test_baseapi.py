@@ -105,19 +105,19 @@ class TestBaseAPIURL(object):
 
 
 class TesteAPIQuery(object):
-    @mock.patch.object(requests, 'get')
+    @mock.patch.object(requests.Session, 'request')
     def test_timeout(self, get, baseapi):
         get.side_effect = requests.exceptions.Timeout
         with pytest.raises(requests.exceptions.Timeout):
             baseapi._query('nodes')
 
-    @mock.patch.object(requests, 'get')
+    @mock.patch.object(requests.Session, 'request')
     def test_connectionerror(self, get, baseapi):
         get.side_effect = requests.exceptions.ConnectionError
         with pytest.raises(requests.exceptions.ConnectionError):
             baseapi._query('nodes')
 
-    @mock.patch.object(requests, 'get')
+    @mock.patch.object(requests.Session, 'request')
     def test_httperror(self, get, baseapi):
         get.side_effect = requests.exceptions.HTTPError(
             response=requests.Response())
