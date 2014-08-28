@@ -142,7 +142,7 @@ class API(BaseAPI):
                 node['status'] = 'unreported'
 
             yield Node(self,
-                       node['name'],
+                       node['certname'],
                        deactivated=node['deactivated'],
                        report_timestamp=node['report-timestamp'],
                        catalog_timestamp=node['catalog-timestamp'],
