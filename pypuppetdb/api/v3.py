@@ -299,7 +299,8 @@ class API(BaseAPI):
                 )
 
     def event_counts(self, query, summarize_by, count_by=None,
-        count_filter=None, order_by=None, limit=None, offset=None):
+                     count_filter=None, order_by=None, limit=None,
+                     offset=None):
         """Get event counts from puppetdb
 
         :param query:
