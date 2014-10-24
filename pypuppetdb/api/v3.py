@@ -174,10 +174,26 @@ class API(BaseAPI):
                 fact['value'],
                 )
 
-    def fact_names(self):
-        """Get a list of all known facts."""
+    def fact_names(self, order_by=None, limit=None, offset=None):
+        """Get a list of all known facts.
 
-        return self._query('fact-names')
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
+
+        :returns: The decoded response from PuppetDB
+        :rtype: :obj:`dict` or :obj:`list`
+        """
+
+        return self._query('fact-names',
+                           order_by=order_by,
+                           limit=limit,
+                           offset=offset)
 
     def resources(self, type_=None, title=None, query=None, order_by=None,
                   limit=None, offset=None):
