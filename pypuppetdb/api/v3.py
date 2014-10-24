@@ -32,8 +32,13 @@ class API(BaseAPI):
         nodes = self.nodes(name=name)
         return next(node for node in nodes)
 
-    def nodes(self, name=None, query=None, unreported=2, with_status=False,
-              order_by=None, limit=None, offset=None):
+    def nodes(self, name=None,
+              query=None,
+              unreported=2,
+              with_status=False,
+              order_by=None,
+              limit=None,
+              offset=None):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also fetches the nodes status and event counts of the latest
@@ -61,7 +66,10 @@ class API(BaseAPI):
         :returns: A generator yieling Nodes.
         :rtype: :class:`pypuppetdb.types.Node`
         """
-        nodes = self._query('nodes', path=name, query=query, limit=limit,
+        nodes = self._query('nodes',
+                            path=name,
+                            query=query,
+                            limit=limit,
                             offset=offset)
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
@@ -129,8 +137,12 @@ class API(BaseAPI):
                        unreported_time=node['unreported_time']
                        )
 
-    def facts(self, name=None, value=None, query=None, order_by=None,
-              limit=None, offset=None):
+    def facts(self, name=None,
+              value=None,
+              query=None,
+              order_by=None,
+              limit=None,
+              offset=None):
         """Query for facts limited by either name, value and/or query.
 
         :param name: (optional)
@@ -164,8 +176,11 @@ class API(BaseAPI):
             query = ''
             path = None
 
-        facts = self._query('facts', path=path, query=query,
-                            order_by=order_by, limit=limit,
+        facts = self._query('facts',
+                            path=path,
+                            query=query,
+                            order_by=order_by,
+                            limit=limit,
                             offset=offset)
         for fact in facts:
             yield Fact(
@@ -195,8 +210,12 @@ class API(BaseAPI):
                            limit=limit,
                            offset=offset)
 
-    def resources(self, type_=None, title=None, query=None, order_by=None,
-                  limit=None, offset=None):
+    def resources(self, type_=None,
+                  title=None,
+                  query=None,
+                  order_by=None,
+                  limit=None,
+                  offset=None):
         """Query for resources limited by either type and/or title or query.
 
         :param type_: (optional)
@@ -232,8 +251,11 @@ class API(BaseAPI):
                       'bad idea as it might return enormous amounts of '
                       'resources.')
 
-        resources = self._query('resources', path=path, query=query,
-                                order_by=order_by, limit=limit,
+        resources = self._query('resources',
+                                path=path,
+                                query=query,
+                                order_by=order_by,
+                                limit=limit,
                                 offset=offset)
         for resource in resources:
             yield Resource(
@@ -264,8 +286,11 @@ class API(BaseAPI):
         :returns: A generator yieling Reports.
         :rtype: :class:`pypuppetdb.types.Report`
         """
-        reports = self._query('reports', query=query, order_by=order_by,
-                              limit=limit, offset=offset)
+        reports = self._query('reports',
+                              query=query,
+                              order_by=order_by,
+                              limit=limit,
+                              offset=offset)
         for report in reports:
             yield Report(
                 report['certname'],
@@ -298,8 +323,11 @@ class API(BaseAPI):
         :rtype: :class:`pypuppetdb.types.Event`
         """
 
-        events = self._query('events', query=query, order_by=order_by,
-                             limit=limit, offset=offset)
+        events = self._query('events',
+                             query=query,
+                             order_by=order_by,
+                             limit=limit,
+                             offset=offset)
         for event in events:
             yield Event(
                 event['certname'],
@@ -314,8 +342,12 @@ class API(BaseAPI):
                 event['resource-type'],
                 )
 
-    def event_counts(self, query, summarize_by, count_by=None,
-                     count_filter=None, order_by=None, limit=None,
+    def event_counts(self, query,
+                     summarize_by,
+                     count_by=None,
+                     count_filter=None,
+                     order_by=None,
+                     limit=None,
                      offset=None):
         """Get event counts from puppetdb
 
@@ -348,12 +380,16 @@ class API(BaseAPI):
                            limit=limit,
                            offset=offset)
 
-    def aggregate_event_counts(self, query, summarize_by,
-                               count_by=None, count_filter=None):
+    def aggregate_event_counts(self, query,
+                               summarize_by,
+                               count_by=None,
+                               count_filter=None):
         """Get event counts from puppetdb"""
         return self._query('aggregate-event-counts',
-                           query=query, summarize_by=summarize_by,
-                           count_by=count_by, count_filter=count_filter)
+                           query=query,
+                           summarize_by=summarize_by,
+                           count_by=count_by,
+                           count_filter=count_filter)
 
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server"""
