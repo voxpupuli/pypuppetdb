@@ -87,7 +87,8 @@ def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
     :type port: :obj:`int`
 
     :param ssl_verify: (optional) Verify PuppetDB server certificate.
-    :type ssl_verify: :obj:`bool`
+    :type ssl_verify: :obj:`bool` or :obj:`string` True, False or filesystem \
+            path to ca certificate.
 
     :param ssl_key: (optional) Path to our client secret key.
     :type ssl_key: :obj:`None` or :obj:`string` representing a filesystem\
