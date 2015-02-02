@@ -32,7 +32,13 @@ class API(BaseAPI):
         nodes = self.nodes(name=name)
         return next(node for node in nodes)
 
-    def nodes(self, name=None, query=None, unreported=2, with_status=False):
+    def nodes(self, name=None,
+              query=None,
+              unreported=2,
+              with_status=False,
+              order_by=None,
+              limit=None,
+              offset=None):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also fetches the nodes status and event counts of the latest
@@ -48,11 +54,23 @@ class API(BaseAPI):
         :param unreported: (optional) amount of hours when a node gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
 
         :returns: A generator yieling Nodes.
         :rtype: :class:`pypuppetdb.types.Node`
         """
-        nodes = self._query('nodes', path=name, query=query)
+        nodes = self._query('nodes',
+                            path=name,
+                            query=query,
+                            limit=limit,
+                            offset=offset)
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
@@ -119,9 +137,32 @@ class API(BaseAPI):
                        unreported_time=node['unreported_time']
                        )
 
-    def facts(self, name=None, value=None, query=None):
+    def facts(self, name=None,
+              value=None,
+              query=None,
+              order_by=None,
+              limit=None,
+              offset=None):
         """Query for facts limited by either name, value and/or query.
-        This will yield a single Fact object at a time."""
+
+        :param name: (optional)
+        :type name: :obj:`None` or :obj:`string`
+        :param value: (optional)
+        :type value: :obj:`None` or :obj:`string`
+        :param query: (optional)
+        :type query: :obj:`None` or :obj:`string`
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
+
+        :returns: A generator yieling Facts.
+        :rtype: :class:`pypuppetdb.types.Fact`
+        """
 
         log.debug('{0}, {1}, {2}'.format(name, value, query))
         if name is not None and value is not None:
@@ -135,7 +176,12 @@ class API(BaseAPI):
             query = ''
             path = None
 
-        facts = self._query('facts', path=path, query=query)
+        facts = self._query('facts',
+                            path=path,
+                            query=query,
+                            order_by=order_by,
+                            limit=limit,
+                            offset=offset)
         for fact in facts:
             yield Fact(
                 fact['certname'],
@@ -143,14 +189,53 @@ class API(BaseAPI):
                 fact['value'],
                 )
 
-    def fact_names(self):
-        """Get a list of all known facts."""
+    def fact_names(self, order_by=None, limit=None, offset=None):
+        """Get a list of all known facts.
 
-        return self._query('fact-names')
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
 
-    def resources(self, type_=None, title=None, query=None):
+        :returns: The decoded response from PuppetDB
+        :rtype: :obj:`dict` or :obj:`list`
+        """
+
+        return self._query('fact-names',
+                           order_by=order_by,
+                           limit=limit,
+                           offset=offset)
+
+    def resources(self, type_=None,
+                  title=None,
+                  query=None,
+                  order_by=None,
+                  limit=None,
+                  offset=None):
         """Query for resources limited by either type and/or title or query.
-        This will yield a Resources object for every returned resource."""
+
+        :param type_: (optional)
+        :type type_: :obj:`None` or :obj:`string`
+        :param title: (optional)
+        :type title: :obj:`None` or :obj:`string`
+        :param query: (optional)
+        :type query: :obj:`None` or :obj:`string`
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
+
+        :returns: A generator yieling Resources.
+        :rtype: :class:`pypuppetdb.types.Resource`
+        """
 
         path = None
 
@@ -166,7 +251,12 @@ class API(BaseAPI):
                       'bad idea as it might return enormous amounts of '
                       'resources.')
 
-        resources = self._query('resources', path=path, query=query)
+        resources = self._query('resources',
+                                path=path,
+                                query=query,
+                                order_by=order_by,
+                                limit=limit,
+                                offset=offset)
         for resource in resources:
             yield Resource(
                 resource['certname'],
@@ -179,13 +269,28 @@ class API(BaseAPI):
                 resource['parameters'],
                 )
 
-    def reports(self, query):
-        """Get reports for our infrastructure. Currently reports can only
-        be filtered through a query which requests a specific certname.
-        If not it will return all reports.
+    def reports(self, query, order_by=None, limit=None, offset=None):
+        """Get reports for our infrastructure.
 
-        This yields a Report object for every returned report."""
-        reports = self._query('reports', query=query)
+        :param query: (optional)
+        :type query: :obj:`None` or :obj:`string`
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
+
+        :returns: A generator yieling Reports.
+        :rtype: :class:`pypuppetdb.types.Report`
+        """
+        reports = self._query('reports',
+                              query=query,
+                              order_by=order_by,
+                              limit=limit,
+                              offset=offset)
         for report in reports:
             yield Report(
                 report['certname'],
@@ -199,13 +304,30 @@ class API(BaseAPI):
                 report['transaction-uuid']
                 )
 
-    def events(self, query, order_by=None, limit=None):
+    def events(self, query, order_by=None, limit=None, offset=None):
         """A report is made up of events. This allows to query for events
-        based on the reprt hash.
-        This yields an Event object for every returned event."""
+        based on the report hash.
 
-        events = self._query('events', query=query,
-                             order_by=order_by, limit=limit)
+        :param query: (optional)
+        :type query: :obj:`None` or :obj:`string`
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
+
+        :returns: A generator yieling Events.
+        :rtype: :class:`pypuppetdb.types.Event`
+        """
+
+        events = self._query('events',
+                             query=query,
+                             order_by=order_by,
+                             limit=limit,
+                             offset=offset)
         for event in events:
             yield Event(
                 event['certname'],
@@ -220,21 +342,54 @@ class API(BaseAPI):
                 event['resource-type'],
                 )
 
-    def event_counts(self, query, summarize_by,
-                     count_by=None, count_filter=None):
-        """Get event counts from puppetdb"""
+    def event_counts(self, query,
+                     summarize_by,
+                     count_by=None,
+                     count_filter=None,
+                     order_by=None,
+                     limit=None,
+                     offset=None):
+        """Get event counts from puppetdb
+
+        :param query:
+        :type query: :obj:`string`
+        :param summarize_by: Summarize the results based on the resource,\
+                             containing-class or certname fields
+        :type summarize_by: :obj:`string`
+        :param count_filter: (optional) Only show the counts based on\
+                               this query.
+        :type count_filter: :obj:`string`
+        :param order_by: (optional) Sort the results by a given field in\
+                         ascending order
+        :type order_by: :obj:`None` or :obj:`string
+        :param limit: (optional) Limit the number of returned results
+        :type limit: :obj:`None` or integer
+        :param offset: (optional) Use with the limit parameter to return\
+                       a set of results
+        :type offset: :obj:`None` or integer
+
+        :returns: The decoded response from PuppetDB
+        :rtype: :obj:`dict` or :obj:`list`
+        """
         return self._query('event-counts',
                            query=query,
                            summarize_by=summarize_by,
                            count_by=count_by,
-                           count_filter=count_filter)
+                           count_filter=count_filter,
+                           order_by=order_by,
+                           limit=limit,
+                           offset=offset)
 
-    def aggregate_event_counts(self, query, summarize_by,
-                               count_by=None, count_filter=None):
+    def aggregate_event_counts(self, query,
+                               summarize_by,
+                               count_by=None,
+                               count_filter=None):
         """Get event counts from puppetdb"""
         return self._query('aggregate-event-counts',
-                           query=query, summarize_by=summarize_by,
-                           count_by=count_by, count_filter=count_filter)
+                           query=query,
+                           summarize_by=summarize_by,
+                           count_by=count_by,
+                           count_filter=count_filter)
 
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server"""
