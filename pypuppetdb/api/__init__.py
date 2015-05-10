@@ -70,26 +70,50 @@ class BaseAPI(object):
 
     :param api_version: Version of the API we're initialising.
     :type api_version: :obj:`int`
+
     :param host: (optional) Hostname or IP of PuppetDB.
     :type host: :obj:`string`
+
     :param port: (optional) Port on which to talk to PuppetDB.
     :type port: :obj:`int`
+
     :param ssl_verify: (optional) Verify PuppetDB server certificate.
     :type ssl_verify: :obj:`bool`
+
     :param ssl_key: (optional) Path to our client secret key.
     :type ssl_key: :obj:`None` or :obj:`string` representing a filesystem\
             path.
+
     :param ssl_cert: (optional) Path to our client certificate.
     :type ssl_cert: :obj:`None` or :obj:`string` representing a filesystem\
             path.
+
     :param timeout: (optional) Number of seconds to wait for a response.
     :type timeout: :obj:`int`
+
+    :param protocol: (optional) Explicitly specify the protocol to be used
+            (especially handy when using HTTPS with ssl_verify=False and
+            without certs)
+    :type protocol: :obj:`None` or :obj:`string`
+
+    :param url_path: (optional) The URL path where PuppetDB is served
+            (if not at the root / path)
+    :type url_path: :obj:`None` or :obj:`string`
+
+    :param username: (optional) The username to use for HTTP basic
+            authentication
+    :type username: :obj:`None` or :obj:`string`
+
+    :param password: (optional) The password to use for HTTP basic
+            authentication
+    :type password: :obj:`None` or :obj:`string`
 
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
     def __init__(self, api_version, host='localhost', port=8080,
-                 ssl_verify=True, ssl_key=None, ssl_cert=None, timeout=10):
+                 ssl_verify=True, ssl_key=None, ssl_cert=None, timeout=10,
+                 protocol=None, url_path=None, username=None, password=None):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
@@ -105,6 +129,24 @@ class BaseAPI(object):
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.timeout = timeout
+
+        # Standardise the URL path to a format similar to /puppetdb
+        if url_path:
+            if not url_path.startswith('/'):
+                url_path = '/' + url_path
+            if url_path.endswith('/'):
+                url_path = url_path[:-1]
+        else:
+            url_path = ''
+
+        self.url_path = url_path
+        if username and password:
+            self.username = username
+            self.password = password
+        else:
+            self.username = None
+            self.password = None
+
         self.endpoints = ENDPOINTS[api_version]
         self._session = requests.Session()
         self._session.headers = {
@@ -113,7 +155,12 @@ class BaseAPI(object):
             'accept-charset': 'utf-8'
         }
 
-        if self.ssl_key is not None and self.ssl_cert is not None:
+        if protocol is not None:
+            protocol = protocol.lower()
+            if protocol not in ['http', 'https']:
+                raise ValueError('Protocol specified must be http or https')
+            self.protocol = protocol
+        elif self.ssl_key is not None and self.ssl_cert is not None:
             self.protocol = 'https'
         else:
             self.protocol = 'http'
@@ -134,10 +181,11 @@ class BaseAPI(object):
         :returns: A URL of the form: ``proto://host:port``.
         :rtype: :obj:`string`
         """
-        return '{proto}://{host}:{port}'.format(
+        return '{proto}://{host}:{port}{url_path}'.format(
             proto=self.protocol,
             host=self.host,
             port=self.port,
+            url_path=self.url_path,
             )
 
     @property
@@ -273,7 +321,8 @@ class BaseAPI(object):
         try:
             r = self._session.get(url, params=payload, verify=self.ssl_verify,
                                   cert=(self.ssl_cert, self.ssl_key),
-                                  timeout=self.timeout)
+                                  timeout=self.timeout,
+                                  auth=(self.username, self.password))
             r.raise_for_status()
 
             # get total number of results if requested with include-total

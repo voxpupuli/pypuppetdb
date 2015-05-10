@@ -1,3 +1,4 @@
+import base64
 import json
 import mock
 import httpretty
@@ -39,6 +40,9 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.ssl_cert is None
         assert baseapi.timeout == 10
         assert baseapi.protocol == 'http'
+        assert baseapi.url_path == ''
+        assert baseapi.username is None
+        assert baseapi.password is None
 
     def test_host(self):
         api = pypuppetdb.api.BaseAPI(3, host='127.0.0.1')
@@ -73,6 +77,56 @@ class TestBaseAPIInitOptions(object):
     def test_timeout(self):
         api = pypuppetdb.api.BaseAPI(3, timeout=20)
         assert api.timeout == 20
+
+    def test_protocol(self):
+        api = pypuppetdb.api.BaseAPI(3, protocol='https')
+        assert api.protocol == 'https'
+
+    def test_uppercase_protocol(self):
+        api = pypuppetdb.api.BaseAPI(3, protocol='HTTP')
+        assert api.protocol == 'http'
+
+    def test_override_protocol(self):
+        api = pypuppetdb.api.BaseAPI(3, protocol='http',
+                                     ssl_cert='/d/e/f.pem',
+                                     ssl_key='/a/b/c.pem')
+        assert api.protocol == 'http'
+
+    def test_invalid_protocol(self):
+        with pytest.raises(ValueError):
+            api = pypuppetdb.api.BaseAPI(3, protocol='ftp')
+
+    def test_url_path(self):
+        api = pypuppetdb.api.BaseAPI(3, url_path='puppetdb')
+        assert api.url_path == '/puppetdb'
+
+    def test_url_path_leading_slash(self):
+        api = pypuppetdb.api.BaseAPI(3, url_path='/puppetdb')
+        assert api.url_path == '/puppetdb'
+
+    def test_url_path_trailing_slash(self):
+        api = pypuppetdb.api.BaseAPI(3, url_path='puppetdb/')
+        assert api.url_path == '/puppetdb'
+
+    def test_url_path_longer_with_both_slashes(self):
+        api = pypuppetdb.api.BaseAPI(3, url_path='/puppet/db/')
+        assert api.url_path == '/puppet/db'
+
+    def test_username(self):
+        api = pypuppetdb.api.BaseAPI(3, username='puppetdb')
+        assert api.username is None
+        assert api.password is None
+
+    def test_password(self):
+        api = pypuppetdb.api.BaseAPI(3, password='password123')
+        assert api.username is None
+        assert api.password is None
+
+    def test_username_and_password(self):
+        api = pypuppetdb.api.BaseAPI(3, username='puppetdb',
+                                     password='password123')
+        assert api.username == 'puppetdb'
+        assert api.password == 'password123'
 
 
 class TestBaseAPIProperties(object):
@@ -142,6 +196,27 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/v3/nodes/node1')
         baseapi._query('nodes', path='node1')
         assert httpretty.last_request().path == '/v3/nodes/node1'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_with_url_path(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/puppetdb/v3/nodes')
+        baseapi.url_path = '/puppetdb'
+        baseapi._query('nodes')
+        assert httpretty.last_request().path == '/puppetdb/v3/nodes'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_with_authorization(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/v3/nodes')
+        baseapi.username = 'puppetdb'
+        baseapi.password = 'password123'
+        baseapi._query('nodes')
+        assert httpretty.last_request().path == '/v3/nodes'
+        assert httpretty.last_request().headers['Authorization'] == \
+            'Basic {0}'.format(base64.b64encode('puppetdb:password123'))
         httpretty.disable()
         httpretty.reset()
 
