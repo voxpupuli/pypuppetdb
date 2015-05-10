@@ -120,7 +120,11 @@ class TestEvent(object):
     def test_event(self):
         event = Event('node', 'failure', '2013-08-01T10:57:00.000Z',
                       'hash#', '/etc/ssh/sshd_config', 'ensure',
-                      'Nothing to say', 'present', 'absent', 'file')
+                      'Nothing to say', 'present', 'absent', 'file',
+                      'Ssh::Server',
+                      ['Stage[main]', 'Ssh::Server',
+                       'File[/etc/ssh/sshd_config]'],
+                      '/etc/puppet/modules/ssh/manifests/server.pp', 80)
 
         assert event.node == 'node'
         assert event.status == 'failure'
@@ -140,7 +144,11 @@ class TestEvent(object):
     def test_event_failed(self):
         event = Event('node', 'success', '2013-08-01T10:57:00.000Z',
                       'hash#', '/etc/ssh/sshd_config', 'ensure',
-                      'Nothing to say', 'present', 'absent', 'file')
+                      'Nothing to say', 'present', 'absent', 'file',
+                      'Ssh::Server',
+                      ['Stage[main]', 'Ssh::Server',
+                       'File[/etc/ssh/sshd_config]'],
+                      '/etc/puppet/modules/ssh/manifests/server.pp', 80)
 
         assert event.status == 'success'
         assert event.failed is False
