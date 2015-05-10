@@ -73,7 +73,8 @@ logging.getLogger(__name__).addHandler(NullHandler())
 
 
 def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
-            ssl_key=None, ssl_cert=None, timeout=10):
+            ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
+            url_path='/', username=None, password=None):
     """Connect with PuppetDB. This will return an object allowing you
     to query the API through its methods.
 
@@ -101,15 +102,34 @@ def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
     :param timeout: (optional) Number of seconds to wait for a response.
     :type timeout: :obj:`int`
 
+    :param protocol: (optional) Explicitly specify the protocol to be used
+            (especially handy when using HTTPS with ssl_verify=False and
+            without certs)
+    :type protocol: :obj:`None` or :obj:`string`
+
+    :param url_path: (optional) The URL path where PuppetDB is served
+            (if not at the root / path)
+    :type url_path: :obj:`None` or :obj:`string`
+
+    :param username: (optional) The username to use for HTTP basic
+            authentication
+    :type username: :obj:`None` or :obj:`string`
+
+    :param password: (optional) The password to use for HTTP basic
+            authentication
+    :type password: :obj:`None` or :obj:`string`
+
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
     if api_version == 3:
         return v3.API(host=host, port=port,
                       timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-                      ssl_cert=ssl_cert)
+                      ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
+                      username=username, password=password)
     if api_version == 2:
         return v2.API(host=host, port=port,
                       timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-                      ssl_cert=ssl_cert)
+                      ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
+                      username=username, password=password)
     else:
         raise UnsupportedVersionError
