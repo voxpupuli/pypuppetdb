@@ -20,6 +20,11 @@ class Event(object):
     :param new_value: The new value/state of the resource.
     :param old_value: The old value/state of the resource.
     :param type\_: The type of the resource this event fired for.
+    :param class_\_: The class responsible for running this event.
+    :param execution_path: The path used to reach this particular resource.
+    :param source_file: The puppet source code file containing the class.
+    :param line_number: The line number in the source file containing the
+            definition responsible for triggering this event.
 
     :ivar status: A :obj:`string` of this event's status.
     :ivar failed: The :obj:`bool` equivalent of `status`.
@@ -31,7 +36,8 @@ class Event(object):
             event was triggered for.
     """
     def __init__(self, node, status, timestamp, hash_, title, property_,
-                 message, new_value, old_value, type_):
+                 message, new_value, old_value, type_, class_, execution_path,
+                 source_file, line_number):
         self.node = node
         self.status = status
         if self.status == 'failure':
@@ -47,6 +53,10 @@ class Event(object):
         self.item['message'] = message
         self.item['old'] = old_value
         self.item['new'] = new_value
+        self.item['class'] = class_
+        self.item['execution_path'] = execution_path
+        self.item['source_file'] = source_file
+        self.item['line_number'] = line_number
         self.__string = '{0}[{1}]/{2}'.format(self.item['type'],
                                               self.item['title'],
                                               self.hash_)

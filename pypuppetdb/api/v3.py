@@ -218,6 +218,10 @@ class API(BaseAPI):
                 event['new-value'],
                 event['old-value'],
                 event['resource-type'],
+                event['containing-class'],
+                event['containment-path'],
+                event['file'],
+                event['line'],
                 )
 
     def event_counts(self, query, summarize_by,
