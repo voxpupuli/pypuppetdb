@@ -2,20 +2,16 @@
 pypuppetdb
 ##########
 
-.. image:: https://api.travis-ci.org/nedap/pypuppetdb.png
-   :target: https://travis-ci.org/nedap/pypuppetdb
+.. image:: https://api.travis-ci.org/puppet-community/pypuppetdb.png
+   :target: https://travis-ci.org/puppet-communit/pypuppetdb
 
-.. image:: https://coveralls.io/repos/nedap/pypuppetdb/badge.png
-   :target: https://coeralls.io/r/nedap/pypuppetdb
-
-.. image:: https://pypip.in/d/pypuppetdb/badge.png
-   :target: https://crate.io/packages/pypuppetdb
-
-.. image:: https://pypip.in/v/pypuppetdb/badge.png
-   :target: https://crate.io/packages/pypuppetdb
+.. image:: https://coveralls.io/repos/puppet-community/pypuppetdb/badge.png
+   :target: https://coeralls.io/r/puppet-community/pypuppetdb
 
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
+
+**pypuppetdb DOES NOT work with PuppetDB 3**
 
 .. _requests: http://docs.python-requests.org/en/latest/
 
