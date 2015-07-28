@@ -15,8 +15,8 @@ log = logging.getLogger(__name__)
 
 
 class API(BaseAPI):
-    """The API object for version 3 of the PuppetDB API. This object contains
-    all v3 specific methods and ways of doing things.
+    """The API object for version 4 of the PuppetDB API. This object contains
+    all v4 specific methods and ways of doing things.
 
     :param \*\*kwargs: Rest of the keywoard arguments passed on to our parent\
             :class:`~pypuppetdb.api.BaseAPI`.
