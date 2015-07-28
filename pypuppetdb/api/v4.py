@@ -172,14 +172,15 @@ class API(BaseAPI):
         resources = self._query('resources', path=path, query=query)
         for resource in resources:
             yield Resource(
-                resource['certname'],
-                resource['title'],
-                resource['type'],
-                resource['tags'],
-                resource['exported'],
-                resource['file'],
-                resource['line'],
-                resource['parameters'],
+                node=resource['certname'],
+                name=resource['title'],
+                type_=resource['type'],
+                tags=resource['tags'],
+                exported=resource['exported'],
+                sourcefile=resource['file'],
+                sourceline=resource['line'],
+                parameters=resource['parameters'],
+                environment=resource['environment'],
                 )
 
     def reports(self, query):

@@ -173,6 +173,9 @@ class Resource(object):
     :param sourceline: The line this resource is declared at.
     :param parameters: The parameters this resource has been declared with.
     :type parameters: :obj:`dict`
+    :param environment: The environment of the node associated with this\
+        resource.
+    :type environment: :obj:`string
 
     :ivar node: The hostname this resources is located on.
     :ivar name: The name of the resource in the Puppet manifest.
@@ -183,9 +186,11 @@ class Resource(object):
     :ivar parameters: :obj:`dict` with key:value pairs of parameters.
     :ivar relationships: :obj:`list` Contains all relationships to other\
         resources
+    :ivar environment: :obj:`string: The environment of the node associated\
+        with this resource.
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, parameters={}):
+                 sourceline, parameters={}, environment):
         self.node = node
         self.name = name
         self.type_ = type_
@@ -195,6 +200,7 @@ class Resource(object):
         self.sourceline = sourceline
         self.parameters = parameters
         self.relationships = []
+        self.environment = environment
         self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
