@@ -135,15 +135,18 @@ class Fact(object):
     :param node: The hostname this fact was collected from.
     :param name: The fact's name, such as 'osfamily'
     :param value: The fact's value, such as 'Debian'
+    :param environment: The fact's environment, such as 'production'
 
     :ivar node: :obj:`string` holding the hostname.
     :ivar name: :obj:`string` holding the fact's name.
     :ivar value: :obj:`string` holding the fact's value.
+    :ivar environment: :obj:`string` holding the fact's environment
     """
-    def __init__(self, node, name, value):
+    def __init__(self, node, name, value, environment):
         self.node = node
         self.name = name
         self.value = value
+        self.environment = environment
         self.__string = '{0}/{1}'.format(self.name, self.node)
 
     def __repr__(self):

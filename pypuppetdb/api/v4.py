@@ -143,6 +143,7 @@ class API(BaseAPI):
                 fact['certname'],
                 fact['name'],
                 fact['value'],
+                fact['environment']
                 )
 
     def fact_names(self):
