@@ -230,6 +230,15 @@ class Node(object):
     :type events: :obj:`dict`
     :param unreported_time: (default `None`) Time since last report
     :type unreported_time: :obj:`string`
+    :param report_environment: (default 'production') The environment of the\
+            last received report for this node
+    :type report_environment: :obj:`string`
+    :param catalog_environment: (default 'production') The environment of the\
+            last received catalog for this node
+    :type catalog_environment: :obj:`string
+    :param facts_environment: (default 'production') The environment of the\
+            last received fact set for this node
+    :type facts_environment" :obj:`string`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -240,14 +249,25 @@ class Node(object):
             compiled or `None`.
     :ivar facts_timestamp: :obj:`datetime.datetime` last time when facts were\
             collected or `None`.
+    :ivar report_environment: :obj:`string` the environment of the last received\
+            report for this node.
+    :ivar catalog_environment: :obj:`string` the environment of the last\
+            received catalog for this node.
+    :ivar facts_environment: :obj:`string` the environemtn of the last received\
+            fact set for this node.
     """
     def __init__(self, api, name, deactivated=None, report_timestamp=None,
                  catalog_timestamp=None, facts_timestamp=None,
-                 status=None, events=None, unreported_time=None):
+                 status=None, events=None, unreported_time=None,
+                 report_environment='production', catalog_environment='production',
+                 facts_environment='production'):
         self.name = name
         self.status = status
         self.events = events
         self.unreported_time = unreported_time
+        self.report_timestamp = report_timestamp
+        self.catalog_environment = catalog_environment
+        self.facts_environment = facts_environment
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)
