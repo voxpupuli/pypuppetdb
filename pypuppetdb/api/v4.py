@@ -192,15 +192,21 @@ class API(BaseAPI):
         reports = self._query('reports', query=query)
         for report in reports:
             yield Report(
-                report['certname'],
-                report['hash'],
-                report['start-time'],
-                report['end-time'],
-                report['receive-time'],
-                report['configuration-version'],
-                report['report-format'],
-                report['puppet-version'],
-                report['transaction-uuid']
+                node=report['certname'],
+                hash_=report['hash'],
+                start=report['start_time'],
+                end=report['end_time'],
+                received=report['receive_time'],
+                version=report['configuration_version'],
+                format_=report['report_format'],
+                agent_version=report['puppet_version'],
+                transaction=report['transaction_uuid'],
+                environment=report['environment'],
+                status=report['status'],
+                noop=report['noop'],
+                events_=report['resource_events'],
+                metrics_=report['metrics'],
+                logs_=report['logs']
                 )
 
     def events(self, query, order_by=None, limit=None):

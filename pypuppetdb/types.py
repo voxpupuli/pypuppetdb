@@ -90,6 +90,21 @@ class Report(object):
     :type agent_version: :obj:`string`
     :param transaction: The UUID of this transaction.
     :type transaction: :obj:`string`
+    :param environment: (Default 'production') The environment assigned to\
+            the node that submitted this report.
+    :type environment: :obj:`string
+    :param status: The status associated to this report's node.
+    :type status: :obj:`string`
+    :param noop: (Default `False`) A flag indicating weather the report was\
+            produced by a noop run.
+    :type noop: :obj:`bool`
+    :param events_: The events of resource that changed, failed, etc in this\
+            report
+    :type events_: :obj:`dict`
+    :param metrics_: All metrics associated with this report.
+    :type metrics_: :obj:`dict`
+    :param logs_: All logs associated with this report.
+    :type logs_: :obj:`dict`
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -102,10 +117,16 @@ class Report(object):
     :ivar agent_version: :obj:`string` Puppet Agent version.
     :ivar run_time: :obj:`datetime.timedelta` of **end** - **start**.
     :ivar transaction: UUID identifying this transaction.
-
+    :ivar environment: The environment assigned to the node that submitted\
+            this report.
+    :ivar status: The status associated to this report's node.
+    :ivar noop: A flag indicating weather the report was produced by a noop\
+            run.
     """
     def __init__(self, node, hash_, start, end, received, version,
-                 format_, agent_version, transaction):
+                 format_, agent_version, transaction, status, 
+                 events_={}, metrics_={}, logs_={}, environment='production', 
+                 noop=False):
 
         self.node = node
         self.hash_ = hash_
@@ -117,6 +138,12 @@ class Report(object):
         self.agent_version = agent_version
         self.run_time = self.end - self.start
         self.transaction = transaction
+        self.environment = environment
+        self.status = status
+        self.noop = noop
+        self.events_ = events_
+        self.metrics_ = metrics_
+        self.logs_ = logs_
         self.__string = '{0}'.format(self.hash_)
 
     def __repr__(self):
@@ -190,7 +217,7 @@ class Resource(object):
         with this resource.
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, parameters={}, environment):
+                 sourceline, environment, parameters={}):
         self.node = node
         self.name = name
         self.type_ = type_
