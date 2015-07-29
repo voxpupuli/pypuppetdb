@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 API_VERSIONS = {
     2: 'v2',
     3: 'v3',
+    4: 'v4',
 }
 
 ENDPOINTS = {
@@ -44,6 +45,25 @@ ENDPOINTS = {
         'server-time': 'server-time',
         'version': 'version',
     },
+    4: {
+        'facts': 'pdb/query/v4/facts',
+        'fact-names': 'pdb/query/v4/fact-names',
+        'nodes': 'pdb/query/v4/nodes',
+        'resources': 'pdb/query/v4/resources',
+        'catalogs': 'pdb/query/v4/catalogs',
+        'mbean': 'metrics/v1/mbeans',
+        'reports': 'pdb/query/v4/reports',
+        'events': 'pdb/query/v4/events',
+        'event-counts': 'pdb/query/v4/event-counts',
+        'aggregate-event-counts': 'pdb/query/v4/aggregate-event-counts',
+        'server-time': 'pdb/meta/v1/server-time',
+        'version': 'pdb/meta/v1/version',
+        'environments': 'pdb/query/v4/environments',
+        'factsets': 'pdb/query/v4/factsets',
+        'fact-paths': 'pdb/query/v4/fact-paths',
+        'fact-contents': 'pdb/query/v4/fact-contents',
+        'edges': 'pdb/query/v4/edges',
+    }
 }
 
 ERROR_STRINGS = {
@@ -68,7 +88,7 @@ class BaseAPI(object):
     When at initialisation :obj:`api_version` isn't found in\
             :const:`API_VERSIONS` this will raise an error.
 
-    :param api_version: Version of the API we're initialising.
+    :param api_version: (Default 4) Version of the API we're initialising.
     :type api_version: :obj:`int`
 
     :param host: (optional) Hostname or IP of PuppetDB.
@@ -111,7 +131,7 @@ class BaseAPI(object):
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
-    def __init__(self, api_version, host='localhost', port=8080,
+    def __init__(self, api_version=4, host='localhost', port=8080,
                  ssl_verify=True, ssl_key=None, ssl_cert=None, timeout=10,
                  protocol=None, url_path=None, username=None, password=None):
         """Initialises our BaseAPI object passing the parameters needed in
@@ -230,16 +250,14 @@ class BaseAPI(object):
             endpoint, path))
 
         if endpoint in self.endpoints:
-            api_prefix = self.api_version
             endpoint = self.endpoints[endpoint]
         else:
             # If we reach this we're trying to query an endpoint that doesn't
             # exist. This shouldn't happen unless someone made a booboo.
             raise APIError
 
-        url = '{base_url}/{api_prefix}/{endpoint}'.format(
+        url = '{base_url}/{endpoint}'.format(
             base_url=self.base_url,
-            api_prefix=api_prefix,
             endpoint=endpoint,
             )
 

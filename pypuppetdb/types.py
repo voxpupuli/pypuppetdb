@@ -90,6 +90,21 @@ class Report(object):
     :type agent_version: :obj:`string`
     :param transaction: The UUID of this transaction.
     :type transaction: :obj:`string`
+    :param environment: (Default 'production') The environment assigned to\
+            the node that submitted this report.
+    :type environment: :obj:`string
+    :param status: The status associated to this report's node.
+    :type status: :obj:`string`
+    :param noop: (Default `False`) A flag indicating weather the report was\
+            produced by a noop run.
+    :type noop: :obj:`bool`
+    :param events_: The events of resource that changed, failed, etc in this\
+            report
+    :type events_: :obj:`dict`
+    :param metrics_: All metrics associated with this report.
+    :type metrics_: :obj:`dict`
+    :param logs_: All logs associated with this report.
+    :type logs_: :obj:`dict`
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -102,10 +117,16 @@ class Report(object):
     :ivar agent_version: :obj:`string` Puppet Agent version.
     :ivar run_time: :obj:`datetime.timedelta` of **end** - **start**.
     :ivar transaction: UUID identifying this transaction.
-
+    :ivar environment: The environment assigned to the node that submitted\
+            this report.
+    :ivar status: The status associated to this report's node.
+    :ivar noop: A flag indicating weather the report was produced by a noop\
+            run.
     """
     def __init__(self, node, hash_, start, end, received, version,
-                 format_, agent_version, transaction):
+                 format_, agent_version, transaction, status, 
+                 events_={}, metrics_={}, logs_={}, environment='production', 
+                 noop=False):
 
         self.node = node
         self.hash_ = hash_
@@ -117,6 +138,12 @@ class Report(object):
         self.agent_version = agent_version
         self.run_time = self.end - self.start
         self.transaction = transaction
+        self.environment = environment
+        self.status = status
+        self.noop = noop
+        self.events_ = events_
+        self.metrics_ = metrics_
+        self.logs_ = logs_
         self.__string = '{0}'.format(self.hash_)
 
     def __repr__(self):
@@ -135,15 +162,18 @@ class Fact(object):
     :param node: The hostname this fact was collected from.
     :param name: The fact's name, such as 'osfamily'
     :param value: The fact's value, such as 'Debian'
+    :param environment: The fact's environment, such as 'production'
 
     :ivar node: :obj:`string` holding the hostname.
     :ivar name: :obj:`string` holding the fact's name.
     :ivar value: :obj:`string` holding the fact's value.
+    :ivar environment: :obj:`string` holding the fact's environment
     """
-    def __init__(self, node, name, value):
+    def __init__(self, node, name, value, environment):
         self.node = node
         self.name = name
         self.value = value
+        self.environment = environment
         self.__string = '{0}/{1}'.format(self.name, self.node)
 
     def __repr__(self):
@@ -170,6 +200,9 @@ class Resource(object):
     :param sourceline: The line this resource is declared at.
     :param parameters: The parameters this resource has been declared with.
     :type parameters: :obj:`dict`
+    :param environment: The environment of the node associated with this\
+        resource.
+    :type environment: :obj:`string
 
     :ivar node: The hostname this resources is located on.
     :ivar name: The name of the resource in the Puppet manifest.
@@ -180,9 +213,11 @@ class Resource(object):
     :ivar parameters: :obj:`dict` with key:value pairs of parameters.
     :ivar relationships: :obj:`list` Contains all relationships to other\
         resources
+    :ivar environment: :obj:`string: The environment of the node associated\
+        with this resource.
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, parameters={}):
+                 sourceline, environment, parameters={}):
         self.node = node
         self.name = name
         self.type_ = type_
@@ -192,6 +227,7 @@ class Resource(object):
         self.sourceline = sourceline
         self.parameters = parameters
         self.relationships = []
+        self.environment = environment
         self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
@@ -230,6 +266,15 @@ class Node(object):
     :type events: :obj:`dict`
     :param unreported_time: (default `None`) Time since last report
     :type unreported_time: :obj:`string`
+    :param report_environment: (default 'production') The environment of the\
+            last received report for this node
+    :type report_environment: :obj:`string`
+    :param catalog_environment: (default 'production') The environment of the\
+            last received catalog for this node
+    :type catalog_environment: :obj:`string
+    :param facts_environment: (default 'production') The environment of the\
+            last received fact set for this node
+    :type facts_environment" :obj:`string`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -240,14 +285,25 @@ class Node(object):
             compiled or `None`.
     :ivar facts_timestamp: :obj:`datetime.datetime` last time when facts were\
             collected or `None`.
+    :ivar report_environment: :obj:`string` the environment of the last received\
+            report for this node.
+    :ivar catalog_environment: :obj:`string` the environment of the last\
+            received catalog for this node.
+    :ivar facts_environment: :obj:`string` the environemtn of the last received\
+            fact set for this node.
     """
     def __init__(self, api, name, deactivated=None, report_timestamp=None,
                  catalog_timestamp=None, facts_timestamp=None,
-                 status=None, events=None, unreported_time=None):
+                 status=None, events=None, unreported_time=None,
+                 report_environment='production', catalog_environment='production',
+                 facts_environment='production'):
         self.name = name
         self.status = status
         self.events = events
         self.unreported_time = unreported_time
+        self.report_timestamp = report_timestamp
+        self.catalog_environment = catalog_environment
+        self.facts_environment = facts_environment
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)
