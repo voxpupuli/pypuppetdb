@@ -11,7 +11,7 @@ from pypuppetdb.errors import (
     EmptyResponseError,
     UnsupportedVersionError,
     APIError,
-    )
+)
 
 log = logging.getLogger(__name__)
 
@@ -23,27 +23,27 @@ API_VERSIONS = {
 
 ENDPOINTS = {
     2: {
-        'facts': 'facts',
-        'fact-names': 'fact-names',
-        'nodes': 'nodes',
-        'resources': 'resources',
-        'metrics': 'metrics',
-        'mbean': 'metrics/mbean',
+        'facts': 'v2/facts',
+        'fact-names': 'v2/fact-names',
+        'nodes': 'v2/nodes',
+        'resources': 'v2/resources',
+        'metrics': 'v2/metrics',
+        'mbean': 'v2/metrics/mbean',
     },
     3: {
-        'facts': 'facts',
-        'fact-names': 'fact-names',
-        'nodes': 'nodes',
-        'resources': 'resources',
-        'catalogs': 'catalogs',
-        'metrics': 'metrics',
-        'mbean': 'metrics/mbean',
-        'reports': 'reports',
-        'events': 'events',
-        'event-counts': 'event-counts',
-        'aggregate-event-counts': 'aggregate-event-counts',
-        'server-time': 'server-time',
-        'version': 'version',
+        'facts': 'v3/facts',
+        'fact-names': 'v3/fact-names',
+        'nodes': 'v3/nodes',
+        'resources': 'v3/resources',
+        'catalogs': 'v3/catalogs',
+        'metrics': 'v3/metrics',
+        'mbean': 'v3/metrics/mbean',
+        'reports': 'v3/reports',
+        'events': 'v3/events',
+        'event-counts': 'v3/event-counts',
+        'aggregate-event-counts': 'v3/aggregate-event-counts',
+        'server-time': 'v3/server-time',
+        'version': 'v3/version',
     },
     4: {
         'facts': 'pdb/query/v4/facts',
@@ -206,7 +206,7 @@ class BaseAPI(object):
             host=self.host,
             port=self.port,
             url_path=self.url_path,
-            )
+        )
 
     @property
     def total(self):
@@ -259,7 +259,7 @@ class BaseAPI(object):
         url = '{base_url}/{endpoint}'.format(
             base_url=self.base_url,
             endpoint=endpoint,
-            )
+        )
 
         if path is not None:
             url = '{0}/{1}'.format(url, path)
