@@ -26,6 +26,10 @@ class TestBaseAPIVersion(object):
         v3 = pypuppetdb.api.BaseAPI(3)
         assert v3.api_version == 'v3'
 
+    def test_init_v4_defaults(self):
+        v4 = pypuppetdb.api.BaseAPI(4)
+        assert v4.api_version == 'v4'
+
     def test_init_invalid_version(self):
         with pytest.raises(pypuppetdb.errors.UnsupportedVersionError):
             vderp = pypuppetdb.api.BaseAPI(10000)
@@ -215,8 +219,10 @@ class TesteAPIQuery(object):
         baseapi.password = 'password123'
         baseapi._query('nodes')
         assert httpretty.last_request().path == '/v3/nodes'
+        encoded_cred = 'puppetdb:password123'.encode('utf-8')
+        bs_authheader = base64.b64encode(encoded_cred).decode('utf-8')
         assert httpretty.last_request().headers['Authorization'] == \
-            'Basic {0}'.format(base64.b64encode('puppetdb:password123'))
+            'Basic {0}'.format(bs_authheader)
         httpretty.disable()
         httpretty.reset()
 
@@ -334,3 +340,8 @@ class TestAPIMethods(object):
         assert httpretty.last_request().path == '/v3/metrics/mbean/test'
         httpretty.disable()
         httpretty.reset()
+
+    def test_normalize_resource_type(self, baseapi):
+        assert baseapi._normalize_resource_type('sysctl::value') == \
+            'Sysctl::Value'
+        assert baseapi._normalize_resource_type('user') == 'User'
