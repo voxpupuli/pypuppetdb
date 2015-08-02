@@ -110,6 +110,7 @@ class API(BaseAPI):
             yield Node(self,
                        node['certname'],
                        deactivated=node['deactivated'],
+                       expired=node['expired'],
                        report_timestamp=node['report_timestamp'],
                        catalog_timestamp=node['catalog_timestamp'],
                        facts_timestamp=node['facts_timestamp'],
