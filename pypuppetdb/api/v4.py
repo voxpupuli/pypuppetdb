@@ -60,31 +60,25 @@ class API(BaseAPI):
             nodes = [nodes, ]
 
         if with_status:
-            latest_events = self._query(
-                'reports',
+            latest_reports = self._query('reports',
                 query='["=","latest_report?",true]')
 
         for node in nodes:
             node['unreported_time'] = None
             node['status'] = None
+            node['events'] = None
 
             if with_status:
-                status = [s for s in latest_events
+                report = [s for s in latest_reports
                           if s['certname'] == node['certname']]
 
-            # node status from events
-            if with_status and status:
-                node['events'] = status = status[0]
-                if status['successes'] > 0:
-                    node['status'] = 'changed'
-                if status['noops'] > 0:
+                events = list(report[0]['resource_events']['data'])
+                node['events'] = len(events)
+
+                if report[0]['noop']:
                     node['status'] = 'noop'
-                if status['failures'] > 0:
-                    node['status'] = 'failed'
-            else:
-                if with_status:
-                    node['status'] = 'unchanged'
-                node['events'] = None
+                else:
+                    node['status'] = report[0]['status']
 
             # node report age
             if with_status and node['report_timestamp'] is not None:
@@ -146,11 +140,6 @@ class API(BaseAPI):
                 fact['value'],
                 fact['environment']
                 )
-
-    def fact_names(self):
-        """Get a list of all known facts."""
-
-        return self._query('fact-names')
 
     def resources(self, type_=None, title=None, query=None):
         """Query for resources limited by either type and/or title or query.
@@ -235,35 +224,14 @@ class API(BaseAPI):
                 line_number=event['line'],
                 )
 
-    def event_counts(self, query, summarize_by,
-                     count_by=None, count_filter=None):
-        """Get event counts from puppetdb"""
-        return self._query('event-counts',
-                           query=query,
-                           summarize_by=summarize_by,
-                           count_by=count_by,
-                           count_filter=count_filter)
-
-    def aggregate_event_counts(self, query, summarize_by,
-                               count_by=None, count_filter=None):
-        """Get event counts from puppetdb"""
-        return self._query('aggregate-event-counts',
-                           query=query, summarize_by=summarize_by,
-                           count_by=count_by, count_filter=count_filter)
-
-    def server_time(self):
-        """Get the current time of the clock on the PuppetDB server"""
-        return self._query('server-time')['server_time']
-
-    def current_version(self):
-        """Get version information about the running PuppetDB server"""
-        return self._query('version')['version']
-
-    def catalog(self, node):
+    def catalog(self, node=None):
         """Get the most recent catalog for a given node"""
-        c = self._query('catalogs', path=node)
-        return Catalog(c['data']['certname'],
-                       c['data']['edges'],
-                       c['data']['resources'],
-                       c['data']['version'],
-                       c['data']['transaction_uuid'])
+        catalogs = self._query('catalogs', path=node)
+
+        for catalog in catalogs:
+            yield Catalog(node=catalog['certname'],
+                          edges=catalog['edges']['data'],
+                          resources=catalog['resources']['data'],
+                          version=catalog['version'],
+                          transaction_uuid=catalog['transaction_uuid'],
+                          environment=catalog['environment'])

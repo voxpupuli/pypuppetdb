@@ -393,6 +393,9 @@ class Catalog(object):
                              corresponding report that was issued during
                              the same puppet run
     :type transaction_uuid: :obj:`string`
+    :param environment: The environment associated with the catalog's\
+                        certname
+    :type environment: :obj:`string:
 
     :ivar node: :obj:`string` Name of the host
     :ivar version: :obj:`string` Catalog version from Puppet
@@ -403,13 +406,16 @@ class Catalog(object):
                  of the relationship
     :ivar resources: :obj:`dict` of :obj:`Resource` The source Resource\
                      object of the relationship
+    :ivar environment: :obj:`string` Environment associated with the
+                       catalog's certname
     """
-    def __init__(self, node, edges, resources,
-                 version, transaction_uuid):
+    def __init__(self, node, edges, resources, version, transaction_uuid,
+                 environment):
 
         self.node = node
         self.version = version
         self.transaction_uuid = transaction_uuid
+        self.environment = environment
 
         self.resources = dict()
         for resource in resources:
@@ -417,22 +423,23 @@ class Catalog(object):
                 resource['file'] = None
             if 'line' not in resource:
                 resource['line'] = None
-            identifier = resource['type'] + '[' + resource['title'] + ']'
-            res = Resource(node, resource['title'],
-                           resource['type'], resource['tags'],
-                           resource['exported'], resource['file'],
-                           resource['line'], resource['parameters'])
+            identifier = resource['type']+'['+resource['title']+']'
+            res = Resource(node=node, name=resource['title'],
+                           type_=resource['type'], tags=resource['tags'],
+                           exported=resource['exported'], sourcefile=resource['file'],
+                           sourceline=resource['line'], parameters=resource['parameters'],
+                           environment=self.environment)
             self.resources[identifier] = res
 
         self.edges = []
         for edge in edges:
-            identifier_source = edge['source']['type'] + \
-                '[' + edge['source']['title'] + ']'
-            identifier_target = edge['target']['type'] + \
-                '[' + edge['target']['title'] + ']'
-            e = Edge(self.resources[identifier_source],
-                     self.resources[identifier_target],
-                     edge['relationship'])
+            identifier_source = edge['source_type'] + \
+                '[' + edge['source_title'] + ']'
+            identifier_target = edge['target_type'] + \
+                '[' + edge['target_title'] + ']'
+            e = Edge(source=self.resources[identifier_source],
+                     target=self.resources[identifier_target],
+                     relationship=edge['relationship'])
             self.edges.append(e)
             self.resources[identifier_source].relationships.append(e)
             self.resources[identifier_target].relationships.append(e)

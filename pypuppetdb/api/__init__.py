@@ -327,11 +327,11 @@ class BaseAPI(object):
         if offset is not None:
             payload['offset'] = offset
         if summarize_by is not None:
-            payload['summarize-by'] = summarize_by
+            payload['summarize_by'] = summarize_by
         if count_by is not None:
-            payload['count-by'] = count_by
+            payload['count_by'] = count_by
         if count_filter is not None:
-            payload['count-filter'] = count_filter
+            payload['counts_filter'] = count_filter
 
         if not (payload):
             payload = None
@@ -387,6 +387,29 @@ class BaseAPI(object):
     def resources(self):
         raise NotImplementedError
 
+    def catalog(self):
+        raise NotImplementedError
+
+    def event_counts(self, query, summarize_by,
+                     count_by=None, count_filter=None):
+        """Get event counts from puppetdb"""
+        return self._query('event-counts',
+                           query=query,
+                           summarize_by=summarize_by,
+                           count_by=count_by,
+                           count_filter=count_filter)
+
+    def aggregate_event_counts(self, query, summarize_by,
+                               count_by=None, count_filter=None):
+        """Get event counts from puppetdb"""
+        return self._query('aggregate-event-counts',
+                           query=query, summarize_by=summarize_by,
+                           count_by=count_by, count_filter=count_filter)
+
+    def fact_names(self):
+        """Get a list of all known facts."""
+        return self._query('fact-names')
+
     def metric(self, metric):
         """Query for a specific metrc.
 
@@ -396,3 +419,11 @@ class BaseAPI(object):
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
         return self._query('mbean', path=metric)
+
+    def server_time(self):
+        """Get the current time of the clock on the PuppetDB server"""
+        return self._query('server-time')['server_time']
+
+    def current_version(self):
+        """Get version information about the running PuppetDB server"""
+        return self._query('version')['version']
