@@ -234,11 +234,14 @@ class API(BaseAPI):
                 line_number=event['line'],
                 )
 
-    def catalog(self, node):
+    def catalog(self, node=None):
         """Get the most recent catalog for a given node"""
-        c = self._query('catalogs', path=node)
-        return Catalog(c['data']['name'],
-                       c['data']['edges'],
-                       c['data']['resources'],
-                       c['data']['version'],
-                       c['data']['transaction-uuid'])
+        catalogs = self._query('catalogs', path=node)
+
+        for catalog in catalogs:
+            yield Catalog(node=catalog['certname'],
+                          edges=catalog['edges']['data'],
+                          resources=catalog['resources']['data'],
+                          version=catalog['version'],
+                          transaction_uuid=catalog['transaction_uuid'],
+                          environment=catalog['environment'])

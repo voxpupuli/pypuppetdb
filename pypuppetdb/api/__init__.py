@@ -387,6 +387,9 @@ class BaseAPI(object):
     def resources(self):
         raise NotImplementedError
 
+    def catalog(self):
+        raise NotImplementedError
+
     def event_counts(self, query, summarize_by,
                      count_by=None, count_filter=None):
         """Get event counts from puppetdb"""
