@@ -351,7 +351,8 @@ class BaseAPI(object):
         if limit is not None:
             payload['limit'] = limit
         if include_total is True:
-            payload[self.parameters['include_total']] = json.dumps(include_total)
+            payload[self.parameters['include_total']] = \
+                json.dumps(include_total)
         if offset is not None:
             payload['offset'] = offset
         if summarize_by is not None:

@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from pypuppetdb.types import (
     Node, Fact, Resource,
     Report, Event, Catalog
-    )
+)
 
 log = logging.getLogger(__name__)
 
@@ -60,8 +60,10 @@ class API(BaseAPI):
             nodes = [nodes, ]
 
         if with_status:
-            latest_reports = self._query('reports',
-                query='["=","latest_report?",true]')
+            latest_reports = self._query(
+                'reports',
+                query='["=","latest_report?",true]'
+            )
 
         for node in nodes:
             node['unreported_time'] = None
@@ -86,15 +88,15 @@ class API(BaseAPI):
                     last_report = json_to_datetime(node['report_timestamp'])
                     last_report = last_report.replace(tzinfo=None)
                     now = datetime.utcnow()
-                    unreported_border = now-timedelta(hours=unreported)
+                    unreported_border = now - timedelta(hours=unreported)
                     if last_report < unreported_border:
-                        delta = (datetime.utcnow()-last_report)
+                        delta = (datetime.utcnow() - last_report)
                         node['status'] = 'unreported'
                         node['unreported_time'] = '{0}d {1}h {2}m'.format(
                             delta.days,
-                            int(delta.seconds/3600),
-                            int((delta.seconds % 3600)/60)
-                            )
+                            int(delta.seconds / 3600),
+                            int((delta.seconds % 3600) / 60)
+                        )
                 except AttributeError:
                     node['status'] = 'unreported'
 
@@ -139,7 +141,7 @@ class API(BaseAPI):
                 fact['name'],
                 fact['value'],
                 fact['environment']
-                )
+            )
 
     def resources(self, type_=None, title=None, query=None):
         """Query for resources limited by either type and/or title or query.
@@ -171,7 +173,7 @@ class API(BaseAPI):
                 sourceline=resource['line'],
                 parameters=resource['parameters'],
                 environment=resource['environment'],
-                )
+            )
 
     def reports(self, query):
         """Get reports for our infrastructure. Currently reports can only
@@ -197,7 +199,7 @@ class API(BaseAPI):
                 events_=report['resource_events'],
                 metrics_=report['metrics'],
                 logs_=report['logs']
-                )
+            )
 
     def events(self, query, order_by=None, limit=None):
         """A report is made up of events. This allows to query for events
@@ -222,7 +224,7 @@ class API(BaseAPI):
                 execution_path=event['containment_path'],
                 source_file=event['file'],
                 line_number=event['line'],
-                )
+            )
 
     def catalog(self, node=None):
         """Get the most recent catalog for a given node"""
