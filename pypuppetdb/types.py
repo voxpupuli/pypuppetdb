@@ -410,7 +410,7 @@ class Catalog(object):
                        catalog's certname
     """
     def __init__(self, node, edges, resources, version, transaction_uuid,
-                 environment):
+                 environment=None):
 
         self.node = node
         self.version = version
@@ -423,11 +423,13 @@ class Catalog(object):
                 resource['file'] = None
             if 'line' not in resource:
                 resource['line'] = None
-            identifier = resource['type']+'['+resource['title']+']'
+            identifier = resource['type'] + '[' + resource['title'] + ']'
             res = Resource(node=node, name=resource['title'],
                            type_=resource['type'], tags=resource['tags'],
-                           exported=resource['exported'], sourcefile=resource['file'],
-                           sourceline=resource['line'], parameters=resource['parameters'],
+                           exported=resource['exported'],
+                           sourcefile=resource['file'],
+                           sourceline=resource['line'],
+                           parameters=resource['parameters'],
                            environment=self.environment)
             self.resources[identifier] = res
 
