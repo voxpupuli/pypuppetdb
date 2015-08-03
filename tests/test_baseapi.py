@@ -294,7 +294,7 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/v3/nodes')
         baseapi._query('nodes', count_filter=1)
         assert httpretty.last_request().querystring == {
-            'count-filter': ['1']}
+            'counts-filter': ['1']}
         httpretty.disable()
         httpretty.reset()
 
