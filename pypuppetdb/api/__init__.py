@@ -406,6 +406,10 @@ class BaseAPI(object):
                            query=query, summarize_by=summarize_by,
                            count_by=count_by, count_filter=count_filter)
 
+    def fact_names(self):
+        """Get a list of all known facts."""
+        return self._query('fact-names')
+
     def metric(self, metric):
         """Query for a specific metrc.
 

@@ -140,11 +140,6 @@ class API(BaseAPI):
                 fact['environment']
                 )
 
-    def fact_names(self):
-        """Get a list of all known facts."""
-
-        return self._query('fact-names')
-
     def resources(self, type_=None, title=None, query=None):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
