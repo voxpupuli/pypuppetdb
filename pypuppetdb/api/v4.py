@@ -253,7 +253,7 @@ class API(BaseAPI):
 
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server"""
-        return self._query('server-time')['server-time']
+        return self._query('server-time')['server_time']
 
     def current_version(self):
         """Get version information about the running PuppetDB server"""
@@ -262,8 +262,8 @@ class API(BaseAPI):
     def catalog(self, node):
         """Get the most recent catalog for a given node"""
         c = self._query('catalogs', path=node)
-        return Catalog(c['data']['name'],
+        return Catalog(c['data']['certname'],
                        c['data']['edges'],
                        c['data']['resources'],
                        c['data']['version'],
-                       c['data']['transaction-uuid'])
+                       c['data']['transaction_uuid'])
