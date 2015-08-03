@@ -234,14 +234,6 @@ class API(BaseAPI):
                 line_number=event['line'],
                 )
 
-    def server_time(self):
-        """Get the current time of the clock on the PuppetDB server"""
-        return self._query('server-time')['server-time']
-
-    def current_version(self):
-        """Get version information about the running PuppetDB server"""
-        return self._query('version')['version']
-
     def catalog(self, node):
         """Get the most recent catalog for a given node"""
         c = self._query('catalogs', path=node)

@@ -412,3 +412,11 @@ class BaseAPI(object):
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
         return self._query('mbean', path=metric)
+
+    def server_time(self):
+        """Get the current time of the clock on the PuppetDB server"""
+        return self._query('server-time')['server_time']
+
+    def current_version(self):
+        """Get version information about the running PuppetDB server"""
+        return self._query('version')['version']
