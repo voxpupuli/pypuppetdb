@@ -66,6 +66,33 @@ ENDPOINTS = {
     }
 }
 
+PARAMETERS = {
+    2: {
+        'order_by': 'order-by',
+        'include_total': 'include-total',
+        'count_by': 'count-by',
+        'counts_filter': 'counts-filter',
+        'summarize_by': 'summarize-by',
+        'server_time': 'server-time',
+    },
+    3: {
+        'order_by': 'order-by',
+        'include_total': 'include-total',
+        'count_by': 'count-by',
+        'counts_filter': 'counts-filter',
+        'summarize_by': 'summarize-by',
+        'server_time': 'server-time',
+    },
+    4: {
+        'order_by': 'order_by',
+        'include_total': 'include_total',
+        'count_by': 'count_by',
+        'counts_filter': 'counts_filter',
+        'summarize_by': 'summarize_by',
+        'server_time': 'server_time',
+    }
+}
+
 ERROR_STRINGS = {
     'timeout': 'Connection to PuppetDB timed out on',
     'refused': 'Could not reach PuppetDB on',
@@ -168,6 +195,7 @@ class BaseAPI(object):
             self.password = None
 
         self.endpoints = ENDPOINTS[api_version]
+        self.parameters = PARAMETERS[api_version]
         self._session = requests.Session()
         self._session.headers = {
             'content-type': 'application/json',
@@ -319,19 +347,19 @@ class BaseAPI(object):
         if query is not None:
             payload['query'] = query
         if order_by is not None:
-            payload['order-by'] = order_by
+            payload[self.parameters['order_by']] = order_by
         if limit is not None:
             payload['limit'] = limit
         if include_total is True:
-            payload['include-total'] = json.dumps(include_total)
+            payload[self.parameters['include_total']] = json.dumps(include_total)
         if offset is not None:
             payload['offset'] = offset
         if summarize_by is not None:
-            payload['summarize_by'] = summarize_by
+            payload[self.parameters['summarize_by']] = summarize_by
         if count_by is not None:
-            payload['count_by'] = count_by
+            payload[self.parameters['count_by']] = count_by
         if count_filter is not None:
-            payload['counts_filter'] = count_filter
+            payload[self.parameters['counts_filter']] = count_filter
 
         if not (payload):
             payload = None
@@ -422,7 +450,7 @@ class BaseAPI(object):
 
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server"""
-        return self._query('server-time')['server_time']
+        return self._query('server-time')[self.parameters['server_time']]
 
     def current_version(self):
         """Get version information about the running PuppetDB server"""
