@@ -9,11 +9,6 @@ pypuppetdb
    :target: https://coveralls.io/repos/puppet-community/pypuppetdb
 
 
-.. image:: https://travis-ci.org/colmat/pypuppetdb.svg?branch=work-pdb3
-    :target: https://travis-ci.org/colmat/pypuppetdb
-
-.. image:: https://coveralls.io/repos/colmat/pypuppetdb/badge.svg?branch=work-pdb3&service=github :target: https://coveralls.io/github/colmat/pypuppetdb?branch=work-pdb3
-
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 
