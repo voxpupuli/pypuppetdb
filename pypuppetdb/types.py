@@ -124,8 +124,8 @@ class Report(object):
             run.
     """
     def __init__(self, node, hash_, start, end, received, version,
-                 format_, agent_version, transaction, status, 
-                 events_={}, metrics_={}, logs_={}, environment='production', 
+                 format_, agent_version, transaction, status=None,
+                 events_={}, metrics_={}, logs_={}, environment=None,
                  noop=False):
 
         self.node = node
@@ -169,7 +169,7 @@ class Fact(object):
     :ivar value: :obj:`string` holding the fact's value.
     :ivar environment: :obj:`string` holding the fact's environment
     """
-    def __init__(self, node, name, value, environment):
+    def __init__(self, node, name, value, environment=None):
         self.node = node
         self.name = name
         self.value = value
@@ -217,7 +217,7 @@ class Resource(object):
         with this resource.
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, environment, parameters={}):
+                 sourceline, environment=None, parameters={}):
         self.node = node
         self.name = name
         self.type_ = type_
@@ -285,23 +285,27 @@ class Node(object):
             compiled or `None`.
     :ivar facts_timestamp: :obj:`datetime.datetime` last time when facts were\
             collected or `None`.
-    :ivar report_environment: :obj:`string` the environment of the last received\
-            report for this node.
+    :ivar report_environment: :obj:`string` the environment of the last\
+            received report for this node.
     :ivar catalog_environment: :obj:`string` the environment of the last\
             received catalog for this node.
-    :ivar facts_environment: :obj:`string` the environemtn of the last received\
-            fact set for this node.
+    :ivar facts_environment: :obj:`string` the environemtn of the last\
+            received fact set for this node.
     """
-    def __init__(self, api, name, deactivated=None, report_timestamp=None,
-                 catalog_timestamp=None, facts_timestamp=None,
-                 status=None, events=None, unreported_time=None,
-                 report_environment='production', catalog_environment='production',
+    def __init__(self, api, name, deactivated=None, expired=None,
+                 report_timestamp=None, catalog_timestamp=None,
+                 facts_timestamp=None, status=None, events=None,
+                 unreported_time=None, report_environment='production',
+                 catalog_environment='production',
                  facts_environment='production'):
         self.name = name
         self.status = status
         self.events = events
         self.unreported_time = unreported_time
         self.report_timestamp = report_timestamp
+        self.catalog_timestamp = catalog_timestamp
+        self.facts_timestamp = facts_timestamp
+        self.report_environment = report_environment
         self.catalog_environment = catalog_environment
         self.facts_environment = facts_environment
 
@@ -309,6 +313,10 @@ class Node(object):
             self.deactivated = json_to_datetime(deactivated)
         else:
             self.deactivated = False
+        if expired is not None:
+            self.expired = json_to_datetime(expired)
+        else:
+            self.expired = False
         if report_timestamp is not None:
             self.report_timestamp = json_to_datetime(report_timestamp)
         else:
@@ -402,7 +410,7 @@ class Catalog(object):
                        catalog's certname
     """
     def __init__(self, node, edges, resources, version, transaction_uuid,
-                 environment):
+                 environment=None):
 
         self.node = node
         self.version = version
@@ -415,11 +423,13 @@ class Catalog(object):
                 resource['file'] = None
             if 'line' not in resource:
                 resource['line'] = None
-            identifier = resource['type']+'['+resource['title']+']'
+            identifier = resource['type'] + '[' + resource['title'] + ']'
             res = Resource(node=node, name=resource['title'],
                            type_=resource['type'], tags=resource['tags'],
-                           exported=resource['exported'], sourcefile=resource['file'],
-                           sourceline=resource['line'], parameters=resource['parameters'],
+                           exported=resource['exported'],
+                           sourcefile=resource['file'],
+                           sourceline=resource['line'],
+                           parameters=resource['parameters'],
                            environment=self.environment)
             self.resources[identifier] = res
 

@@ -11,7 +11,7 @@ from pypuppetdb.errors import (
     EmptyResponseError,
     UnsupportedVersionError,
     APIError,
-    )
+)
 
 log = logging.getLogger(__name__)
 
@@ -23,27 +23,27 @@ API_VERSIONS = {
 
 ENDPOINTS = {
     2: {
-        'facts': 'facts',
-        'fact-names': 'fact-names',
-        'nodes': 'nodes',
-        'resources': 'resources',
-        'metrics': 'metrics',
-        'mbean': 'metrics/mbean',
+        'facts': 'v2/facts',
+        'fact-names': 'v2/fact-names',
+        'nodes': 'v2/nodes',
+        'resources': 'v2/resources',
+        'metrics': 'v2/metrics',
+        'mbean': 'v2/metrics/mbean',
     },
     3: {
-        'facts': 'facts',
-        'fact-names': 'fact-names',
-        'nodes': 'nodes',
-        'resources': 'resources',
-        'catalogs': 'catalogs',
-        'metrics': 'metrics',
-        'mbean': 'metrics/mbean',
-        'reports': 'reports',
-        'events': 'events',
-        'event-counts': 'event-counts',
-        'aggregate-event-counts': 'aggregate-event-counts',
-        'server-time': 'server-time',
-        'version': 'version',
+        'facts': 'v3/facts',
+        'fact-names': 'v3/fact-names',
+        'nodes': 'v3/nodes',
+        'resources': 'v3/resources',
+        'catalogs': 'v3/catalogs',
+        'metrics': 'v3/metrics',
+        'mbean': 'v3/metrics/mbean',
+        'reports': 'v3/reports',
+        'events': 'v3/events',
+        'event-counts': 'v3/event-counts',
+        'aggregate-event-counts': 'v3/aggregate-event-counts',
+        'server-time': 'v3/server-time',
+        'version': 'v3/version',
     },
     4: {
         'facts': 'pdb/query/v4/facts',
@@ -63,6 +63,33 @@ ENDPOINTS = {
         'fact-paths': 'pdb/query/v4/fact-paths',
         'fact-contents': 'pdb/query/v4/fact-contents',
         'edges': 'pdb/query/v4/edges',
+    }
+}
+
+PARAMETERS = {
+    2: {
+        'order_by': 'order-by',
+        'include_total': 'include-total',
+        'count_by': 'count-by',
+        'counts_filter': 'counts-filter',
+        'summarize_by': 'summarize-by',
+        'server_time': 'server-time',
+    },
+    3: {
+        'order_by': 'order-by',
+        'include_total': 'include-total',
+        'count_by': 'count-by',
+        'counts_filter': 'counts-filter',
+        'summarize_by': 'summarize-by',
+        'server_time': 'server-time',
+    },
+    4: {
+        'order_by': 'order_by',
+        'include_total': 'include_total',
+        'count_by': 'count_by',
+        'counts_filter': 'counts_filter',
+        'summarize_by': 'summarize_by',
+        'server_time': 'server_time',
     }
 }
 
@@ -168,6 +195,7 @@ class BaseAPI(object):
             self.password = None
 
         self.endpoints = ENDPOINTS[api_version]
+        self.parameters = PARAMETERS[api_version]
         self._session = requests.Session()
         self._session.headers = {
             'content-type': 'application/json',
@@ -206,7 +234,7 @@ class BaseAPI(object):
             host=self.host,
             port=self.port,
             url_path=self.url_path,
-            )
+        )
 
     @property
     def total(self):
@@ -259,7 +287,7 @@ class BaseAPI(object):
         url = '{base_url}/{endpoint}'.format(
             base_url=self.base_url,
             endpoint=endpoint,
-            )
+        )
 
         if path is not None:
             url = '{0}/{1}'.format(url, path)
@@ -319,19 +347,20 @@ class BaseAPI(object):
         if query is not None:
             payload['query'] = query
         if order_by is not None:
-            payload['order-by'] = order_by
+            payload[self.parameters['order_by']] = order_by
         if limit is not None:
             payload['limit'] = limit
         if include_total is True:
-            payload['include-total'] = json.dumps(include_total)
+            payload[self.parameters['include_total']] = \
+                json.dumps(include_total)
         if offset is not None:
             payload['offset'] = offset
         if summarize_by is not None:
-            payload['summarize_by'] = summarize_by
+            payload[self.parameters['summarize_by']] = summarize_by
         if count_by is not None:
-            payload['count_by'] = count_by
+            payload[self.parameters['count_by']] = count_by
         if count_filter is not None:
-            payload['counts_filter'] = count_filter
+            payload[self.parameters['counts_filter']] = count_filter
 
         if not (payload):
             payload = None
@@ -422,7 +451,7 @@ class BaseAPI(object):
 
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server"""
-        return self._query('server-time')['server_time']
+        return self._query('server-time')[self.parameters['server_time']]
 
     def current_version(self):
         """Get version information about the running PuppetDB server"""
