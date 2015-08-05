@@ -439,7 +439,8 @@ class Catalog(object):
                 '[' + edge['target_title'] + ']'
             e = Edge(source=self.resources[identifier_source],
                      target=self.resources[identifier_target],
-                     relationship=edge['relationship'])
+                     relationship=edge['relationship'],
+                     node=self.node)
             self.edges.append(e)
             self.resources[identifier_source].relationships.append(e)
             self.resources[identifier_target].relationships.append(e)
@@ -477,15 +478,19 @@ class Edge(object):
     :type target: :obj:`Resource`
     :param relaptionship: Name of the Puppet Ressource Relationship
     :type relationship: :obj:`string`
+    :param node: The certname of the node that owns this Relationship
+    :type node: :obj:`string
 
     :ivar source: :obj:`Resource` The source Resource object
     :ivar target: :obj:`Resource` The target Resource object
     :ivar relationship: :obj:`string` Name of the Puppet Resource relationship
+    :ivar node: :obj:`string` The name of the node that owns this relationship
     """
-    def __init__(self, source, target, relationship):
+    def __init__(self, source, target, relationship, node=None):
         self.source = source
         self.target = target
         self.relationship = relationship
+        self.node = node
         self.__string = '{0} - {1} - {2}'.format(self.source,
                                                  self.relationship,
                                                  self.target)

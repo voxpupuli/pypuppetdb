@@ -260,3 +260,17 @@ class API(BaseAPI):
     def current_version(self):
         """Get version information about the running PuppetDB server"""
         return self._query('version')['version']
+
+    def edges(self, query=None):
+        """Get the known catalog edges, formed between tow resources"""
+        edges = self._query('edges', query=query)
+
+        for edge in edges:
+            identifier_source = edge['source_type'] + \
+                '[' + edge['source_title'] + ']'
+            identifier_target = edge['target_type'] + \
+                '[' + edge['target_title'] + ']'
+            yield Edge(source=self.resources[identifier_source],
+                       target=self.resources[identifier_target],
+                       relationship=edge['relationship'],
+                       node=edge['certname'])

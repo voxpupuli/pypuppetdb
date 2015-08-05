@@ -410,6 +410,9 @@ class BaseAPI(object):
     def node(self):
         raise NotImplementedError
 
+    def edges(self):
+        raise NotImplementedError
+
     def facts(self):
         raise NotImplementedError
 
