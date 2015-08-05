@@ -274,3 +274,7 @@ class API(BaseAPI):
                        target=self.resources[identifier_target],
                        relationship=edge['relationship'],
                        node=edge['certname'])
+
+    def environments(self, query=None)
+        """Get all known environments from Puppetdb"""
+        return = self._query('environments', query=query)
