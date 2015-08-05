@@ -226,6 +226,22 @@ class API(BaseAPI):
                 line_number=event['line'],
             )
 
+    def aggregate_event_counts(self, query, summarize_by,
+                               count_by=None, count_filter=None):
+        """Get event counts from puppetdb"""
+        return self._query('aggregate-event-counts',
+                           query=query, summarize_by=summarize_by,
+                           count_by=count_by, count_filter=count_filter)
+
+    def event_counts(self, query, summarize_by,
+                     count_by=None, count_filter=None):
+        """Get event counts from puppetdb"""
+        return self._query('event-counts',
+                           query=query,
+                           summarize_by=summarize_by,
+                           count_by=count_by,
+                           count_filter=count_filter)
+
     def catalog(self, node=None):
         """Get the most recent catalog for a given node"""
         catalogs = self._query('catalogs', path=node)
@@ -237,3 +253,11 @@ class API(BaseAPI):
                           version=catalog['version'],
                           transaction_uuid=catalog['transaction_uuid'],
                           environment=catalog['environment'])
+
+    def server_time(self):
+        """Get the current time of the clock on the PuppetDB server"""
+        return self._query('server-time')[self.parameters['server_time']]
+
+    def current_version(self):
+        """Get version information about the running PuppetDB server"""
+        return self._query('version')['version']
