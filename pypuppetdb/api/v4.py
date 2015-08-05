@@ -196,9 +196,8 @@ class API(BaseAPI):
                 environment=report['environment'],
                 status=report['status'],
                 noop=report['noop'],
-                events_=report['resource_events'],
-                metrics_=report['metrics'],
-                logs_=report['logs']
+                metrics=report['metrics']['data'],
+                logs=report['logs']['data']
             )
 
     def events(self, query, order_by=None, limit=None):
