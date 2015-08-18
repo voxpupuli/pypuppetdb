@@ -419,6 +419,9 @@ class BaseAPI(object):
     def facts(self):
         raise NotImplementedError
 
+    def factsets(self):
+        raise NotImplementedError
+
     def resources(self):
         raise NotImplementedError
 

@@ -275,6 +275,10 @@ class API(BaseAPI):
                        relationship=edge['relationship'],
                        node=edge['certname'])
 
-    def environments(self, query=None)
+    def environments(self, query=None):
         """Get all known environments from Puppetdb"""
-        return = self._query('environments', query=query)
+        return self._query('environments', query=query)
+
+    def factsets(self, query=None):
+        """Returns a set of all facts or for a single certname"""
+        return self._query('factsets', query=query)
