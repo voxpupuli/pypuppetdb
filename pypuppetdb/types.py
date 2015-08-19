@@ -122,7 +122,7 @@ class Report(object):
     :ivar metrics: :obj:`list` containing :obj:`dict` of all metrics\
             associated with this report
     """
-    def __init__(self, node, hash_, start, end, received, version,
+    def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
                  noop=False):
@@ -144,6 +144,9 @@ class Report(object):
         self.logs = logs
         self.__string = '{0}'.format(self.hash_)
 
+        self.__api = api
+        self.__query_scope = '["=", "report", "{0}"]'.format(self.hash_)
+
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))
 
@@ -152,6 +155,10 @@ class Report(object):
 
     def __unicode__(self):
         return self.__string
+
+    def events(self):
+        """Get all events for this report."""
+        return self.__api.events(query=self.__query_scope)
 
 
 class Fact(object):

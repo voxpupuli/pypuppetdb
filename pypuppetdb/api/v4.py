@@ -184,6 +184,7 @@ class API(BaseAPI):
         reports = self._query('reports', query=query)
         for report in reports:
             yield Report(
+                api=self,
                 node=report['certname'],
                 hash_=report['hash'],
                 start=report['start_time'],
