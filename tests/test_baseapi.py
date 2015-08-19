@@ -242,7 +242,7 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', order_by='ted')
         assert httpretty.last_request().querystring == {
-            'order-by': ['ted']}
+            'order_by': ['ted']}
         httpretty.disable()
         httpretty.reset()
 
@@ -260,7 +260,7 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', include_total=True)
         assert httpretty.last_request().querystring == {
-            'include-total': ['true']}
+            'include_total': ['true']}
         httpretty.disable()
         httpretty.reset()
 
@@ -278,7 +278,7 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', summarize_by=1)
         assert httpretty.last_request().querystring == {
-            'summarize-by': ['1']}
+            'summarize_by': ['1']}
         httpretty.disable()
         httpretty.reset()
 
@@ -287,7 +287,7 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', count_by=1)
         assert httpretty.last_request().querystring == {
-            'count-by': ['1']}
+            'count_by': ['1']}
         httpretty.disable()
         httpretty.reset()
 
@@ -296,13 +296,13 @@ class TesteAPIQuery(object):
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', count_filter=1)
         assert httpretty.last_request().querystring == {
-            'counts-filter': ['1']}
+            'counts_filter': ['1']}
         httpretty.disable()
         httpretty.reset()
 
     def test_response_empty(self, baseapi):
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, 
+        httpretty.register_uri(httpretty.GET,
                                'http://localhost:8080/pdb/query/v4/nodes',
                                body=json.dumps(None))
         with pytest.raises(pypuppetdb.errors.EmptyResponseError):
@@ -310,7 +310,7 @@ class TesteAPIQuery(object):
 
     def test_response_x_records(self, baseapi):
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, 
+        httpretty.register_uri(httpretty.GET,
                                'http://localhost:8080/pdb/query/v4/nodes',
                                adding_headers={
                                    'X-Records': 256},

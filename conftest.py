@@ -23,7 +23,7 @@ def api4():
 
 @pytest.fixture
 def baseapi():
-    return pypuppetdb.api.BaseAPI(3)
+    return pypuppetdb.api.BaseAPI(4)
 
 
 @pytest.fixture

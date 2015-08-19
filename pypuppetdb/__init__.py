@@ -127,12 +127,12 @@ def connect(api_version=4, host='localhost', port=8080, ssl_verify=False,
                       timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
                       ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
                       username=username, password=password)
-    if api_version == 3:
+    elif api_version == 3:
         return v3.API(host=host, port=port,
                       timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
                       ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
                       username=username, password=password)
-    if api_version == 2:
+    elif api_version == 2:
         return v2.API(host=host, port=port,
                       timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
                       ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
