@@ -282,3 +282,10 @@ class API(BaseAPI):
     def factsets(self, query=None):
         """Returns a set of all facts or for a single certname"""
         return self._query('factsets', query=query)
+
+    def fact_paths(self, query=None):
+        """Fact Paths are intended to be a counter-part of the fact-names
+        endpoint. It provides increased granularity around structured 
+        facts and may be used for building GUI autocompletions or other
+        applications that require a basic top-level view of fact paths."""
+        return self._query('fact-paths', query=query)

@@ -422,6 +422,9 @@ class BaseAPI(object):
     def factsets(self):
         raise NotImplementedError
 
+    def fact_paths(self):
+        raise NotImplementedError
+
     def resources(self):
         raise NotImplementedError
 
