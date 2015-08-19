@@ -151,7 +151,7 @@ class TestBaseAPIProperties(object):
 
 class TestBaseAPIURL(object):
     def test_without_path(self, baseapi):
-        assert baseapi._url('nodes') == 
+        assert baseapi._url('nodes') == \
             'http://localhost:8080/pdb/query/v4/nodes'
 
     def test_with_invalid_endpoint(self, baseapi):
@@ -160,7 +160,7 @@ class TestBaseAPIURL(object):
 
     def test_with_path(self, baseapi):
         url = baseapi._url('nodes', path='node1.example.com')
-        assert url == 
+        assert url == \
             'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
 
 
