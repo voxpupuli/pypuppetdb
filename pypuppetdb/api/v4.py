@@ -289,3 +289,9 @@ class API(BaseAPI):
         facts and may be used for building GUI autocompletions or other
         applications that require a basic top-level view of fact paths."""
         return self._query('fact-paths', query=query)
+
+    def fact_contents(self, query=None):
+        """To complement fact_paths(), this endpoint provides the capability
+        to descend into structured facts and retreive the values associated
+        with fact paths"""
+        return self._query('fact-contents', query=query)
