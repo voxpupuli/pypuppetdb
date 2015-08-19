@@ -151,7 +151,8 @@ class TestBaseAPIProperties(object):
 
 class TestBaseAPIURL(object):
     def test_without_path(self, baseapi):
-        assert baseapi._url('nodes') == 'http://localhost:8080/pdb/query/v4/nodes'
+        assert baseapi._url('nodes') == 
+            'http://localhost:8080/pdb/query/v4/nodes'
 
     def test_with_invalid_endpoint(self, baseapi):
         with pytest.raises(pypuppetdb.errors.APIError):
@@ -159,7 +160,8 @@ class TestBaseAPIURL(object):
 
     def test_with_path(self, baseapi):
         url = baseapi._url('nodes', path='node1.example.com')
-        assert url == 'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
+        assert url == 
+            'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
 
 
 class TesteAPIQuery(object):
@@ -300,14 +302,16 @@ class TesteAPIQuery(object):
 
     def test_response_empty(self, baseapi):
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/pdb/query/v4/nodes',
+        httpretty.register_uri(httpretty.GET, 
+                               'http://localhost:8080/pdb/query/v4/nodes',
                                body=json.dumps(None))
         with pytest.raises(pypuppetdb.errors.EmptyResponseError):
             baseapi._query('nodes')
 
     def test_response_x_records(self, baseapi):
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/pdb/query/v4/nodes',
+        httpretty.register_uri(httpretty.GET, 
+                               'http://localhost:8080/pdb/query/v4/nodes',
                                adding_headers={
                                    'X-Records': 256},
                                body='[]',
