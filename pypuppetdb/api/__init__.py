@@ -450,7 +450,7 @@ class BaseAPI(object):
         """Get a list of all known facts."""
         return self._query('fact-names')
 
-    def metric(self, metric):
+    def metric(self, metric=None):
         """Query for a specific metrc.
 
         :param metric: The name of the metric we want.
