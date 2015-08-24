@@ -68,14 +68,23 @@ class API(BaseAPI):
         for node in nodes:
             node['unreported_time'] = None
             node['status'] = None
-            node['events'] = None
+            node['events'] = {
+                'failures': 0,
+                'successes': 0,
+                'skips': 0
+                }
 
             if with_status:
                 report = [s for s in latest_reports
                           if s['certname'] == node['certname']]
 
-                events = list(report[0]['resource_events']['data'])
-                node['events'] = len(events)
+                for event in report[0]['resource_events']['data']:
+                    if event['status'] == 'success':
+                        node['events']['successes'] += 1
+                    elif event['status'] == 'failure':
+                        node['events']['failures'] += 1
+                    elif event['status'] == 'skipped':
+                        node['events']['skips'] += 1
 
                 if report[0]['noop']:
                     node['status'] = 'noop'
