@@ -185,8 +185,8 @@ class API(BaseAPI):
             )
 
     def reports(self, query, 
-            order_by='[{"field": "start_time", "order": "desc"}]',
-            limit=None, include_total=None, offset=None):
+                order_by='[{"field": "start_time", "order": "desc"}]',
+                limit=None, include_total=None, offset=None):
         """Get reports for our infrastructure. Currently reports can only
         be filtered through a query which requests a specific certname.
         If not it will return all reports.
