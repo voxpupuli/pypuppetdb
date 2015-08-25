@@ -184,13 +184,16 @@ class API(BaseAPI):
                 environment=resource['environment'],
             )
 
-    def reports(self, query):
+    def reports(self, query, 
+            order_by='[{"field": "start_time", "order": "desc"}]',
+            limit=None, include_total=None, offset=None):
         """Get reports for our infrastructure. Currently reports can only
         be filtered through a query which requests a specific certname.
         If not it will return all reports.
 
         This yields a Report object for every returned report."""
-        reports = self._query('reports', query=query)
+        reports = self._query('reports', query=query, order_by=order_by,
+            limit=limit, include_total=include_total, offset=offset)
         for report in reports:
             yield Report(
                 api=self,
