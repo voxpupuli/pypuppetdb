@@ -3,10 +3,11 @@ pypuppetdb
 ##########
 
 .. image:: https://api.travis-ci.org/puppet-community/pypuppetdb.png
-   :target: https://travis-ci.org/puppet-communit/pypuppetdb
+   :target: https://travis-ci.org/puppet-community/pypuppetdb
 
 .. image:: https://coveralls.io/repos/puppet-community/pypuppetdb/badge.png
-   :target: https://coeralls.io/r/puppet-community/pypuppetdb
+   :target: https://coveralls.io/repos/puppet-community/pypuppetdb
+
 
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
@@ -33,7 +34,7 @@ You can install this package from source or from PyPi.
 
 .. code-block:: bash
 
-   $ git clone https://github.com/nedap/pypuppetdb
+   $ git clone https://github.com/puppet-community/pypuppetdb
    $ python setup.py install
 
 If you wish to hack on it clone the repository but after that run:

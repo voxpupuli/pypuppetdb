@@ -20,6 +20,7 @@ class TestNode(object):
 
         assert node.name == 'node'
         assert node.deactivated is False
+        assert node.expired is False
         assert node.report_timestamp is not None
         assert node.facts_timestamp is not None
         assert node.catalog_timestamp is not None
@@ -37,6 +38,7 @@ class TestNode(object):
 
         assert node.name == 'node'
         assert node.deactivated is False
+        assert node.expired is False
         assert node.report_timestamp is not None
         assert node.facts_timestamp is not None
         assert node.catalog_timestamp is not None
@@ -46,15 +48,56 @@ class TestNode(object):
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
 
+    def test_apiv4_without_status(self):
+        node = Node('_', 'node',
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',)
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp is not None
+        assert node.facts_timestamp is not None
+        assert node.catalog_timestamp is not None
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_deactivated(self):
+        node = Node('_', 'node',
+                    deactivated='2013-08-01T09:57:00.000Z',)
+        assert node.name == 'node'
+        assert node.deactivated is not False
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_expired(self):
+        node = Node('_', 'node',
+                    expired='2013-08-01T09:57:00.000Z',)
+        assert node.name == 'node'
+        assert node.expired is not False
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
 
 class TestFact(object):
     """Test the Fact object."""
     def test_fact(self):
-        fact = Fact('node', 'osfamily', 'Debian')
+        fact = Fact('node', 'osfamily', 'Debian', 'production')
 
         assert fact.node == 'node'
         assert fact.name == 'osfamily'
         assert fact.value == 'Debian'
+        assert fact.environment == 'production'
         assert str(fact) == str('osfamily/node')
         assert unicode(fact) == unicode('osfamily/node')
         assert repr(fact) == str('Fact: osfamily/node')
@@ -66,7 +109,7 @@ class TestResource(object):
     def test_resource(self):
         resource = Resource('node', '/etc/ssh/sshd_config', 'file',
                             ['class', 'ssh'], False, '/ssh/manifests/init.pp',
-                            15, parameters={
+                            15, 'production', parameters={
                                 'ensure': 'present',
                                 'owner': 'root',
                                 'group': 'root',
@@ -80,6 +123,7 @@ class TestResource(object):
         assert resource.exported is False
         assert resource.sourcefile == '/ssh/manifests/init.pp'
         assert resource.sourceline == 15
+        assert resource.environment == 'production'
         assert resource.parameters['ensure'] == 'present'
         assert resource.parameters['owner'] == 'root'
         assert resource.parameters['group'] == 'root'
@@ -93,12 +137,13 @@ class TestResource(object):
 class TestReport(object):
     """Test the Report object."""
     def test_report(self):
-        report = Report('node1.puppet.board', 'hash#',
+        report = Report('_', 'node1.puppet.board', 'hash#',
                         '2013-08-01T09:57:00.000Z',
                         '2013-08-01T10:57:00.000Z',
                         '2013-08-01T10:58:00.000Z',
                         '1351535883', 3, '3.2.1',
-                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3')
+                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+                        status='success')
 
         assert report.node == 'node1.puppet.board'
         assert report.hash_ == 'hash#'
@@ -110,6 +155,7 @@ class TestReport(object):
         assert report.agent_version == '3.2.1'
         assert report.run_time == report.end - report.start
         assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
+        assert report.status == 'success'
         assert str(report) == str('hash#')
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
@@ -174,11 +220,13 @@ class TestEdge(object):
     def test_edge(self):
         resource_a = Resource('node', '/etc/ssh/sshd_config', 'file',
                               ['class', 'ssh'], False,
-                              '/ssh/manifests/init.pp', 15, parameters={})
+                              '/ssh/manifests/init.pp', 15, 'production',
+                              parameters={})
 
         resource_b = Resource('node', 'sshd', 'service',
                               ['class', 'ssh'], False,
-                              '/ssh/manifests/init.pp', 30, parameters={})
+                              '/ssh/manifests/init.pp', 30, 'production',
+                              parameters={})
 
         edge = Edge(resource_a, resource_b, 'notify')
 
