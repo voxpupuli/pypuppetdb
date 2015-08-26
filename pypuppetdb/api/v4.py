@@ -60,36 +60,30 @@ class API(BaseAPI):
             nodes = [nodes, ]
 
         if with_status:
-            latest_reports = self._query(
-                'reports',
-                query='["=","latest_report?",true]'
+            latest_events = self.event_counts(
+                query='["=", "latest_report?", true]',
+                summarize_by='certname'
             )
 
         for node in nodes:
             node['unreported_time'] = None
             node['status'] = None
-            node['events'] = {
-                'failures': 0,
-                'successes': 0,
-                'skips': 0
-                }
+            node['events'] = None
 
             if with_status:
-                report = [s for s in latest_reports
-                          if s['certname'] == node['certname']]
+                status = [s for s in latest_events
+                          if s['subject']['title'] == node['certname']]
 
-                for event in report[0]['resource_events']['data']:
-                    if event['status'] == 'success':
-                        node['events']['successes'] += 1
-                    elif event['status'] == 'failure':
-                        node['events']['failures'] += 1
-                    elif event['status'] == 'skipped':
-                        node['events']['skips'] += 1
-
-                if report[0]['noop']:
-                    node['status'] = 'noop'
+                if status:
+                    node['events'] = status = status[0]
+                    if status['successes'] > 0:
+                        node['status'] = 'changed'
+                    if status['noops'] > 0:
+                        node['status'] = 'noop'
+                    if status['failures'] > 0:
+                        node['status'] = 'failed'
                 else:
-                    node['status'] = report[0]['status']
+                    node['status'] = 'unchanged'
 
             # node report age
             if with_status and node['report_timestamp'] is not None:
