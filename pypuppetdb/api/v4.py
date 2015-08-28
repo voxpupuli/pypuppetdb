@@ -32,7 +32,8 @@ class API(BaseAPI):
         nodes = self.nodes(name=name)
         return next(node for node in nodes)
 
-    def nodes(self, name=None, query=None, unreported=2, with_status=False):
+    def nodes(self, name=None, query=None, unreported=2, with_status=False,
+              **kwargs):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also fetches the nodes status and event counts of the latest
@@ -48,11 +49,13 @@ class API(BaseAPI):
         :param unreported: (optional) amount of hours when a node gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
+        :param \*\*kwargs: The rest of the keyword arguments are passed
+                           to the_query function/
 
         :returns: A generator yieling Nodes.
         :rtype: :class:`pypuppetdb.types.Node`
         """
-        nodes = self._query('nodes', path=name, query=query)
+        nodes = self._query('nodes', path=name, query=query, **kwargs)
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
@@ -121,7 +124,7 @@ class API(BaseAPI):
                        facts_environment=node['facts_environment']
                        )
 
-    def facts(self, name=None, value=None, query=None):
+    def facts(self, name=None, value=None, query=None, **kwargs):
         """Query for facts limited by either name, value and/or query.
         This will yield a single Fact object at a time."""
 
@@ -137,7 +140,7 @@ class API(BaseAPI):
             query = ''
             path = None
 
-        facts = self._query('facts', path=path, query=query)
+        facts = self._query('facts', path=path, query=query, **kwargs)
         for fact in facts:
             yield Fact(
                 fact['certname'],
@@ -146,7 +149,7 @@ class API(BaseAPI):
                 fact['environment']
             )
 
-    def resources(self, type_=None, title=None, query=None):
+    def resources(self, type_=None, title=None, query=None, **kwargs):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
@@ -164,7 +167,8 @@ class API(BaseAPI):
                       'bad idea as it might return enormous amounts of '
                       'resources.')
 
-        resources = self._query('resources', path=path, query=query)
+        resources = self._query('resources', path=path, query=query,
+                                **kwargs)
         for resource in resources:
             yield Resource(
                 node=resource['certname'],
@@ -178,16 +182,13 @@ class API(BaseAPI):
                 environment=resource['environment'],
             )
 
-    def reports(self, query, 
-                order_by='[{"field": "start_time", "order": "desc"}]',
-                limit=None, include_total=None, offset=None):
+    def reports(self, query, **kwargs):
         """Get reports for our infrastructure. Currently reports can only
         be filtered through a query which requests a specific certname.
         If not it will return all reports.
 
         This yields a Report object for every returned report."""
-        reports = self._query('reports', query=query, order_by=order_by,
-            limit=limit, include_total=include_total, offset=offset)
+        reports = self._query('reports', query=query, **kwargs)
         for report in reports:
             yield Report(
                 api=self,
@@ -207,13 +208,12 @@ class API(BaseAPI):
                 logs=report['logs']['data']
             )
 
-    def events(self, query, order_by=None, limit=None):
+    def events(self, query, **kwargs):
         """A report is made up of events. This allows to query for events
         based on the reprt hash.
         This yields an Event object for every returned event."""
 
-        events = self._query('events', query=query,
-                             order_by=order_by, limit=limit)
+        events = self._query('events', query=query, **kwargs)
         for event in events:
             yield Event(
                 node=event['certname'],
@@ -240,17 +240,18 @@ class API(BaseAPI):
                            count_by=count_by, count_filter=count_filter)
 
     def event_counts(self, query, summarize_by,
-                     count_by=None, count_filter=None):
+                     count_by=None, count_filter=None, **kwargs):
         """Get event counts from puppetdb"""
         return self._query('event-counts',
                            query=query,
                            summarize_by=summarize_by,
                            count_by=count_by,
-                           count_filter=count_filter)
+                           count_filter=count_filter,
+                           **kwargs)
 
-    def catalog(self, node=None):
+    def catalog(self, node=None, **kwargs):
         """Get the most recent catalog for a given node"""
-        catalogs = self._query('catalogs', path=node)
+        catalogs = self._query('catalogs', path=node, **kwargs)
 
         for catalog in catalogs:
             yield Catalog(node=catalog['certname'],
@@ -268,9 +269,9 @@ class API(BaseAPI):
         """Get version information about the running PuppetDB server"""
         return self._query('version')['version']
 
-    def edges(self, query=None):
+    def edges(self, query=None, **kwargs):
         """Get the known catalog edges, formed between tow resources"""
-        edges = self._query('edges', query=query)
+        edges = self._query('edges', query=query, **kwargs)
 
         for edge in edges:
             identifier_source = edge['source_type'] + \
@@ -282,23 +283,23 @@ class API(BaseAPI):
                        relationship=edge['relationship'],
                        node=edge['certname'])
 
-    def environments(self, query=None):
+    def environments(self, query=None, **kwargs):
         """Get all known environments from Puppetdb"""
-        return self._query('environments', query=query)
+        return self._query('environments', query=query, **kwargs)
 
-    def factsets(self, query=None):
+    def factsets(self, query=None, **kwargs):
         """Returns a set of all facts or for a single certname"""
-        return self._query('factsets', query=query)
+        return self._query('factsets', query=query, **kwargs)
 
-    def fact_paths(self, query=None):
+    def fact_paths(self, query=None, **kwargs):
         """Fact Paths are intended to be a counter-part of the fact-names
         endpoint. It provides increased granularity around structured
         facts and may be used for building GUI autocompletions or other
         applications that require a basic top-level view of fact paths."""
-        return self._query('fact-paths', query=query)
+        return self._query('fact-paths', query=query, **kwargs)
 
-    def fact_contents(self, query=None):
+    def fact_contents(self, query=None, **kwargs):
         """To complement fact_paths(), this endpoint provides the capability
         to descend into structured facts and retreive the values associated
         with fact paths"""
-        return self._query('fact-contents', query=query)
+        return self._query('fact-contents', query=query, **kwargs)
