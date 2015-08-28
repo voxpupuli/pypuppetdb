@@ -249,9 +249,9 @@ class API(BaseAPI):
                            count_filter=count_filter,
                            **kwargs)
 
-    def catalog(self, node=None, **kwargs):
+    def catalog(self, query=None, **kwargs):
         """Get the most recent catalog for a given node"""
-        catalogs = self._query('catalogs', path=node, **kwargs)
+        catalogs = self._query('catalogs', query=query, **kwargs)
 
         for catalog in catalogs:
             yield Catalog(node=catalog['certname'],
