@@ -32,7 +32,8 @@ class API(BaseAPI):
         nodes = self.nodes(name=name)
         return next(node for node in nodes)
 
-    def nodes(self, name=None, query=None, unreported=2, with_status=False):
+    def nodes(self, name=None, query=None, unreported=2, with_status=False,
+              **kwargs):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also fetches the nodes status and event counts of the latest
@@ -48,11 +49,13 @@ class API(BaseAPI):
         :param unreported: (optional) amount of hours when a node gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
+        :param \*\*kwargs: The rest of the keyword arguments are passed
+                           to the_query function.
 
         :returns: A generator yieling Nodes.
         :rtype: :class:`pypuppetdb.types.Node`
         """
-        nodes = self._query('nodes', path=name, query=query)
+        nodes = self._query('nodes', path=name, query=query, **kwargs)
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
@@ -119,7 +122,7 @@ class API(BaseAPI):
                        unreported_time=node['unreported_time']
                        )
 
-    def facts(self, name=None, value=None, query=None):
+    def facts(self, name=None, value=None, query=None, **kwargs):
         """Query for facts limited by either name, value and/or query.
         This will yield a single Fact object at a time."""
 
@@ -135,7 +138,7 @@ class API(BaseAPI):
             query = ''
             path = None
 
-        facts = self._query('facts', path=path, query=query)
+        facts = self._query('facts', path=path, query=query, **kwargs)
         for fact in facts:
             yield Fact(
                 fact['certname'],
@@ -148,7 +151,7 @@ class API(BaseAPI):
 
         return self._query('fact-names')
 
-    def resources(self, type_=None, title=None, query=None):
+    def resources(self, type_=None, title=None, query=None, **kwargs):
         """Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource."""
 
@@ -166,7 +169,8 @@ class API(BaseAPI):
                       'bad idea as it might return enormous amounts of '
                       'resources.')
 
-        resources = self._query('resources', path=path, query=query)
+        resources = self._query('resources', path=path, query=query,
+                                **kwargs)
         for resource in resources:
             yield Resource(
                 resource['certname'],
@@ -179,13 +183,13 @@ class API(BaseAPI):
                 resource['parameters'],
                 )
 
-    def reports(self, query):
+    def reports(self, query, **kwargs):
         """Get reports for our infrastructure. Currently reports can only
         be filtered through a query which requests a specific certname.
         If not it will return all reports.
 
         This yields a Report object for every returned report."""
-        reports = self._query('reports', query=query)
+        reports = self._query('reports', query=query, **kwargs)
         for report in reports:
             yield Report(
                 report['certname'],
@@ -199,13 +203,13 @@ class API(BaseAPI):
                 report['transaction-uuid']
                 )
 
-    def events(self, query, order_by=None, limit=None):
+    def events(self, query, **kwargs):
         """A report is made up of events. This allows to query for events
         based on the reprt hash.
         This yields an Event object for every returned event."""
 
         events = self._query('events', query=query,
-                             order_by=order_by, limit=limit)
+                             **kwargs)
         for event in events:
             yield Event(
                 event['certname'],
@@ -225,13 +229,14 @@ class API(BaseAPI):
                 )
 
     def event_counts(self, query, summarize_by,
-                     count_by=None, count_filter=None):
+                     count_by=None, count_filter=None, **kwargs):
         """Get event counts from puppetdb"""
         return self._query('event-counts',
                            query=query,
                            summarize_by=summarize_by,
                            count_by=count_by,
-                           count_filter=count_filter)
+                           count_filter=count_filter,
+                           **kwargs)
 
     def aggregate_event_counts(self, query, summarize_by,
                                count_by=None, count_filter=None):
