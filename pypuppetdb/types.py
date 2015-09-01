@@ -138,8 +138,7 @@ class Report(object):
         self.run_time = self.end - self.start
         self.transaction = transaction
         self.environment = environment
-        self.status = status
-        self.noop = noop
+        self.status = 'noop' if noop else status 
         self.metrics = metrics
         self.logs = logs
         self.__string = '{0}'.format(self.hash_)
