@@ -182,7 +182,7 @@ class API(BaseAPI):
                 environment=resource['environment'],
             )
 
-    def reports(self, query, **kwargs):
+    def reports(self, query=None, **kwargs):
         """Get reports for our infrastructure. Currently reports can only
         be filtered through a query which requests a specific certname.
         If not it will return all reports.
