@@ -88,26 +88,26 @@ class API(BaseAPI):
                 else:
                     node['status'] = 'unchanged'
 
-            # node report age
-            if with_status and node['report_timestamp'] is not None:
-                try:
-                    last_report = json_to_datetime(node['report_timestamp'])
-                    last_report = last_report.replace(tzinfo=None)
-                    now = datetime.utcnow()
-                    unreported_border = now - timedelta(hours=unreported)
-                    if last_report < unreported_border:
-                        delta = (datetime.utcnow() - last_report)
+                # node report age
+                if node['report_timestamp'] is not None:
+                    try:
+                        last_report = json_to_datetime(node['report_timestamp'])
+                        last_report = last_report.replace(tzinfo=None)
+                        now = datetime.utcnow()
+                        unreported_border = now - timedelta(hours=unreported)
+                        if last_report < unreported_border:
+                            delta = (datetime.utcnow() - last_report)
+                            node['status'] = 'unreported'
+                            node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                                delta.days,
+                                int(delta.seconds / 3600),
+                                int((delta.seconds % 3600) / 60)
+                            )
+                    except AttributeError:
                         node['status'] = 'unreported'
-                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
-                            delta.days,
-                            int(delta.seconds / 3600),
-                            int((delta.seconds % 3600) / 60)
-                        )
-                except AttributeError:
-                    node['status'] = 'unreported'
 
-            if not node['report_timestamp'] and with_status:
-                node['status'] = 'unreported'
+                if not node['report_timestamp']:
+                    node['status'] = 'unreported'
 
             yield Node(self,
                        node['certname'],
