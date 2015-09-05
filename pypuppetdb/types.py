@@ -117,8 +117,6 @@ class Report(object):
     :ivar environment: The environment assigned to the node that submitted\
             this report.
     :ivar status: The status associated to this report's node.
-    :ivar noop: A flag indicating weather the report was produced by a noop\
-            run.
     :ivar metrics: :obj:`list` containing :obj:`dict` of all metrics\
             associated with this report
     """
