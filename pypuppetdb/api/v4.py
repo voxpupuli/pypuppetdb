@@ -253,6 +253,9 @@ class API(BaseAPI):
         """Get the most recent catalog for a given node"""
         catalogs = self._query('catalogs', query=query, **kwargs)
 
+        if type(catalogs) == dict:
+            catalogs = [catalogs, ]
+
         for catalog in catalogs:
             yield Catalog(node=catalog['certname'],
                           edges=catalog['edges']['data'],
