@@ -12,7 +12,7 @@ pypuppetdb
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 
-**pypuppetdb DOES NOT work with PuppetDB 3**
+**pypuppetdb >= 0.2.0 DOES work with PuppetDB 3**
 
 .. _requests: http://docs.python-requests.org/en/latest/
 
@@ -41,7 +41,7 @@ If you wish to hack on it clone the repository but after that run:
 
 .. code-block:: bash
 
-   $ pip install -r requirements.txt
+   $ pip install -r test-requirements.txt
 
 This will install all the runtime requirements of pypuppetdb and the
 dependencies for the test suite and generation of documentation.
@@ -64,6 +64,8 @@ Native packages for your operating system will be provided in the near future.
 | CentOS/RHEL 5    | n/a       | Python 2.4                                 |
 +------------------+-----------+--------------------------------------------+
 | CentOS/RHEL 6    | planned   |                                            |
++------------------+-----------+--------------------------------------------+
+| CentOS/RHEL 7    | planned   |                                            |
 +------------------+-----------+--------------------------------------------+
 | `ArchLinux`_     | available | Maintained by `Niels Abspoel`_             |
 +------------------+-----------+--------------------------------------------+

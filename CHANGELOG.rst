@@ -2,6 +2,39 @@
 Changelog
 #########
 
+0.2.0
+=====
+
+* Version bump to 0.2.0
+* Preliminary support for the v4 api as well as the additional endpoints that
+  it supports.
+* Removing v2 api functions as per changelog
+
+New Features
+------------
+
+The following features apply to **only** the new **API v4**
+
+New endpoints:
+
+* ``environments``: ``environments()``
+* ``factsets``: ``factsets()``
+* ``fact-paths``: ``fact_paths()``
+* ``fact-contents``: ``fact_contents()``
+* ``edges``: ``edges()``
+
+Changes to Types:
+
+* ``pypupperdb.types.Report`` now requires ``api`` to be passed as the second
+  argument, this allows to directly query for any events that occurred in this
+  report object.
+* All ``pypupperdb.types.*`` accept the v4 API information as optional parameters.
+  These parameters are primarily environment related but may include additional
+  information if provided from that endpoint.
+* All ``pypuppetdb.api.v4`` functions pass any received keyword arguments to the
+  ``pypuppetdb.api.__init__._query()`` function. This allows for easy integration
+  with paging functions and parameters.
+
 0.1.1
 =====
 
