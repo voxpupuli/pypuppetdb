@@ -16,20 +16,11 @@ from pypuppetdb.errors import (
 log = logging.getLogger(__name__)
 
 API_VERSIONS = {
-    2: 'v2',
     3: 'v3',
     4: 'v4',
 }
 
 ENDPOINTS = {
-    2: {
-        'facts': 'v2/facts',
-        'fact-names': 'v2/fact-names',
-        'nodes': 'v2/nodes',
-        'resources': 'v2/resources',
-        'metrics': 'v2/metrics',
-        'mbean': 'v2/metrics/mbean',
-    },
     3: {
         'facts': 'v3/facts',
         'fact-names': 'v3/fact-names',
@@ -67,14 +58,6 @@ ENDPOINTS = {
 }
 
 PARAMETERS = {
-    2: {
-        'order_by': 'order-by',
-        'include_total': 'include-total',
-        'count_by': 'count-by',
-        'counts_filter': 'counts-filter',
-        'summarize_by': 'summarize-by',
-        'server_time': 'server-time',
-    },
     3: {
         'order_by': 'order-by',
         'include_total': 'include-total',
