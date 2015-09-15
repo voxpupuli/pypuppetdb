@@ -377,6 +377,10 @@ class TestAPIMethods(object):
         with pytest.raises(NotImplementedError):
             baseapi.catalog()
 
+    def test_catalogs(self, baseapi):
+        with pytest.raises(NotImplementedError):
+            baseapi.catalogs()
+
     def test_metric(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/metrics/v1/mbeans/test')

@@ -249,9 +249,15 @@ class API(BaseAPI):
                            count_filter=count_filter,
                            **kwargs)
 
-    def catalog(self, query=None, **kwargs):
+    def catalog(self, node):
         """Get the most recent catalog for a given node"""
-        catalogs = self._query('catalogs', query=query, **kwargs)
+        catalogs = self.catalogs(path=node)
+        return next(x for x in catalogs)
+
+    def catalogs(self, query=None, path=None, **kwargs):
+        """Return any catalog information that matches the supplied
+        query string for the path information."""
+        catalogs = self._query('catalogs', query=query, path=path, **kwargs)
 
         if type(catalogs) == dict:
             catalogs = [catalogs, ]

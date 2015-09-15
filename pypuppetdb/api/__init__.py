@@ -434,6 +434,9 @@ class BaseAPI(object):
     def catalog(self):
         raise NotImplementedError
 
+    def catalogs(self):
+        raise NotImplementedError
+
     def event_counts(self):
         raise NotImplementedError
 
