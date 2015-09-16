@@ -11,39 +11,69 @@ from pypuppetdb.errors import (
     EmptyResponseError,
     UnsupportedVersionError,
     APIError,
-    )
+)
 
 log = logging.getLogger(__name__)
 
 API_VERSIONS = {
-    2: 'v2',
     3: 'v3',
+    4: 'v4',
 }
 
 ENDPOINTS = {
-    2: {
-        'facts': 'facts',
-        'fact-names': 'fact-names',
-        'nodes': 'nodes',
-        'resources': 'resources',
-        'metrics': 'metrics',
-        'mbean': 'metrics/mbean',
-    },
     3: {
-        'facts': 'facts',
-        'fact-names': 'fact-names',
-        'nodes': 'nodes',
-        'resources': 'resources',
-        'catalogs': 'catalogs',
-        'metrics': 'metrics',
-        'mbean': 'metrics/mbean',
-        'reports': 'reports',
-        'events': 'events',
-        'event-counts': 'event-counts',
-        'aggregate-event-counts': 'aggregate-event-counts',
-        'server-time': 'server-time',
-        'version': 'version',
+        'facts': 'v3/facts',
+        'fact-names': 'v3/fact-names',
+        'nodes': 'v3/nodes',
+        'resources': 'v3/resources',
+        'catalogs': 'v3/catalogs',
+        'metrics': 'v3/metrics',
+        'mbean': 'v3/metrics/mbean',
+        'reports': 'v3/reports',
+        'events': 'v3/events',
+        'event-counts': 'v3/event-counts',
+        'aggregate-event-counts': 'v3/aggregate-event-counts',
+        'server-time': 'v3/server-time',
+        'version': 'v3/version',
     },
+    4: {
+        'facts': 'pdb/query/v4/facts',
+        'fact-names': 'pdb/query/v4/fact-names',
+        'nodes': 'pdb/query/v4/nodes',
+        'resources': 'pdb/query/v4/resources',
+        'catalogs': 'pdb/query/v4/catalogs',
+        'mbean': 'metrics/v1/mbeans',
+        'reports': 'pdb/query/v4/reports',
+        'events': 'pdb/query/v4/events',
+        'event-counts': 'pdb/query/v4/event-counts',
+        'aggregate-event-counts': 'pdb/query/v4/aggregate-event-counts',
+        'server-time': 'pdb/meta/v1/server-time',
+        'version': 'pdb/meta/v1/version',
+        'environments': 'pdb/query/v4/environments',
+        'factsets': 'pdb/query/v4/factsets',
+        'fact-paths': 'pdb/query/v4/fact-paths',
+        'fact-contents': 'pdb/query/v4/fact-contents',
+        'edges': 'pdb/query/v4/edges',
+    }
+}
+
+PARAMETERS = {
+    3: {
+        'order_by': 'order-by',
+        'include_total': 'include-total',
+        'count_by': 'count-by',
+        'counts_filter': 'counts-filter',
+        'summarize_by': 'summarize-by',
+        'server_time': 'server-time',
+    },
+    4: {
+        'order_by': 'order_by',
+        'include_total': 'include_total',
+        'count_by': 'count_by',
+        'counts_filter': 'counts_filter',
+        'summarize_by': 'summarize_by',
+        'server_time': 'server_time',
+    }
 }
 
 ERROR_STRINGS = {
@@ -68,7 +98,7 @@ class BaseAPI(object):
     When at initialisation :obj:`api_version` isn't found in\
             :const:`API_VERSIONS` this will raise an error.
 
-    :param api_version: Version of the API we're initialising.
+    :param api_version: (Default 4) Version of the API we're initialising.
     :type api_version: :obj:`int`
 
     :param host: (optional) Hostname or IP of PuppetDB.
@@ -111,7 +141,7 @@ class BaseAPI(object):
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
-    def __init__(self, api_version, host='localhost', port=8080,
+    def __init__(self, api_version=4, host='localhost', port=8080,
                  ssl_verify=True, ssl_key=None, ssl_cert=None, timeout=10,
                  protocol=None, url_path=None, username=None, password=None):
         """Initialises our BaseAPI object passing the parameters needed in
@@ -148,6 +178,7 @@ class BaseAPI(object):
             self.password = None
 
         self.endpoints = ENDPOINTS[api_version]
+        self.parameters = PARAMETERS[api_version]
         self._session = requests.Session()
         self._session.headers = {
             'content-type': 'application/json',
@@ -186,7 +217,7 @@ class BaseAPI(object):
             host=self.host,
             port=self.port,
             url_path=self.url_path,
-            )
+        )
 
     @property
     def total(self):
@@ -230,18 +261,16 @@ class BaseAPI(object):
             endpoint, path))
 
         if endpoint in self.endpoints:
-            api_prefix = self.api_version
             endpoint = self.endpoints[endpoint]
         else:
             # If we reach this we're trying to query an endpoint that doesn't
             # exist. This shouldn't happen unless someone made a booboo.
             raise APIError
 
-        url = '{base_url}/{api_prefix}/{endpoint}'.format(
+        url = '{base_url}/{endpoint}'.format(
             base_url=self.base_url,
-            api_prefix=api_prefix,
             endpoint=endpoint,
-            )
+        )
 
         if path is not None:
             url = '{0}/{1}'.format(url, path)
@@ -301,19 +330,20 @@ class BaseAPI(object):
         if query is not None:
             payload['query'] = query
         if order_by is not None:
-            payload['order-by'] = order_by
+            payload[self.parameters['order_by']] = order_by
         if limit is not None:
             payload['limit'] = limit
         if include_total is True:
-            payload['include-total'] = json.dumps(include_total)
+            payload[self.parameters['include_total']] = \
+                json.dumps(include_total)
         if offset is not None:
             payload['offset'] = offset
         if summarize_by is not None:
-            payload['summarize-by'] = summarize_by
+            payload[self.parameters['summarize_by']] = summarize_by
         if count_by is not None:
-            payload['count-by'] = count_by
+            payload[self.parameters['count_by']] = count_by
         if count_filter is not None:
-            payload['count-filter'] = count_filter
+            payload[self.parameters['counts_filter']] = count_filter
 
         if not (payload):
             payload = None
@@ -363,13 +393,50 @@ class BaseAPI(object):
     def node(self):
         raise NotImplementedError
 
+    def edges(self):
+        raise NotImplementedError
+
+    def environments(self):
+        raise NotImplementedError
+
     def facts(self):
+        raise NotImplementedError
+
+    def factsets(self):
+        raise NotImplementedError
+
+    def fact_contents(self):
+        raise NotImplementedError
+
+    def fact_paths(self):
         raise NotImplementedError
 
     def resources(self):
         raise NotImplementedError
 
-    def metric(self, metric):
+    def catalog(self):
+        raise NotImplementedError
+
+    def catalogs(self):
+        raise NotImplementedError
+
+    def event_counts(self):
+        raise NotImplementedError
+
+    def aggregate_event_counts(self):
+        raise NotImplementedError
+
+    def server_time(self):
+        raise NotImplementedError
+
+    def current_version(self):
+        raise NotImplementedError
+
+    def fact_names(self):
+        """Get a list of all known facts."""
+        return self._query('fact-names')
+
+    def metric(self, metric=None):
         """Query for a specific metrc.
 
         :param metric: The name of the metric we want.

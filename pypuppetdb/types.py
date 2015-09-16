@@ -90,6 +90,18 @@ class Report(object):
     :type agent_version: :obj:`string`
     :param transaction: The UUID of this transaction.
     :type transaction: :obj:`string`
+    :param environment: (Default 'production') The environment assigned to\
+            the node that submitted this report.
+    :type environment: :obj:`string
+    :param status: The status associated to this report's node.
+    :type status: :obj:`string`
+    :param noop: (Default `False`) A flag indicating weather the report was\
+            produced by a noop run.
+    :type noop: :obj:`bool`
+    :param metrics: All metrics associated with this report.
+    :type metrics: :obj:`list` containing :obj:`dict` with Metrics
+    :param logs: All logs associated with this report.
+    :type logs: :obj:`list containing :obj:`dict` of logs
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -102,10 +114,16 @@ class Report(object):
     :ivar agent_version: :obj:`string` Puppet Agent version.
     :ivar run_time: :obj:`datetime.timedelta` of **end** - **start**.
     :ivar transaction: UUID identifying this transaction.
-
+    :ivar environment: The environment assigned to the node that submitted\
+            this report.
+    :ivar status: The status associated to this report's node.
+    :ivar metrics: :obj:`list` containing :obj:`dict` of all metrics\
+            associated with this report
     """
-    def __init__(self, node, hash_, start, end, received, version,
-                 format_, agent_version, transaction):
+    def __init__(self, api, node, hash_, start, end, received, version,
+                 format_, agent_version, transaction, status=None,
+                 metrics={}, logs={}, environment=None,
+                 noop=False):
 
         self.node = node
         self.hash_ = hash_
@@ -117,7 +135,14 @@ class Report(object):
         self.agent_version = agent_version
         self.run_time = self.end - self.start
         self.transaction = transaction
+        self.environment = environment
+        self.status = 'noop' if noop else status
+        self.metrics = metrics
+        self.logs = logs
         self.__string = '{0}'.format(self.hash_)
+
+        self.__api = api
+        self.__query_scope = '["=", "report", "{0}"]'.format(self.hash_)
 
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))
@@ -128,6 +153,10 @@ class Report(object):
     def __unicode__(self):
         return self.__string
 
+    def events(self):
+        """Get all events for this report."""
+        return self.__api.events(query=self.__query_scope)
+
 
 class Fact(object):
     """his object represents a fact.
@@ -135,15 +164,18 @@ class Fact(object):
     :param node: The hostname this fact was collected from.
     :param name: The fact's name, such as 'osfamily'
     :param value: The fact's value, such as 'Debian'
+    :param environment: The fact's environment, such as 'production'
 
     :ivar node: :obj:`string` holding the hostname.
     :ivar name: :obj:`string` holding the fact's name.
     :ivar value: :obj:`string` holding the fact's value.
+    :ivar environment: :obj:`string` holding the fact's environment
     """
-    def __init__(self, node, name, value):
+    def __init__(self, node, name, value, environment=None):
         self.node = node
         self.name = name
         self.value = value
+        self.environment = environment
         self.__string = '{0}/{1}'.format(self.name, self.node)
 
     def __repr__(self):
@@ -170,6 +202,9 @@ class Resource(object):
     :param sourceline: The line this resource is declared at.
     :param parameters: The parameters this resource has been declared with.
     :type parameters: :obj:`dict`
+    :param environment: The environment of the node associated with this\
+        resource.
+    :type environment: :obj:`string
 
     :ivar node: The hostname this resources is located on.
     :ivar name: The name of the resource in the Puppet manifest.
@@ -180,9 +215,11 @@ class Resource(object):
     :ivar parameters: :obj:`dict` with key:value pairs of parameters.
     :ivar relationships: :obj:`list` Contains all relationships to other\
         resources
+    :ivar environment: :obj:`string: The environment of the node associated\
+        with this resource.
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, parameters={}):
+                 sourceline, environment=None, parameters={}):
         self.node = node
         self.name = name
         self.type_ = type_
@@ -192,6 +229,7 @@ class Resource(object):
         self.sourceline = sourceline
         self.parameters = parameters
         self.relationships = []
+        self.environment = environment
         self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
@@ -230,6 +268,15 @@ class Node(object):
     :type events: :obj:`dict`
     :param unreported_time: (default `None`) Time since last report
     :type unreported_time: :obj:`string`
+    :param report_environment: (default 'production') The environment of the\
+            last received report for this node
+    :type report_environment: :obj:`string`
+    :param catalog_environment: (default 'production') The environment of the\
+            last received catalog for this node
+    :type catalog_environment: :obj:`string
+    :param facts_environment: (default 'production') The environment of the\
+            last received fact set for this node
+    :type facts_environment" :obj:`string`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -240,19 +287,38 @@ class Node(object):
             compiled or `None`.
     :ivar facts_timestamp: :obj:`datetime.datetime` last time when facts were\
             collected or `None`.
+    :ivar report_environment: :obj:`string` the environment of the last\
+            received report for this node.
+    :ivar catalog_environment: :obj:`string` the environment of the last\
+            received catalog for this node.
+    :ivar facts_environment: :obj:`string` the environemtn of the last\
+            received fact set for this node.
     """
-    def __init__(self, api, name, deactivated=None, report_timestamp=None,
-                 catalog_timestamp=None, facts_timestamp=None,
-                 status=None, events=None, unreported_time=None):
+    def __init__(self, api, name, deactivated=None, expired=None,
+                 report_timestamp=None, catalog_timestamp=None,
+                 facts_timestamp=None, status=None, events=None,
+                 unreported_time=None, report_environment='production',
+                 catalog_environment='production',
+                 facts_environment='production'):
         self.name = name
         self.status = status
         self.events = events
         self.unreported_time = unreported_time
+        self.report_timestamp = report_timestamp
+        self.catalog_timestamp = catalog_timestamp
+        self.facts_timestamp = facts_timestamp
+        self.report_environment = report_environment
+        self.catalog_environment = catalog_environment
+        self.facts_environment = facts_environment
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)
         else:
             self.deactivated = False
+        if expired is not None:
+            self.expired = json_to_datetime(expired)
+        else:
+            self.expired = False
         if report_timestamp is not None:
             self.report_timestamp = json_to_datetime(report_timestamp)
         else:
@@ -329,6 +395,9 @@ class Catalog(object):
                              corresponding report that was issued during
                              the same puppet run
     :type transaction_uuid: :obj:`string`
+    :param environment: The environment associated with the catalog's\
+                        certname
+    :type environment: :obj:`string:
 
     :ivar node: :obj:`string` Name of the host
     :ivar version: :obj:`string` Catalog version from Puppet
@@ -339,13 +408,16 @@ class Catalog(object):
                  of the relationship
     :ivar resources: :obj:`dict` of :obj:`Resource` The source Resource\
                      object of the relationship
+    :ivar environment: :obj:`string` Environment associated with the
+                       catalog's certname
     """
-    def __init__(self, node, edges, resources,
-                 version, transaction_uuid):
+    def __init__(self, node, edges, resources, version, transaction_uuid,
+                 environment=None):
 
         self.node = node
         self.version = version
         self.transaction_uuid = transaction_uuid
+        self.environment = environment
 
         self.resources = dict()
         for resource in resources:
@@ -353,22 +425,26 @@ class Catalog(object):
                 resource['file'] = None
             if 'line' not in resource:
                 resource['line'] = None
-            identifier = resource['type']+'['+resource['title']+']'
-            res = Resource(node, resource['title'],
-                           resource['type'], resource['tags'],
-                           resource['exported'], resource['file'],
-                           resource['line'], resource['parameters'])
+            identifier = resource['type'] + '[' + resource['title'] + ']'
+            res = Resource(node=node, name=resource['title'],
+                           type_=resource['type'], tags=resource['tags'],
+                           exported=resource['exported'],
+                           sourcefile=resource['file'],
+                           sourceline=resource['line'],
+                           parameters=resource['parameters'],
+                           environment=self.environment)
             self.resources[identifier] = res
 
         self.edges = []
         for edge in edges:
-            identifier_source = edge['source']['type'] + \
-                '[' + edge['source']['title'] + ']'
-            identifier_target = edge['target']['type'] + \
-                '[' + edge['target']['title'] + ']'
-            e = Edge(self.resources[identifier_source],
-                     self.resources[identifier_target],
-                     edge['relationship'])
+            identifier_source = edge['source_type'] + \
+                '[' + edge['source_title'] + ']'
+            identifier_target = edge['target_type'] + \
+                '[' + edge['target_title'] + ']'
+            e = Edge(source=self.resources[identifier_source],
+                     target=self.resources[identifier_target],
+                     relationship=edge['relationship'],
+                     node=self.node)
             self.edges.append(e)
             self.resources[identifier_source].relationships.append(e)
             self.resources[identifier_target].relationships.append(e)
@@ -406,15 +482,19 @@ class Edge(object):
     :type target: :obj:`Resource`
     :param relaptionship: Name of the Puppet Ressource Relationship
     :type relationship: :obj:`string`
+    :param node: The certname of the node that owns this Relationship
+    :type node: :obj:`string
 
     :ivar source: :obj:`Resource` The source Resource object
     :ivar target: :obj:`Resource` The target Resource object
     :ivar relationship: :obj:`string` Name of the Puppet Resource relationship
+    :ivar node: :obj:`string` The name of the node that owns this relationship
     """
-    def __init__(self, source, target, relationship):
+    def __init__(self, source, target, relationship, node=None):
         self.source = source
         self.target = target
         self.relationship = relationship
+        self.node = node
         self.__string = '{0} - {1} - {2}'.format(self.source,
                                                  self.relationship,
                                                  self.target)
