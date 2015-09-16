@@ -18,10 +18,6 @@ def stub_request(url, data=None, **kwargs):
 
 
 class TestBaseAPIVersion(object):
-    def test_init_v2_defaults(self):
-        v2 = pypuppetdb.api.BaseAPI(2)
-        assert v2.api_version == 'v2'
-
     def test_init_v3_defaults(self):
         v3 = pypuppetdb.api.BaseAPI(3)
         assert v3.api_version == 'v3'

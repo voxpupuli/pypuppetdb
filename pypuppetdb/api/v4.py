@@ -91,7 +91,8 @@ class API(BaseAPI):
                 # node report age
                 if node['report_timestamp'] is not None:
                     try:
-                        last_report = json_to_datetime(node['report_timestamp'])
+                        last_report = json_to_datetime(
+                            node['report_timestamp'])
                         last_report = last_report.replace(tzinfo=None)
                         now = datetime.utcnow()
                         unreported_border = now - timedelta(hours=unreported)
