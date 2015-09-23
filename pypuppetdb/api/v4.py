@@ -342,7 +342,7 @@ class API(BaseAPI):
     def catalogs(self, **kwargs):
         """Get the catalog information from the infrastructure based on path
         and/or query results. It is strongly recommended to include query
-        and/or paging parameters for this endpoint to prevent large result 
+        and/or paging parameters for this endpoint to prevent large result
         sets or PuppetDB performance bottlenecks.
 
         :param \*\*kwargs: The rest of the keyword arguments are passed
