@@ -18,13 +18,9 @@ def stub_request(url, data=None, **kwargs):
 
 
 class TestBaseAPIVersion(object):
-    def test_init_v4_defaults(self):
-        v4 = pypuppetdb.api.BaseAPI(4)
+    def test_init_defaults(self):
+        v4 = pypuppetdb.api.BaseAPI()
         assert v4.api_version == 'v4'
-
-    def test_init_invalid_version(self):
-        with pytest.raises(pypuppetdb.errors.UnsupportedVersionError):
-            vderp = pypuppetdb.api.BaseAPI(10000)
 
 
 class TestBaseAPIInitOptions(object):
@@ -41,85 +37,85 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.password is None
 
     def test_host(self):
-        api = pypuppetdb.api.BaseAPI(4, host='127.0.0.1')
+        api = pypuppetdb.api.BaseAPI(host='127.0.0.1')
         assert api.host == '127.0.0.1'
 
     def test_port(self):
-        api = pypuppetdb.api.BaseAPI(4, port=8081)
+        api = pypuppetdb.api.BaseAPI(port=8081)
         assert api.port == 8081
 
     def test_ssl_verify(self):
-        api = pypuppetdb.api.BaseAPI(4, ssl_verify=False)
+        api = pypuppetdb.api.BaseAPI(ssl_verify=False)
         assert api.ssl_verify is False
         assert api.protocol == 'http'
 
     def test_ssl_key(self):
-        api = pypuppetdb.api.BaseAPI(4, ssl_key='/a/b/c.pem')
+        api = pypuppetdb.api.BaseAPI(ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.protocol == 'http'
 
     def test_ssl_cert(self):
-        api = pypuppetdb.api.BaseAPI(4, ssl_cert='/d/e/f.pem')
+        api = pypuppetdb.api.BaseAPI(ssl_cert='/d/e/f.pem')
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'http'
 
     def test_ssl_key_and_cert(self):
-        api = pypuppetdb.api.BaseAPI(4, ssl_cert='/d/e/f.pem',
+        api = pypuppetdb.api.BaseAPI(ssl_cert='/d/e/f.pem',
                                      ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'https'
 
     def test_timeout(self):
-        api = pypuppetdb.api.BaseAPI(4, timeout=20)
+        api = pypuppetdb.api.BaseAPI(timeout=20)
         assert api.timeout == 20
 
     def test_protocol(self):
-        api = pypuppetdb.api.BaseAPI(4, protocol='https')
+        api = pypuppetdb.api.BaseAPI(protocol='https')
         assert api.protocol == 'https'
 
     def test_uppercase_protocol(self):
-        api = pypuppetdb.api.BaseAPI(4, protocol='HTTP')
+        api = pypuppetdb.api.BaseAPI(protocol='HTTP')
         assert api.protocol == 'http'
 
     def test_override_protocol(self):
-        api = pypuppetdb.api.BaseAPI(4, protocol='http',
+        api = pypuppetdb.api.BaseAPI(protocol='http',
                                      ssl_cert='/d/e/f.pem',
                                      ssl_key='/a/b/c.pem')
         assert api.protocol == 'http'
 
     def test_invalid_protocol(self):
         with pytest.raises(ValueError):
-            api = pypuppetdb.api.BaseAPI(4, protocol='ftp')
+            api = pypuppetdb.api.BaseAPI(protocol='ftp')
 
     def test_url_path(self):
-        api = pypuppetdb.api.BaseAPI(4, url_path='puppetdb')
+        api = pypuppetdb.api.BaseAPI(url_path='puppetdb')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_leading_slash(self):
-        api = pypuppetdb.api.BaseAPI(4, url_path='/puppetdb')
+        api = pypuppetdb.api.BaseAPI(url_path='/puppetdb')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_trailing_slash(self):
-        api = pypuppetdb.api.BaseAPI(4, url_path='puppetdb/')
+        api = pypuppetdb.api.BaseAPI(url_path='puppetdb/')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_longer_with_both_slashes(self):
-        api = pypuppetdb.api.BaseAPI(4, url_path='/puppet/db/')
+        api = pypuppetdb.api.BaseAPI(url_path='/puppet/db/')
         assert api.url_path == '/puppet/db'
 
     def test_username(self):
-        api = pypuppetdb.api.BaseAPI(4, username='puppetdb')
+        api = pypuppetdb.api.BaseAPI(username='puppetdb')
         assert api.username is None
         assert api.password is None
 
     def test_password(self):
-        api = pypuppetdb.api.BaseAPI(4, password='password123')
+        api = pypuppetdb.api.BaseAPI(password='password123')
         assert api.username is None
         assert api.password is None
 
     def test_username_and_password(self):
-        api = pypuppetdb.api.BaseAPI(4, username='puppetdb',
+        api = pypuppetdb.api.BaseAPI(username='puppetdb',
                                      password='password123')
         assert api.username == 'puppetdb'
         assert api.password == 'password123'
@@ -313,66 +309,6 @@ class TesteAPIQuery(object):
 
 
 class TestAPIMethods(object):
-    def test_nodes(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.nodes()
-
-    def test_node(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.node()
-
-    def test_facts(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.facts()
-
-    def test_factsets(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.factsets()
-
-    def test_fact_paths(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.fact_paths()
-
-    def test_fact_contents(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.fact_contents()
-
-    def test_resources(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.resources()
-
-    def test_environments(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.environments()
-
-    def test_edges(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.edges()
-
-    def test_event_counts(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.event_counts()
-
-    def test_aggregate_event_counts(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.aggregate_event_counts()
-
-    def test_server_time(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.server_time()
-
-    def test_current_version(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.current_version()
-
-    def test_catalog(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.catalog()
-
-    def test_catalogs(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.catalogs()
-
     def test_metric(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/metrics/v1/mbeans/test')
@@ -393,3 +329,11 @@ class TestAPIMethods(object):
         assert baseapi._normalize_resource_type('sysctl::value') == \
             'Sysctl::Value'
         assert baseapi._normalize_resource_type('user') == 'User'
+
+    def test_environments(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/environments')
+        baseapi.environments()
+        assert httpretty.last_request().path == '/pdb/query/v4/environments'
+        httpretty.disable()
+        httpretty.reset()

@@ -6,13 +6,15 @@ Changelog
 =====
 
 * Version bump to 0.2.0
-* Adding support for v4 of the query API
-* Removing v2 and v3 api functions as per changelog
+* Adding support for v4 of the Query API
+* pypuppetdb will no longer support multiple API versions, removing the
+  api_version attribute from pypuppetdb.connect() 
+
+**All clients must remove the api_version attribute from the connect function,
+or the starting number, since it is no longer supported**
 
 New Features
 ------------
-
-The following features apply to **only** the new **API v4**
 
 New endpoints:
 

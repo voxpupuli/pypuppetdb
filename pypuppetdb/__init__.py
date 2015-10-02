@@ -58,8 +58,7 @@ number of nodes as the response will be huge.
 """
 import logging
 
-from pypuppetdb.api import v4
-from pypuppetdb.errors import UnsupportedVersionError
+from pypuppetdb.api import BaseAPI
 
 try:  # Python 2.7+
     from logging import NullHandler
@@ -71,14 +70,11 @@ except ImportError:  # pragma: notest
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
-def connect(api_version=4, host='localhost', port=8080, ssl_verify=False,
-            ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-            url_path='/', username=None, password=None):
+def connect(host='localhost', port=8080, ssl_verify=False, ssl_key=None,
+            ssl_cert=None, timeout=10, protocol=None, url_path='/',
+            username=None, password=None):
     """Connect with PuppetDB. This will return an object allowing you
     to query the API through its methods.
-
-    :param api_version: Version of the API we're initialising.
-    :type api_version: :obj:`int`
 
     :param host: (Default: 'localhost;) Hostname or IP of PuppetDB.
     :type host: :obj:`string`
@@ -116,13 +112,8 @@ def connect(api_version=4, host='localhost', port=8080, ssl_verify=False,
     :param password: (optional) The password to use for HTTP basic
             authentication
     :type password: :obj:`None` or :obj:`string`
-
-    :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
-    if api_version == 4:
-        return v4.API(host=host, port=port,
-                      timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-                      ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
-                      username=username, password=password)
-    else:
-        raise UnsupportedVersionError
+    return BaseAPI(host=host, port=port,
+                   timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
+                   ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
+                   username=username, password=password)

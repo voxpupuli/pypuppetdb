@@ -21,9 +21,12 @@ class TestNode(object):
         assert node.name == 'node'
         assert node.deactivated is False
         assert node.expired is False
-        assert node.report_timestamp is not None
-        assert node.facts_timestamp is not None
-        assert node.catalog_timestamp is not None
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
         assert str(node) == str('node')
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
@@ -39,9 +42,12 @@ class TestNode(object):
         assert node.name == 'node'
         assert node.deactivated is False
         assert node.expired is False
-        assert node.report_timestamp is not None
-        assert node.facts_timestamp is not None
-        assert node.catalog_timestamp is not None
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status is 'unreported'
         assert node.unreported_time is '0d 5h 20m'
         assert str(node) == str('node')
@@ -63,9 +69,12 @@ class TestNode(object):
         assert node.report_environment == 'development'
         assert node.catalog_environment == 'development'
         assert node.facts_environment == 'development'
-        assert node.report_timestamp is not None
-        assert node.facts_timestamp is not None
-        assert node.catalog_timestamp is not None
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
         assert str(node) == str('node')
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
@@ -74,7 +83,8 @@ class TestNode(object):
         node = Node('_', 'node',
                     deactivated='2013-08-01T09:57:00.000Z',)
         assert node.name == 'node'
-        assert node.deactivated is not False
+        assert node.deactivated == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
         assert str(node) == str('node')
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
@@ -83,7 +93,7 @@ class TestNode(object):
         node = Node('_', 'node',
                     expired='2013-08-01T09:57:00.000Z',)
         assert node.name == 'node'
-        assert node.expired is not False
+        assert node.expired == json_to_datetime('2013-08-01T09:57:00.000Z')
         assert str(node) == str('node')
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
@@ -170,7 +180,20 @@ class TestReport(object):
                         status='success',
                         noop=True)
 
+        assert report.node == 'node2.puppet.board'
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '4.2.1'
+        assert report.run_time == report.end - report.start
+        assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
         assert report.status == 'noop'
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
 
 
 class TestEvent(object):
