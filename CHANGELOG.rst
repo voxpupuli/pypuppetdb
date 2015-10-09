@@ -7,11 +7,13 @@ Changelog
 
 * Version bump to 0.2.0
 * Adding support for v4 of the Query API
+* Removing v2 and v3 api functions as per changelog
 * pypuppetdb will no longer support multiple API versions, removing the
   api_version attribute from pypuppetdb.connect() 
-
-**All clients must remove the api_version attribute from the connect function,
-or the starting number, since it is no longer supported**
+* All clients must remove the api_version attribute from the connect function,
+  or the starting number, since it is no longer supported
+* Removing all NotImplemented errors in the function of BaseAPI and filled
+  them with the real code
 
 New Features
 ------------
@@ -34,7 +36,9 @@ Changes to Types:
 * All ``pypupperdb.types.*`` accept the v4 API information as optional parameters.
   These parameters are primarily environment related but may include additional
   information if provided from that endpoint.
-* All ``pypuppetdb.api.v4`` functions pass any received keyword arguments to the
+* Functions appearing inside ``pypuppetdb.types`` that run queries against the
+  PuppetDB now accept and passing additional keyword arguments to the query.
+* All ``pypuppetdb.BaseAPI`` functions pass any received keyword arguments to the
   ``pypuppetdb.api.__init__._query()`` function. This allows for easy integration
   with paging functions and parameters.
 

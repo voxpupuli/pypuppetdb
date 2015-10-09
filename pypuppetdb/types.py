@@ -176,9 +176,11 @@ class Report(object):
     def __unicode__(self):
         return self.__string
 
-    def events(self):
-        """Get all events for this report."""
-        return self.__api.events(query=self.__query_scope)
+    def events(self, **kwargs):
+        """Get all events for this report. Additional arguments may also be
+        specified that will be passed to the query function.
+        """
+        return self.__api.events(query=self.__query_scope, **kwargs)
 
 
 class Fact(object):
@@ -385,37 +387,50 @@ class Node(object):
     def __unicode__(self):
         return self.__string
 
-    def facts(self):
-        """Get all facts of this node."""
-        return self.__api.facts(query=self.__query_scope)
+    def facts(self, **kwargs):
+        """Get all facts of this node. Additional arguments may also be
+        specified that will be passed to the query function.
+        """
+        return self.__api.facts(query=self.__query_scope, **kwargs)
 
     def fact(self, name):
         """Get a single fact from this node."""
-        facts = self.__api.facts(name=name, query=self.__query_scope)
+        facts = facts(name=name)
         return next(fact for fact in facts)
 
-    def resources(self, type_=None, title=None):
+    def resources(self, type_=None, title=None, **kwargs):
         """Get all resources of this node or all resources of the specified
-        type."""
+        type. Additional arguments may also be specified that will be passed
+        to the query function.
+        """
         if type_ is None:
-            resources = self.__api.resources(query=self.__query_scope)
+            resources = self.__api.resources(query=self.__query_scope,
+                                             **kwargs)
         elif type_ is not None and title is None:
             resources = self.__api.resources(type_=type_,
-                                             query=self.__query_scope)
+                                             query=self.__query_scope,
+                                             **kwargs)
         else:
             resources = self.__api.resources(type_=type_, title=title,
-                                             query=self.__query_scope)
+                                             query=self.__query_scope,
+                                             **kwargs)
         return resources
 
-    def resource(self, type_, title):
-        """Get a resource matching the supplied type and title."""
+    def resource(self, type_, title, **kwargs):
+        """Get a resource matching the supplied type and title. Additional
+        arguments may also be specified that will be passed to the query
+        function.
+        """
         resources = self.__api.resources(type_=type_, title=title,
-                                         query=self.__query_scope)
+                                         query=self.__query_scope,
+                                         **kwargs)
         return next(resource for resource in resources)
 
-    def reports(self):
-        """Get all reports for this node."""
-        return self.__api.reports(self.__query_scope)
+    def reports(self, **kwargs):
+        """Get all reports for this node. Additional arguments may also be
+        specified that will be passed to the query function.
+        """
+        return self.__api.reports(query=self.__query_scope, **kwargs)
 
 
 class Catalog(object):
