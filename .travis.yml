@@ -11,3 +11,4 @@ after_success:
   - coveralls
 notifications:
   email: false
+sudo: false

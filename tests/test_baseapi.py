@@ -18,17 +18,9 @@ def stub_request(url, data=None, **kwargs):
 
 
 class TestBaseAPIVersion(object):
-    def test_init_v2_defaults(self):
-        v2 = pypuppetdb.api.BaseAPI(2)
-        assert v2.api_version == 'v2'
-
-    def test_init_v3_defaults(self):
-        v3 = pypuppetdb.api.BaseAPI(3)
-        assert v3.api_version == 'v3'
-
-    def test_init_invalid_version(self):
-        with pytest.raises(pypuppetdb.errors.UnsupportedVersionError):
-            vderp = pypuppetdb.api.BaseAPI(10000)
+    def test_init_defaults(self):
+        v4 = pypuppetdb.api.BaseAPI()
+        assert v4.api_version == 'v4'
 
 
 class TestBaseAPIInitOptions(object):
@@ -45,85 +37,85 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.password is None
 
     def test_host(self):
-        api = pypuppetdb.api.BaseAPI(3, host='127.0.0.1')
+        api = pypuppetdb.api.BaseAPI(host='127.0.0.1')
         assert api.host == '127.0.0.1'
 
     def test_port(self):
-        api = pypuppetdb.api.BaseAPI(3, port=8081)
+        api = pypuppetdb.api.BaseAPI(port=8081)
         assert api.port == 8081
 
     def test_ssl_verify(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_verify=False)
+        api = pypuppetdb.api.BaseAPI(ssl_verify=False)
         assert api.ssl_verify is False
         assert api.protocol == 'http'
 
     def test_ssl_key(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_key='/a/b/c.pem')
+        api = pypuppetdb.api.BaseAPI(ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.protocol == 'http'
 
     def test_ssl_cert(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_cert='/d/e/f.pem')
+        api = pypuppetdb.api.BaseAPI(ssl_cert='/d/e/f.pem')
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'http'
 
     def test_ssl_key_and_cert(self):
-        api = pypuppetdb.api.BaseAPI(3, ssl_cert='/d/e/f.pem',
+        api = pypuppetdb.api.BaseAPI(ssl_cert='/d/e/f.pem',
                                      ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'https'
 
     def test_timeout(self):
-        api = pypuppetdb.api.BaseAPI(3, timeout=20)
+        api = pypuppetdb.api.BaseAPI(timeout=20)
         assert api.timeout == 20
 
     def test_protocol(self):
-        api = pypuppetdb.api.BaseAPI(3, protocol='https')
+        api = pypuppetdb.api.BaseAPI(protocol='https')
         assert api.protocol == 'https'
 
     def test_uppercase_protocol(self):
-        api = pypuppetdb.api.BaseAPI(3, protocol='HTTP')
+        api = pypuppetdb.api.BaseAPI(protocol='HTTP')
         assert api.protocol == 'http'
 
     def test_override_protocol(self):
-        api = pypuppetdb.api.BaseAPI(3, protocol='http',
+        api = pypuppetdb.api.BaseAPI(protocol='http',
                                      ssl_cert='/d/e/f.pem',
                                      ssl_key='/a/b/c.pem')
         assert api.protocol == 'http'
 
     def test_invalid_protocol(self):
         with pytest.raises(ValueError):
-            api = pypuppetdb.api.BaseAPI(3, protocol='ftp')
+            api = pypuppetdb.api.BaseAPI(protocol='ftp')
 
     def test_url_path(self):
-        api = pypuppetdb.api.BaseAPI(3, url_path='puppetdb')
+        api = pypuppetdb.api.BaseAPI(url_path='puppetdb')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_leading_slash(self):
-        api = pypuppetdb.api.BaseAPI(3, url_path='/puppetdb')
+        api = pypuppetdb.api.BaseAPI(url_path='/puppetdb')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_trailing_slash(self):
-        api = pypuppetdb.api.BaseAPI(3, url_path='puppetdb/')
+        api = pypuppetdb.api.BaseAPI(url_path='puppetdb/')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_longer_with_both_slashes(self):
-        api = pypuppetdb.api.BaseAPI(3, url_path='/puppet/db/')
+        api = pypuppetdb.api.BaseAPI(url_path='/puppet/db/')
         assert api.url_path == '/puppet/db'
 
     def test_username(self):
-        api = pypuppetdb.api.BaseAPI(3, username='puppetdb')
+        api = pypuppetdb.api.BaseAPI(username='puppetdb')
         assert api.username is None
         assert api.password is None
 
     def test_password(self):
-        api = pypuppetdb.api.BaseAPI(3, password='password123')
+        api = pypuppetdb.api.BaseAPI(password='password123')
         assert api.username is None
         assert api.password is None
 
     def test_username_and_password(self):
-        api = pypuppetdb.api.BaseAPI(3, username='puppetdb',
+        api = pypuppetdb.api.BaseAPI(username='puppetdb',
                                      password='password123')
         assert api.username == 'puppetdb'
         assert api.password == 'password123'
@@ -131,7 +123,7 @@ class TestBaseAPIInitOptions(object):
 
 class TestBaseAPIProperties(object):
     def test_version(self, baseapi):
-        assert baseapi.version == 'v3'
+        assert baseapi.version == 'v4'
 
     def test_base_url(self, baseapi):
         assert baseapi.base_url == 'http://localhost:8080'
@@ -147,7 +139,8 @@ class TestBaseAPIProperties(object):
 
 class TestBaseAPIURL(object):
     def test_without_path(self, baseapi):
-        assert baseapi._url('nodes') == 'http://localhost:8080/v3/nodes'
+        assert baseapi._url('nodes') == \
+            'http://localhost:8080/pdb/query/v4/nodes'
 
     def test_with_invalid_endpoint(self, baseapi):
         with pytest.raises(pypuppetdb.errors.APIError):
@@ -155,7 +148,8 @@ class TestBaseAPIURL(object):
 
     def test_with_path(self, baseapi):
         url = baseapi._url('nodes', path='node1.example.com')
-        assert url == 'http://localhost:8080/v3/nodes/node1.example.com'
+        assert url == \
+            'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
 
 
 class TesteAPIQuery(object):
@@ -180,49 +174,51 @@ class TesteAPIQuery(object):
 
     def test_setting_headers(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes')  # need to query some endpoint
         request_headers = dict(httpretty.last_request().headers)
         assert request_headers['Accept'] == 'application/json'
         assert request_headers['Content-Type'] == 'application/json'
         assert request_headers['Accept-Charset'] == 'utf-8'
         assert request_headers['Host'] == 'localhost:8080'
-        assert httpretty.last_request().path == '/v3/nodes'
+        assert httpretty.last_request().path == '/pdb/query/v4/nodes'
         httpretty.disable()
         httpretty.reset()
 
     def test_with_path(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes/node1')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes/node1')
         baseapi._query('nodes', path='node1')
-        assert httpretty.last_request().path == '/v3/nodes/node1'
+        assert httpretty.last_request().path == '/pdb/query/v4/nodes/node1'
         httpretty.disable()
         httpretty.reset()
 
     def test_with_url_path(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/puppetdb/v3/nodes')
+        stub_request('http://localhost:8080/puppetdb/pdb/query/v4/nodes')
         baseapi.url_path = '/puppetdb'
         baseapi._query('nodes')
-        assert httpretty.last_request().path == '/puppetdb/v3/nodes'
+        assert httpretty.last_request().path == '/puppetdb/pdb/query/v4/nodes'
         httpretty.disable()
         httpretty.reset()
 
     def test_with_authorization(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi.username = 'puppetdb'
         baseapi.password = 'password123'
         baseapi._query('nodes')
-        assert httpretty.last_request().path == '/v3/nodes'
+        assert httpretty.last_request().path == '/pdb/query/v4/nodes'
+        encoded_cred = 'puppetdb:password123'.encode('utf-8')
+        bs_authheader = base64.b64encode(encoded_cred).decode('utf-8')
         assert httpretty.last_request().headers['Authorization'] == \
-            'Basic {0}'.format(base64.b64encode('puppetdb:password123'))
+            'Basic {0}'.format(bs_authheader)
         httpretty.disable()
         httpretty.reset()
 
     def test_with_query(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', query='["certname", "=", "node1"]')
         assert httpretty.last_request().querystring == {
             'query': ['["certname", "=", "node1"]']}
@@ -231,16 +227,16 @@ class TesteAPIQuery(object):
 
     def test_with_order(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', order_by='ted')
         assert httpretty.last_request().querystring == {
-            'order-by': ['ted']}
+            'order_by': ['ted']}
         httpretty.disable()
         httpretty.reset()
 
     def test_with_limit(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', limit=1)
         assert httpretty.last_request().querystring == {
             'limit': ['1']}
@@ -249,16 +245,16 @@ class TesteAPIQuery(object):
 
     def test_with_include_total(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', include_total=True)
         assert httpretty.last_request().querystring == {
-            'include-total': ['true']}
+            'include_total': ['true']}
         httpretty.disable()
         httpretty.reset()
 
     def test_with_offset(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', offset=1)
         assert httpretty.last_request().querystring == {
             'offset': ['1']}
@@ -267,41 +263,43 @@ class TesteAPIQuery(object):
 
     def test_with_summarize_by(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', summarize_by=1)
         assert httpretty.last_request().querystring == {
-            'summarize-by': ['1']}
+            'summarize_by': ['1']}
         httpretty.disable()
         httpretty.reset()
 
     def test_with_count_by(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', count_by=1)
         assert httpretty.last_request().querystring == {
-            'count-by': ['1']}
+            'count_by': ['1']}
         httpretty.disable()
         httpretty.reset()
 
     def test_with_count_filter(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/nodes')
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes', count_filter=1)
         assert httpretty.last_request().querystring == {
-            'count-filter': ['1']}
+            'counts_filter': ['1']}
         httpretty.disable()
         httpretty.reset()
 
     def test_response_empty(self, baseapi):
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/v3/nodes',
+        httpretty.register_uri(httpretty.GET,
+                               'http://localhost:8080/pdb/query/v4/nodes',
                                body=json.dumps(None))
         with pytest.raises(pypuppetdb.errors.EmptyResponseError):
             baseapi._query('nodes')
 
     def test_response_x_records(self, baseapi):
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/v3/nodes',
+        httpretty.register_uri(httpretty.GET,
+                               'http://localhost:8080/pdb/query/v4/nodes',
                                adding_headers={
                                    'X-Records': 256},
                                body='[]',
@@ -311,26 +309,31 @@ class TesteAPIQuery(object):
 
 
 class TestAPIMethods(object):
-    def test_nodes(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.nodes()
-
-    def test_node(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.node()
-
-    def test_facts(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.facts()
-
-    def test_resources(self, baseapi):
-        with pytest.raises(NotImplementedError):
-            baseapi.resources()
-
     def test_metric(self, baseapi):
         httpretty.enable()
-        stub_request('http://localhost:8080/v3/metrics/mbean/test')
+        stub_request('http://localhost:8080/metrics/v1/mbeans/test')
         baseapi.metric('test')
-        assert httpretty.last_request().path == '/v3/metrics/mbean/test'
+        assert httpretty.last_request().path == '/metrics/v1/mbeans/test'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_fact_names(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/fact-names')
+        baseapi.fact_names()
+        assert httpretty.last_request().path == '/pdb/query/v4/fact-names'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_normalize_resource_type(self, baseapi):
+        assert baseapi._normalize_resource_type('sysctl::value') == \
+            'Sysctl::Value'
+        assert baseapi._normalize_resource_type('user') == 'User'
+
+    def test_environments(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/environments')
+        baseapi.environments()
+        assert httpretty.last_request().path == '/pdb/query/v4/environments'
         httpretty.disable()
         httpretty.reset()

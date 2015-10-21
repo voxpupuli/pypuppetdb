@@ -58,9 +58,7 @@ number of nodes as the response will be huge.
 """
 import logging
 
-from pypuppetdb.api import v2
-from pypuppetdb.api import v3
-from pypuppetdb.errors import UnsupportedVersionError
+from pypuppetdb.api import BaseAPI
 
 try:  # Python 2.7+
     from logging import NullHandler
@@ -72,19 +70,16 @@ except ImportError:  # pragma: notest
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
-def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
-            ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-            url_path='/', username=None, password=None):
+def connect(host='localhost', port=8080, ssl_verify=False, ssl_key=None,
+            ssl_cert=None, timeout=10, protocol=None, url_path='/',
+            username=None, password=None):
     """Connect with PuppetDB. This will return an object allowing you
     to query the API through its methods.
 
-    :param api_version: Version of the API we're initialising.
-    :type api_version: :obj:`int`
-
-    :param host: (optional) Hostname or IP of PuppetDB.
+    :param host: (Default: 'localhost;) Hostname or IP of PuppetDB.
     :type host: :obj:`string`
 
-    :param port: (optional) Port on which to talk to PuppetDB.
+    :param port: (Default: '8080') Port on which to talk to PuppetDB.
     :type port: :obj:`int`
 
     :param ssl_verify: (optional) Verify PuppetDB server certificate.
@@ -99,7 +94,7 @@ def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
     :type ssl_cert: :obj:`None` or :obj:`string` representing a filesystem\
             path.
 
-    :param timeout: (optional) Number of seconds to wait for a response.
+    :param timeout: (Default: 10) Number of seconds to wait for a response.
     :type timeout: :obj:`int`
 
     :param protocol: (optional) Explicitly specify the protocol to be used
@@ -107,8 +102,7 @@ def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
             without certs)
     :type protocol: :obj:`None` or :obj:`string`
 
-    :param url_path: (optional) The URL path where PuppetDB is served
-            (if not at the root / path)
+    :param url_path: (Default: '/') The URL path where PuppetDB is served
     :type url_path: :obj:`None` or :obj:`string`
 
     :param username: (optional) The username to use for HTTP basic
@@ -118,18 +112,8 @@ def connect(api_version=3, host='localhost', port=8080, ssl_verify=False,
     :param password: (optional) The password to use for HTTP basic
             authentication
     :type password: :obj:`None` or :obj:`string`
-
-    :raises: :class:`~pypuppetdb.errors.UnsupportedVersionError`
     """
-    if api_version == 3:
-        return v3.API(host=host, port=port,
-                      timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-                      ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
-                      username=username, password=password)
-    if api_version == 2:
-        return v2.API(host=host, port=port,
-                      timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-                      ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
-                      username=username, password=password)
-    else:
-        raise UnsupportedVersionError
+    return BaseAPI(host=host, port=port,
+                   timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
+                   ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
+                   username=username, password=password)

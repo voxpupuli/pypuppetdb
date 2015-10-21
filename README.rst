@@ -3,16 +3,16 @@ pypuppetdb
 ##########
 
 .. image:: https://api.travis-ci.org/puppet-community/pypuppetdb.png
-   :target: https://travis-ci.org/puppet-communit/pypuppetdb
+   :target: https://travis-ci.org/puppet-community/pypuppetdb
 
 .. image:: https://coveralls.io/repos/puppet-community/pypuppetdb/badge.png
-   :target: https://coeralls.io/r/puppet-community/pypuppetdb
+   :target: https://coveralls.io/repos/puppet-community/pypuppetdb
+
 
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 
-**pypuppetdb DOES NOT work with PuppetDB 3**
-
+**pypuppetdb >= 0.2.0 DOES work with PuppetDB 3**
 .. _requests: http://docs.python-requests.org/en/latest/
 
 This library is a thin wrapper around the REST API providing some convinience
@@ -33,14 +33,14 @@ You can install this package from source or from PyPi.
 
 .. code-block:: bash
 
-   $ git clone https://github.com/nedap/pypuppetdb
+   $ git clone https://github.com/puppet-community/pypuppetdb
    $ python setup.py install
 
 If you wish to hack on it clone the repository but after that run:
 
 .. code-block:: bash
 
-   $ pip install -r requirements.txt
+   $ pip install -r test-requirements.txt
 
 This will install all the runtime requirements of pypuppetdb and the
 dependencies for the test suite and generation of documentation.
@@ -63,6 +63,8 @@ Native packages for your operating system will be provided in the near future.
 | CentOS/RHEL 5    | n/a       | Python 2.4                                 |
 +------------------+-----------+--------------------------------------------+
 | CentOS/RHEL 6    | planned   |                                            |
++------------------+-----------+--------------------------------------------+
+| CentOS/RHEL 7    | planned   |                                            |
 +------------------+-----------+--------------------------------------------+
 | `ArchLinux`_     | available | Maintained by `Niels Abspoel`_             |
 +------------------+-----------+--------------------------------------------+

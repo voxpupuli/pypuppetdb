@@ -16,12 +16,6 @@ class EmptyResponseError(APIError):
     pass
 
 
-class UnsupportedVersionError(APIError):
-    """Triggers when using the :func:`connect` function and
-    providing it with an unknown API version."""
-    pass
-
-
 class DoesNotComputeError(APIError):
     """This error will be thrown when a function is called with
     an incompatible set of optional parameters. This is the 'you are
