@@ -66,13 +66,13 @@ Native packages for your operating system will be provided in the near future.
 +------------------+-----------+--------------------------------------------+
 | CentOS/RHEL 7    | planned   |                                            |
 +------------------+-----------+--------------------------------------------+
-| `ArchLinux`_     | available | Maintained by `Niels Abspoel`_             |
+| `ArchLinux`_     | available | Maintained by `Tim Meusel`_                |
 +------------------+-----------+--------------------------------------------+
 | `OpenBSD`_       | available | Maintained by `Jasper Lievisse Adriaanse`_ |
 +------------------+-----------+--------------------------------------------+
 
-.. _ArchLinux: https://aur.archlinux.org/packages/python2-pypuppetdb/ 
-.. _Niels Abspoel: https://github.com/aboe76
+.. _ArchLinux: https://aur.archlinux.org/packages/?O=0&SeB=nd&K=puppetdb&outdated=&SB=n&SO=a&PP=50&do_Search=Go
+.. _Tim Meusel: https://github.com/bastelfreak
 .. _Jasper Lievisse Adriaanse: https://github.com/jasperla
 .. _OpenBSD: http://www.openbsd.org/cgi-bin/cvsweb/ports/databases/py-puppetdb/
 
@@ -199,7 +199,7 @@ and answer questions related to pypuppetdb and Puppetboard.
 Documentation
 =============
 API documentation is automatically generated from the docstrings using
-Sphinx's autodoc feature. 
+Sphinx's autodoc feature.
 
 Documentation will automatically be rebuilt on every push thanks to the
 Read The Docs webhook. You can `find it here`_.
@@ -276,7 +276,7 @@ run:
 To run the unit tests (the ones that don't require a live PuppetDB):
 
 .. code-block:: bash
-   
+
    $ py.test -v -m unit
 
 If the tests pass, you're golden. If not we'll have to figure out why and
