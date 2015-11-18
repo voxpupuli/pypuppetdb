@@ -395,7 +395,7 @@ class Node(object):
 
     def fact(self, name):
         """Get a single fact from this node."""
-        facts = facts(name=name)
+        facts = self.facts(name=name)
         return next(fact for fact in facts)
 
     def resources(self, type_=None, title=None, **kwargs):
