@@ -380,6 +380,19 @@ class BaseAPI(object):
                 query='["=", "latest_report?", true]',
                 summarize_by='certname'
             )
+            # Puppetdb version 3.0 and 3.1 do not return latest_report_status
+            # in node endpoint. Use *slower* reports endpoint to query
+            # latest report status.
+            try:
+                puppetdb_vers = int(''.join(self.current_version().split('.')))
+                status_from_reports = puppetdb_vers < 320
+            except ValueError:
+                # Assume faster approach on unexpected version string.
+                status_from_reports = False
+
+            if status_from_reports:
+                query = '["=","latest_report?","true"]'
+                latest_reports = [r for r in self.reports(query=query)]
 
         for node in nodes:
             node['unreported_time'] = None
@@ -398,10 +411,20 @@ class BaseAPI(object):
                         node['status'] = 'noop'
                     if status['failures'] > 0:
                         node['status'] = 'failed'
-                elif node['latest_report_status'] == 'failed':
-                    node['status'] = 'failed'
+                # Puppetdb < 3.2
+                elif status_from_reports:
+                    reports = [r for r in latest_reports
+                               if r.node == node['certname']]
+                    if reports and reports[0].status == 'failed':
+                        node['status'] = 'failed'
+                    else:
+                        node['status'] = 'unchanged'
+                # Puppetdb >= 3.2
                 else:
-                    node['status'] = 'unchanged'
+                    if node['latest_report_status'] == 'failed':
+                        node['status'] = 'failed'
+                    else:
+                        node['status'] = 'unchanged'
 
                 # node report age
                 if node['report_timestamp'] is not None:
