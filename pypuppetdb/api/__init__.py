@@ -398,6 +398,8 @@ class BaseAPI(object):
                         node['status'] = 'noop'
                     if status['failures'] > 0:
                         node['status'] = 'failed'
+                elif node['latest_report_status'] == 'failed':
+                    node['status'] = 'failed'
                 else:
                     node['status'] = 'unchanged'
 
