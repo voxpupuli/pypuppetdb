@@ -401,6 +401,10 @@ class BaseAPI(object):
                 else:
                     node['status'] = 'unchanged'
 
+                # Override if available
+                if 'latest_report_status' in node:
+                    node['status'] = node['latest_report_status']
+
                 # node report age
                 if node['report_timestamp'] is not None:
                     try:
