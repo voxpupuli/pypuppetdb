@@ -2,6 +2,12 @@
 Changelog
 #########
 
+0.2.1
+=====
+
+* Adding a version comparison utility function using examples provided in
+  http://stackoverflow.com/questions/1714027/version-number-comparison
+
 0.2.0
 =====
 

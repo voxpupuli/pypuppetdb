@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import warnings
 import datetime
+import re
 
 
 # A UTC class, see:
@@ -41,3 +42,9 @@ def json_to_datetime(date):
     """
     return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(
         tzinfo=UTC())
+
+
+def versioncmp(v1, v2):
+    def normalize(v):
+        return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
+    return cmp(normalize(v1), normalize(v2))
