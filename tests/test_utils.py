@@ -47,3 +47,25 @@ class TestJSONToDateTime(object):
     def test_json_to_datetime_invalid(self):
         with pytest.raises(ValueError):
             pypuppetdb.utils.json_to_datetime('2013-08-0109:57:00.000Z')
+
+
+class TestVersionCmp(object):
+    """Test the versioncmp function using different criteria."""
+
+    def test_versioncmp(self):
+        assert pypuppetdb.utils.versioncmp('1', '1') == 0
+        assert pypuppetdb.utils.versioncmp('2.1', '2.2') < 0
+        assert pypuppetdb.utils.versioncmp('3.0.4.10', '3.0.4.2') > 0
+        assert pypuppetdb.utils.versioncmp('4.08', '4.08.1') < 0
+        assert pypuppetdb.utils.versioncmp('3.2.1.9.8144', '3.2') > 0
+        assert pypuppetdb.utils.versioncmp('3.2', '3.2.1.9.8144') < 0
+        assert pypuppetdb.utils.versioncmp('1.2', '2.1') < 0
+        assert pypuppetdb.utils.versioncmp('2.1', '1.2') > 0
+        assert pypuppetdb.utils.versioncmp('5.6.7', '5.6.7') == 0
+        assert pypuppetdb.utils.versioncmp('1.01.1', '1.1.1') == 0
+        assert pypuppetdb.utils.versioncmp('1.1.1', '1.01.1') == 0
+        assert pypuppetdb.utils.versioncmp('1', '1.0') == 0
+        assert pypuppetdb.utils.versioncmp('1.0', '1') == 0
+        assert pypuppetdb.utils.versioncmp('1.0', '1.0.1') < 0
+        assert pypuppetdb.utils.versioncmp('1.0.1', '1.0') > 0
+        assert pypuppetdb.utils.versioncmp('1.0.2.0', '1.0.2') == 0
