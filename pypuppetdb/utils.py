@@ -50,4 +50,5 @@ def versioncmp(v1, v2):
     try:
         return cmp(normalize(v1), normalize(v2))
     except NameError:
-        return (v1 > v2) - (v1 < v2)
+        return (normalize(v1) > normalize(v2)) - (
+            normalize(v1) < normalize(v2))
