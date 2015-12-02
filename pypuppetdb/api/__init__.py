@@ -7,7 +7,7 @@ import json
 import requests
 
 from datetime import datetime, timedelta
-from pypuppetdb.utils import json_to_datetime
+from pypuppetdb.utils import json_to_datetime, versioncmp
 from pypuppetdb.errors import (
     ImproperlyConfiguredError,
     EmptyResponseError,
@@ -381,16 +381,8 @@ class BaseAPI(object):
                 summarize_by='certname'
             )
             # Puppetdb version 3.0 and 3.1 do not return latest_report_status
-            # in node endpoint. Use *slower* reports endpoint to query
-            # latest report status.
-            try:
-                puppetdb_vers = int(''.join(self.current_version().split('.')))
-                status_from_reports = puppetdb_vers < 320
-            except ValueError:
-                # Assume faster approach on unexpected version string.
-                status_from_reports = False
-
-            if status_from_reports:
+            # in node endpoint. Use *slower* reports endpoint to query instead.
+            if versioncmp(self.current_version(), '3.2') < 0:
                 query = '["=","latest_report?","true"]'
                 latest_reports = [r for r in self.reports(query=query)]
 
@@ -403,6 +395,7 @@ class BaseAPI(object):
                 status = [s for s in latest_events
                           if s['subject']['title'] == node['certname']]
 
+                node['status'] = 'unchanged'
                 if status:
                     node['events'] = status = status[0]
                     if status['successes'] > 0:
@@ -411,20 +404,14 @@ class BaseAPI(object):
                         node['status'] = 'noop'
                     if status['failures'] > 0:
                         node['status'] = 'failed'
-                # Puppetdb < 3.2
-                elif status_from_reports:
+                elif 'latest_report_status' in node:
+                    if node['latest_report_status'] == 'failed':
+                        node['status'] = 'failed'
+                else:
                     reports = [r for r in latest_reports
                                if r.node == node['certname']]
                     if reports and reports[0].status == 'failed':
                         node['status'] = 'failed'
-                    else:
-                        node['status'] = 'unchanged'
-                # Puppetdb >= 3.2
-                else:
-                    if node['latest_report_status'] == 'failed':
-                        node['status'] = 'failed'
-                    else:
-                        node['status'] = 'unchanged'
 
                 # node report age
                 if node['report_timestamp'] is not None:
