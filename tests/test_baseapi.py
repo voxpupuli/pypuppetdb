@@ -307,6 +307,16 @@ class TesteAPIQuery(object):
         baseapi._query('nodes', include_total=True)
         assert baseapi.total == 256
 
+    def test_query_bad_request_type(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
+        with pytest.raises(pypuppetdb.errors.APIError):
+            baseapi._query('nodes',
+                           query='["certname", "=", "node1"]',
+                           request_method='DELETE')
+        httpretty.disable()
+        httpretty.reset()
+
 
 class TestAPIMethods(object):
     def test_metric(self, baseapi):
