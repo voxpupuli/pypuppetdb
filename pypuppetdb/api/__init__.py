@@ -242,7 +242,8 @@ class BaseAPI(object):
 
     def _query(self, endpoint, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
-               summarize_by=None, count_by=None, count_filter=None):
+               summarize_by=None, count_by=None, count_filter=None,
+               request_method='GET'):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -312,10 +313,22 @@ class BaseAPI(object):
             payload = None
 
         try:
-            r = self._session.get(url, params=payload, verify=self.ssl_verify,
-                                  cert=(self.ssl_cert, self.ssl_key),
-                                  timeout=self.timeout,
-                                  auth=(self.username, self.password))
+            if request_method.upper() == 'GET':
+                r = self._session.get(url, params=payload,
+                                      verify=self.ssl_verify,
+                                      cert=(self.ssl_cert, self.ssl_key),
+                                      timeout=self.timeout,
+                                      auth=(self.username, self.password))
+            elif request_method.upper() == 'POST':
+                r = self._session.post(url, params=payload,
+                                       verify=self.ssl_verify,
+                                       cert=(self.ssl_cert, self.ssl_key),
+                                       timeout=self.timeout,
+                                       auth=(self.username, self.password))
+            else:
+                log.error("Only GET or POST supported, {0} unsupported".format(
+                          request_method))
+                raise APIError
             r.raise_for_status()
 
             # get total number of results if requested with include-total
@@ -385,21 +398,31 @@ class BaseAPI(object):
             node['unreported_time'] = None
             node['status'] = None
             node['events'] = None
+            latest_report_hash = None
 
             if with_status:
                 status = [s for s in latest_events
                           if s['subject']['title'] == node['certname']]
 
-                if status:
-                    node['events'] = status = status[0]
-                    if status['successes'] > 0:
-                        node['status'] = 'changed'
-                    if status['noops'] > 0:
-                        node['status'] = 'noop'
-                    if status['failures'] > 0:
-                        node['status'] = 'failed'
-                else:
-                    node['status'] = 'unchanged'
+                try:
+                    node['status'] = node['latest_report_status']
+                    latest_report_hash = node['latest_report_hash']
+
+                    if status:
+                        node['events'] = status = status[0]
+                        if status['noops'] > 0:
+                            node['status'] = 'noop'
+                except KeyError:
+                    if status:
+                        node['events'] = status = status[0]
+                        if status['successes'] > 0:
+                            node['status'] = 'changed'
+                        if status['noops'] > 0:
+                            node['status'] = 'noop'
+                        if status['failures'] > 0:
+                            node['status'] = 'failed'
+                    else:
+                        node['status'] = 'unchanged'
 
                 # node report age
                 if node['report_timestamp'] is not None:
@@ -435,7 +458,8 @@ class BaseAPI(object):
                        unreported_time=node['unreported_time'],
                        report_environment=node['report_environment'],
                        catalog_environment=node['catalog_environment'],
-                       facts_environment=node['facts_environment']
+                       facts_environment=node['facts_environment'],
+                       latest_report_hash=latest_report_hash
                        )
 
     def node(self, name):
@@ -623,12 +647,17 @@ class BaseAPI(object):
             catalogs = [catalogs, ]
 
         for catalog in catalogs:
+            try:
+                code_id = catalog['code_id']
+            except KeyError:
+                code_id = None
             yield Catalog(node=catalog['certname'],
                           edges=catalog['edges']['data'],
                           resources=catalog['resources']['data'],
                           version=catalog['version'],
                           transaction_uuid=catalog['transaction_uuid'],
-                          environment=catalog['environment'])
+                          environment=catalog['environment'],
+                          code_id=code_id)
 
     def events(self, **kwargs):
         """A report is made up of events which can be queried either

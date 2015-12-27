@@ -98,6 +98,12 @@ class TestNode(object):
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
 
+    def test_with_latest_report_hash(self):
+        node = Node('_', 'node',
+                    latest_report_hash='hash#1')
+        assert node.name == 'node'
+        assert node.latest_report_hash == 'hash#1'
+
 
 class TestFact(object):
     """Test the Fact object."""
@@ -248,6 +254,20 @@ class TestCatalog(object):
         assert unicode(catalog) == unicode('node/None')
         assert repr(catalog) == str(
             '<Catalog: node/None>')
+
+    def test_catalog_codeid(self):
+        catalog = Catalog('node', [], [], 'unique', None,
+                          code_id='somecodeid')
+        assert catalog.node == 'node'
+        assert catalog.version == 'unique'
+        assert catalog.transaction_uuid is None
+        assert catalog.resources == {}
+        assert catalog.edges == []
+        assert str(catalog) == str('node/None')
+        assert unicode(catalog) == unicode('node/None')
+        assert repr(catalog) == str(
+            '<Catalog: node/None>')
+        assert catalog.code_id == 'somecodeid'
 
 
 class TestEdge(object):
