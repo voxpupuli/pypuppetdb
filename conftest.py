@@ -3,21 +3,9 @@ import pypuppetdb
 
 
 # Set up our API objects
-@pytest.fixture(scope='session')
-def api2():
-    """Set up a connection to PuppetDB with API version 2."""
-    return pypuppetdb.connect(api_version=2)
-
-
-@pytest.fixture(scope='session')
-def api3():
-    """Set up a connection to PuppetDB with API version 3."""
-    return pypuppetdb.connect(api_version=3)
-
-
 @pytest.fixture
 def baseapi():
-    return pypuppetdb.api.BaseAPI(3)
+    return pypuppetdb.api.BaseAPI()
 
 
 @pytest.fixture
