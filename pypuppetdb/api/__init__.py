@@ -522,13 +522,16 @@ class BaseAPI(object):
         :rtype: :class:`pypuppetdb.types.Fact`
         """
         if name is not None and value is not None:
-            path = '{0}/{1}'.format(name, value)
+            query = '["and",' \
+                '["=", "name", "{0}"],' \
+                '["=", "value", "{1}"]]'.format(
+                    name, value)
         elif name is not None and value is None:
-            path = name
+            query = '["=", "name", "{0}"]'.format(name)
         else:
-            path = None
+            query = None
 
-        facts = self._query('facts', path=path, **kwargs)
+        facts = self._query('facts', query=query, **kwargs)
         for fact in facts:
             yield Fact(
                 node=fact['certname'],
