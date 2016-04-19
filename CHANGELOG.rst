@@ -2,6 +2,22 @@
 Changelog
 #########
 
+0.2.1
+=====
+
+* Adding a version comparison utility function using examples provided in
+  http://stackoverflow.com/questions/1714027/version-number-comparison
+* Adding a new variable latest_report_hash to the Node object. Default
+  None but is given a real value from the field of the same name in the
+  Nodes endpoint available in PuppetDB 3.2 or higher.
+* Allowing support for 'GET' AND 'POST' requests in the api _query()
+  function. This will allow clients to send requests to the PuppetDB that
+  are too long for a GEt request query string
+* Adding a node field, code_id, to the Catalog object using the field of
+  the same name from the Catalogs endpoint (currently unused as of
+  PuppetDB 3.2.2)
+* Adding test cases for new features EXCEPT the GET and POST update.
+
 0.2.0
 =====
 

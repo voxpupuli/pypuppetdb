@@ -319,6 +319,9 @@ class Node(object):
     :param facts_environment: (default 'production') The environment of the\
             last received fact set for this node
     :type facts_environment" :obj:`string`
+    :param latest_report_hash: The hash of the latest report from this node,\
+            is only available in PuppetDB 3.2 and later
+    :type latest_report_hash: :obj:`string`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -333,15 +336,19 @@ class Node(object):
             received report for this node.
     :ivar catalog_environment: :obj:`string` the environment of the last\
             received catalog for this node.
-    :ivar facts_environment: :obj:`string` the environemtn of the last\
+    :ivar facts_environment: :obj:`string` the environment of the last\
             received fact set for this node.
+    :ivar latest_report_hash: :obj:`string` the hash value of the latest\
+            report the current node reported. Available in PuppetDB 3.2\
+            and later.
     """
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
                  facts_timestamp=None, status=None, events=None,
                  unreported_time=None, report_environment='production',
                  catalog_environment='production',
-                 facts_environment='production'):
+                 facts_environment='production',
+                 latest_report_hash=None):
         self.name = name
         self.status = status
         self.events = events
@@ -352,6 +359,7 @@ class Node(object):
         self.report_environment = report_environment
         self.catalog_environment = catalog_environment
         self.facts_environment = facts_environment
+        self.latest_report_hash = latest_report_hash
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)
@@ -395,7 +403,7 @@ class Node(object):
 
     def fact(self, name):
         """Get a single fact from this node."""
-        facts = facts(name=name)
+        facts = self.facts(name=name)
         return next(fact for fact in facts)
 
     def resources(self, type_=None, title=None, **kwargs):
@@ -453,6 +461,9 @@ class Catalog(object):
     :param environment: The environment associated with the catalog's\
         certname.
     :type environment: :obj:`string`
+    :param code_id: The string used to tie this catalog to the Puppet code\
+        which generated the catalog.
+    :type code_id: :obj:`string`
 
     :ivar node: :obj:`string` Name of the host
     :ivar version: :obj:`string` Catalog version from Puppet
@@ -465,14 +476,17 @@ class Catalog(object):
         Resource object of the relationship
     :ivar environment: :obj:`string` Environment associated with the
         catalog's certname
+    :ivar code_id: :obj:`string` ties the catalog to the Puppet code that\
+        generated the catalog
     """
     def __init__(self, node, edges, resources, version, transaction_uuid,
-                 environment=None):
+                 environment=None, code_id=None):
 
         self.node = node
         self.version = version
         self.transaction_uuid = transaction_uuid
         self.environment = environment
+        self.code_id = code_id
 
         self.resources = dict()
         for resource in resources:
