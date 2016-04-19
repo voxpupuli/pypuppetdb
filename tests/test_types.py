@@ -201,6 +201,33 @@ class TestReport(object):
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
 
+    def test_report_with_cataloguuid_codeid(self):
+        report = Report('_', 'node2.puppet.board', 'hash#',
+                        '2015-08-31T21:07:00.000Z',
+                        '2015-08-31T21:09:00.000Z',
+                        '2015-08-31T21:10:00.000Z',
+                        '1482347613', 4, '4.2.1',
+                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+                        code_id=None,
+                        catalog_uuid="0b3a4943-a164-4cea-bbf0-91d0ee931326",
+                        cached_catalog_status="not_used")
+
+        assert report.node == 'node2.puppet.board'
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '4.2.1'
+        assert report.run_time == report.end - report.start
+        assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
+        assert report.catalog_uuid == "0b3a4943-a164-4cea-bbf0-91d0ee931326"
+        assert report.cached_catalog_status == "not_used"
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
 
 class TestEvent(object):
     """Test the Event object."""
@@ -268,6 +295,20 @@ class TestCatalog(object):
         assert repr(catalog) == str(
             '<Catalog: node/None>')
         assert catalog.code_id == 'somecodeid'
+
+    def test_catalog_uuid(self):
+        catalog = Catalog('node', [], [], 'unique', None,
+                          catalog_uuid='univerallyuniqueidentifier')
+        assert catalog.node == 'node'
+        assert catalog.version == 'unique'
+        assert catalog.transaction_uuid is None
+        assert catalog.resources == {}
+        assert catalog.edges == []
+        assert str(catalog) == str('node/None')
+        assert unicode(catalog) == unicode('node/None')
+        assert repr(catalog) == str(
+            '<Catalog: node/None>')
+        assert catalog.catalog_uuid == 'univerallyuniqueidentifier'
 
 
 class TestEdge(object):

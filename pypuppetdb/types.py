@@ -123,6 +123,17 @@ class Report(object):
     :type metrics: :obj:`list` containing :obj:`dict` with Metrics
     :param logs: (Optional) All logs associated with this report.
     :type logs: :obj:`list containing :obj:`dict` of logs
+    :param code_id: (Optional) Ties the catalog to the Puppet Code that\
+        generated the catalog.
+    :type code_id: :obj:`string`
+    :param catalog_uuid: (Optional) Ties the report to the catalog used\
+        from that Puppet run.
+    :type catalog_uuid: :obj:`string`
+    :param cached_catalog_status: (Optional) Identifies if the Puppet run\
+        used a cached catalog and weather or not it was used due to an\
+        error. Can be one of 'explicitly_requested', 'on_failure',\
+        'not_used' not 'null'.
+    :type cached_catalog_status: :obj:`string`
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -142,11 +153,19 @@ class Report(object):
         associated with this report.
     :ivar logs: :obj:`list` containing :obj:`dict` of all logs\
         associated with this report.
+    :ivar code_id: :obj:`string` used to tie a catalog to the Puppet Code\
+        which generated the catalog.
+    :ivar catalog_uuid: :obj:`string` used to tie this report to the catalog\
+        used on this Puppet run.
+    :ivar cached_catalog_status: :obj:`string` identifying if this Puppet run\
+        used a cached catalog, if so weather it was a result of an error or\
+        otherwise.
     """
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
-                 noop=False):
+                 noop=False, code_id=None, catalog_uuid=None,
+                 cached_catalog_status=None):
 
         self.node = node
         self.hash_ = hash_
@@ -162,6 +181,9 @@ class Report(object):
         self.status = 'noop' if noop else status
         self.metrics = metrics
         self.logs = logs
+        self.code_id = code_id
+        self.catalog_uuid = catalog_uuid
+        self.cached_catalog_status = cached_catalog_status
         self.__string = '{0}'.format(self.hash_)
 
         self.__api = api
@@ -464,6 +486,8 @@ class Catalog(object):
     :param code_id: The string used to tie this catalog to the Puppet code\
         which generated the catalog.
     :type code_id: :obj:`string`
+    :param catalog_uuid: Universally unique identifier of this catalog.
+    :type catalog_uuid: :obj:`string`
 
     :ivar node: :obj:`string` Name of the host
     :ivar version: :obj:`string` Catalog version from Puppet
@@ -478,15 +502,17 @@ class Catalog(object):
         catalog's certname
     :ivar code_id: :obj:`string` ties the catalog to the Puppet code that\
         generated the catalog
+    :ivar catalog_uuid: :obj:`string` uniquely identifying this catalog.
     """
     def __init__(self, node, edges, resources, version, transaction_uuid,
-                 environment=None, code_id=None):
+                 environment=None, code_id=None, catalog_uuid=None):
 
         self.node = node
         self.version = version
         self.transaction_uuid = transaction_uuid
         self.environment = environment
         self.code_id = code_id
+        self.catalog_uuid = catalog_uuid
 
         self.resources = dict()
         for resource in resources:

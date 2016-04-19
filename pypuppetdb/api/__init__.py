@@ -649,15 +649,18 @@ class BaseAPI(object):
         for catalog in catalogs:
             try:
                 code_id = catalog['code_id']
+                catalog_uuid = catalog['catalog_uuid']
             except KeyError:
                 code_id = None
+                catalog_uuid = None
             yield Catalog(node=catalog['certname'],
                           edges=catalog['edges']['data'],
                           resources=catalog['resources']['data'],
                           version=catalog['version'],
                           transaction_uuid=catalog['transaction_uuid'],
                           environment=catalog['environment'],
-                          code_id=code_id)
+                          code_id=code_id,
+                          catalog_uuid=catalog_uuid)
 
     def events(self, **kwargs):
         """A report is made up of events which can be queried either
@@ -793,6 +796,14 @@ class BaseAPI(object):
         """
         reports = self._query('reports', **kwargs)
         for report in reports:
+            try:
+                code_id = report['code_id']
+                catalog_uuid = report['catalog_uuid']
+                cached_catalog_status = report['cached_catalog_status']
+            except KeyError:
+                code_id = None
+                catalog_uuid = None
+                cached_catalog_status = None
             yield Report(
                 api=self,
                 node=report['certname'],
@@ -808,5 +819,8 @@ class BaseAPI(object):
                 status=report['status'],
                 noop=report['noop'],
                 metrics=report['metrics']['data'],
-                logs=report['logs']['data']
+                logs=report['logs']['data'],
+                code_id=code_id,
+                catalog_uuid=catalog_uuid,
+                cached_catalog_status=cached_catalog_status
             )
