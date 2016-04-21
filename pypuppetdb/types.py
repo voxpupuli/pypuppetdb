@@ -113,7 +113,7 @@ class Report(object):
     :type transaction: :obj:`string`
     :param environment: (Optional) The environment assigned to the node that\
         submitted this report.
-    :type environment: :obj:`string
+    :type environment: :obj:`string`
     :param status: (Optional) The status associated to this report's node.
     :type status: :obj:`string`
     :param noop: (Default `False`) A flag indicating weather the report was\
@@ -122,7 +122,7 @@ class Report(object):
     :param metrics: (Optional) All metrics associated with this report.
     :type metrics: :obj:`list` containing :obj:`dict` with Metrics
     :param logs: (Optional) All logs associated with this report.
-    :type logs: :obj:`list containing :obj:`dict` of logs
+    :type logs: :obj:`list` containing :obj:`dict` of logs
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -243,7 +243,7 @@ class Resource(object):
     :type parameters: :obj:`dict`
     :param environment: (Optional) The environment of the node associated\
         with this resource.
-    :type environment: :obj:`string
+    :type environment: :obj:`string`
 
     :ivar node: The hostname this resources is located on.
     :ivar name: The name of the resource in the Puppet manifest.
@@ -254,7 +254,7 @@ class Resource(object):
     :ivar parameters: :obj:`dict` with key:value pairs of parameters.
     :ivar relationships: :obj:`list` Contains all relationships to other\
         resources
-    :ivar environment: :obj:`string: The environment of the node associated\
+    :ivar environment: :obj:`string` The environment of the node associated\
         with this resource.
     """
     def __init__(self, node, name, type_, tags, exported, sourcefile,
@@ -315,10 +315,10 @@ class Node(object):
     :type report_environment: :obj:`string`
     :param catalog_environment: (default 'production') The environment of the\
             last received catalog for this node
-    :type catalog_environment: :obj:`string
+    :type catalog_environment: :obj:`string`
     :param facts_environment: (default 'production') The environment of the\
             last received fact set for this node
-    :type facts_environment" :obj:`string`
+    :type facts_environment: :obj:`string`
     :param latest_report_hash: The hash of the latest report from this node,\
             is only available in PuppetDB 3.2 and later
     :type latest_report_hash: :obj:`string`
@@ -450,9 +450,9 @@ class Catalog(object):
     :param node: Name of the host
     :type node: :obj:`string`
     :param edges: Edges returned from Catalog data
-    :type edges: :obj:`list` containing :obj:`dict` with Edge information
-    :param resources: Resources returned from Catalog data
-    :type resources: :obj:`list` containing :obj:`dict` with Resources
+    :type edges: :obj:`list` containing :obj:`dict` of :class:`pypuppetdb.types.Edge`
+    :param resources: :class:`pypuppetdb.types.Resource` managed as of this Catalog.
+    :type resources: :obj:`dict` of :class:`pypuppetdb.types.Resource`
     :param version: Catalog version from Puppet (unique for each node)
     :type version: :obj:`string`
     :param transaction_uuid: A string used to match the catalog with the
@@ -472,7 +472,7 @@ class Catalog(object):
         corresponding report
     :ivar edges: :obj:`list` of :obj:`Edge` The source Resource object\
         of the relationship
-    :ivar resources: :obj:`dict` of :class:`pypuppetdb.Resource` The source\
+    :ivar resources: :obj:`dict` of :class:`pypuppetdb.types.Resource` The source\
         Resource object of the relationship
     :ivar environment: :obj:`string` Environment associated with the
         catalog's certname
@@ -553,7 +553,7 @@ class Edge(object):
     :param relaptionship: Name of the Puppet Ressource Relationship
     :type relationship: :obj:`string`
     :param node: The certname of the node that owns this Relationship
-    :type node: :obj:`string
+    :type node: :obj:`string`
 
     :ivar source: :obj:`Resource` The source Resource object
     :ivar target: :obj:`Resource` The target Resource object

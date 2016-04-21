@@ -23,7 +23,7 @@ that are expected to return more than a single item are implemented as
 generators.
 
 This is usually the case for functions with a plural name like
-:func:`~pypuppetdb.api.v2.API.nodes` or :func:`~pypuppetdb.api.v2.API.facts`.
+:func:`~pypuppetdb.api.BaseAPI.nodes` or :func:`~pypuppetdb.api.BaseAPI.facts`.
 
 Because of this we'll only query PuppetDB once you start iterating over the
 generator object. Until that time not a single request is fired at PuppetDB.
@@ -43,13 +43,11 @@ talk.
 API objects
 -----------
 
-The PuppetDB API is versioned. We currently have a v1, v2 and v3.
+The PuppetDB API is no longer versioned. This was changed in v0.2.0 because
+it started to become too difficult to maintain multiple API versions.
 
-In order to work with this structure PyPuppetDB consists of a :class:`BaseAPI
-<BaseAPI>` class that factors out identical code between different versions.
-
-Every version of the API has its own class which inherits from our
-:class:`BaseAPI <BaseAPI>`.
+All the functions of the v1, v2, and v3 APIs have been moved to :class:`BaseAPI
+<BaseAPI>` which now only supports API version 4 of PuppetDB.
 
 .. data:: API_VERSIONS
 
@@ -66,27 +64,11 @@ BaseAPI
    :members:
    :private-members:
 
-v2.API
-^^^^^^
-.. autoclass:: pypuppetdb.api.v2.API
-   :members:
-   :inherited-members:
-   :private-members:
-   :show-inheritance:
-
-v3.API
-^^^^^^
-.. autoclass:: pypuppetdb.api.v3.API
-   :members:
-   :inherited-members:
-   :private-members:
-   :show-inheritance:
-
 Types
 -----
 
 In order to facilitate working with the API most methods like
-:meth:`~pypuppetdb.api.v2.API.nodes` don't return the decoded
+:meth:`~pypuppetdb.api.BaseAPI.nodes` don't return the decoded
 JSON response but return an object representation of the querried
 endpoints data.
 
@@ -96,7 +78,9 @@ endpoints data.
 .. autoclass:: pypuppetdb.types.Resource
 .. autoclass:: pypuppetdb.types.Event
 .. autoclass:: pypuppetdb.types.Report
+   :members:
 .. autoclass:: pypuppetdb.types.Catalog
+   :members:
 .. autoclass:: pypuppetdb.types.Edge
 
 Errors
@@ -111,8 +95,6 @@ In that case, we'll throw an exception at you.
 .. autoexception:: pypuppetdb.errors.APIError
 .. autoexception:: pypuppetdb.errors.ImproperlyConfiguredError
    :show-inheritance:
-.. autoexception:: pypuppetdb.errors.UnsupportedVersionError
-   :show-inheritance:
 .. autoexception:: pypuppetdb.errors.DoesNotComputeError
    :show-inheritance:
 .. autoexception:: pypuppetdb.errors.EmptyResponseError
@@ -126,3 +108,4 @@ into their own :mod:`utils` module.
 
 .. autoclass::    pypuppetdb.utils.UTC
 .. autofunction:: pypuppetdb.utils.json_to_datetime
+.. autofunction:: pypuppetdb.utils.versioncmp
