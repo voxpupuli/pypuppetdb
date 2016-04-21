@@ -443,19 +443,21 @@ class Node(object):
 
 class Catalog(object):
     """
-    This object represents a compiled catalog from puppet. It contains Resource
-    and Edge object that represent the dependency graph. Unless otherwise\
-    specified all parameters are required.
+    This object represents a compiled catalog from puppet. It contains\
+    Resource and Edge object that represent the dependency graph. Unless\
+    otherwise specified all parameters are required.
 
     :param node: Name of the host
     :type node: :obj:`string`
     :param edges: Edges returned from Catalog data
-    :type edges: :obj:`list` containing :obj:`dict` of :class:`pypuppetdb.types.Edge`
-    :param resources: :class:`pypuppetdb.types.Resource` managed as of this Catalog.
+    :type edges: :obj:`list` containing :obj:`dict` of\
+        :class:`pypuppetdb.types.Edge`
+    :param resources: :class:`pypuppetdb.types.Resource` managed as of this\
+        Catalog.
     :type resources: :obj:`dict` of :class:`pypuppetdb.types.Resource`
     :param version: Catalog version from Puppet (unique for each node)
     :type version: :obj:`string`
-    :param transaction_uuid: A string used to match the catalog with the
+    :param transaction_uuid: A string used to match the catalog with the\
         corresponding report that was issued during the same puppet run
     :type transaction_uuid: :obj:`string`
     :param environment: The environment associated with the catalog's\
@@ -472,8 +474,8 @@ class Catalog(object):
         corresponding report
     :ivar edges: :obj:`list` of :obj:`Edge` The source Resource object\
         of the relationship
-    :ivar resources: :obj:`dict` of :class:`pypuppetdb.types.Resource` The source\
-        Resource object of the relationship
+    :ivar resources: :obj:`dict` of :class:`pypuppetdb.types.Resource` The\
+        source Resource object of the relationship
     :ivar environment: :obj:`string` Environment associated with the
         catalog's certname
     :ivar code_id: :obj:`string` ties the catalog to the Puppet code that\
