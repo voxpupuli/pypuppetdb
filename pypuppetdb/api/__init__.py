@@ -522,13 +522,16 @@ class BaseAPI(object):
         :rtype: :class:`pypuppetdb.types.Fact`
         """
         if name is not None and value is not None:
-            path = '{0}/{1}'.format(name, value)
+            query = '["and",' \
+                '["=", "name", "{0}"],' \
+                '["=", "value", "{1}"]]'.format(
+                    name, value)
         elif name is not None and value is None:
-            path = name
+            query = '["=", "name", "{0}"]'.format(name)
         else:
-            path = None
+            query = None
 
-        facts = self._query('facts', path=path, **kwargs)
+        facts = self._query('facts', query=query, **kwargs)
         for fact in facts:
             yield Fact(
                 node=fact['certname'],
@@ -647,17 +650,14 @@ class BaseAPI(object):
             catalogs = [catalogs, ]
 
         for catalog in catalogs:
-            try:
-                code_id = catalog['code_id']
-            except KeyError:
-                code_id = None
             yield Catalog(node=catalog['certname'],
                           edges=catalog['edges']['data'],
                           resources=catalog['resources']['data'],
                           version=catalog['version'],
                           transaction_uuid=catalog['transaction_uuid'],
                           environment=catalog['environment'],
-                          code_id=code_id)
+                          code_id=catalog.get('code_id'),
+                          catalog_uuid=catalog.get('catalog_uuid'))
 
     def events(self, **kwargs):
         """A report is made up of events which can be queried either
@@ -808,5 +808,8 @@ class BaseAPI(object):
                 status=report['status'],
                 noop=report['noop'],
                 metrics=report['metrics']['data'],
-                logs=report['logs']['data']
+                logs=report['logs']['data'],
+                code_id=report.get('code_id'),
+                catalog_uuid=report.get('catalog_uuid'),
+                cached_catalog_status=report.get('cached_catalog_status')
             )
