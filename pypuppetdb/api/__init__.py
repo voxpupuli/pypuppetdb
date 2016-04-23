@@ -789,7 +789,7 @@ class BaseAPI(object):
                            to the _query function
 
         :returns: A generating yielding Reports
-        :rtype: :class:`pypuppetdb.types.Report
+        :rtype: :class:`pypuppetdb.types.Report`
         """
         reports = self._query('reports', **kwargs)
         for report in reports:
