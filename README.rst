@@ -2,19 +2,22 @@
 pypuppetdb
 ##########
 
-.. image:: https://api.travis-ci.org/puppet-community/pypuppetdb.png
-   :target: https://travis-ci.org/puppet-community/pypuppetdb
+.. image:: https://api.travis-ci.org/voxpupuli/pypuppetdb.png
+   :target: https://travis-ci.org/voxpupuli/pypuppetdb
 
-.. image:: https://coveralls.io/repos/puppet-community/pypuppetdb/badge.png
-   :target: https://coveralls.io/repos/puppet-community/pypuppetdb
+.. image:: https://coveralls.io/repos/voxpupuli/pypuppetdb/badge.png
+   :target: https://coveralls.io/repos/voxpupuli/pypuppetdb
 
 
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 .. _requests: http://docs.python-requests.org/en/latest/
 
-**pypuppetdb >= 0.2.0 DOES work with PuppetDB 3. There is no support for
+**pypuppetdb >= 0.2.0 requires PuppetDB 3.0.0 or later. There is no support for
 previous versions beyond 0.1.1**
+
+**pypuppetdb >= 0.2.2 supports PuppetDB 4.0.0. Backwards compatability with 3.x
+is available.**
 
 This library is a thin wrapper around the REST API providing some convinience
 functions and objects to request and hold data from PuppetDB.
@@ -34,7 +37,7 @@ You can install this package from source or from PyPi.
 
 .. code-block:: bash
 
-   $ git clone https://github.com/puppet-community/pypuppetdb
+   $ git clone https://github.com/voxpupuli/pypuppetdb
    $ python setup.py install
 
 If you wish to hack on it clone the repository but after that run:
@@ -192,7 +195,7 @@ be found on `IRCnet`_ and `Freenode`_ and idles in #puppet.
 There's now also the #puppetboard channel on `Freenode`_ where we hang out
 and answer questions related to pypuppetdb and Puppetboard.
 
-.. _issue: https://github.com/nedap/pypuppetdb/issues
+.. _issue: https://github.com/voxpupuli/pypuppetdb/issues
 .. _@daenney: https://github.com/daenney
 .. _IRCnet: http://www.ircnet.org
 .. _Freenode: http://freenode.net

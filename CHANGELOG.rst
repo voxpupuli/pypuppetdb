@@ -2,6 +2,19 @@
 Changelog
 #########
 
+0.2.2
+=====
+
+* Fixed URL Encoding found when querying the specific value of a macaddress
+  fact. 
+* Adding support for PuppetDB 4.0.0 information. Namely Adding a catalog_uuid
+  attribute to the Catalog type object. Adding code_id, catalog_uuid and
+  cached_catalog_status attributes to the Report type object.
+* Removing unneeded sudo option from .travis.yml, this gave unnecessary
+  warning in the test environment.
+* Updating the files under docs/ so https://pypuppetdb.readthedocs.org/en/latest/
+  can be updated
+
 0.2.1
 =====
 
