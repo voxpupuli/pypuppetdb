@@ -16,6 +16,7 @@ Changelog
   can be updated
 * Deprecating :func:`pypuppetdb.types.Report.events()` in favour of the new
   events list variable.
+* Renaming test-requirements.txt to requirements.txt
 
 0.2.1
 =====
