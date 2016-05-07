@@ -44,7 +44,7 @@ If you wish to hack on it clone the repository but after that run:
 
 .. code-block:: bash
 
-   $ pip install -r test-requirements.txt
+   $ pip install -r requirements.txt
 
 This will install all the runtime requirements of pypuppetdb and the
 dependencies for the test suite and generation of documentation.
