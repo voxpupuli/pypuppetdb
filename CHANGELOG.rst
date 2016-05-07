@@ -14,6 +14,8 @@ Changelog
   warning in the test environment.
 * Updating the files under docs/ so https://pypuppetdb.readthedocs.org/en/latest/
   can be updated
+* Deprecating :func:`pypuppetdb.types.Report.events()` in favour of the new
+  events list variable.
 
 0.2.1
 =====
