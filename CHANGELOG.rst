@@ -2,6 +2,12 @@
 Changelog
 #########
 
+0.2.3
+=====
+
+* Removed deprecation of :func:`pypuppetdb.types.Report.events()`. Expanded
+  resource events data timestamps are not parseable.
+
 0.2.2
 =====
 
