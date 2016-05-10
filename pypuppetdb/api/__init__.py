@@ -811,6 +811,5 @@ class BaseAPI(object):
                 logs=report['logs']['data'],
                 code_id=report.get('code_id'),
                 catalog_uuid=report.get('catalog_uuid'),
-                cached_catalog_status=report.get('cached_catalog_status'),
-                events=report['resource_events']['data']
+                cached_catalog_status=report.get('cached_catalog_status')
             )
