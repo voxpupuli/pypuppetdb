@@ -228,41 +228,6 @@ class TestReport(object):
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
 
-    def test_report_with_event(self):
-        report = Report('_', 'node2.puppet.board', 'hash#',
-                        '2015-08-31T21:07:00.000Z',
-                        '2015-08-31T21:09:00.000Z',
-                        '2015-08-31T21:10:00.000Z',
-                        '1482347613', 4, '4.2.1',
-                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
-                        events=[{
-                            "status": "success",
-                            "timestamp": '2015-08-31T21:09:00.000Z',
-                            "old_value": "file",
-                            "resource_title": "/etc/httpd/conf.d/README",
-                            "containment_path": [
-                                "Stage['main']",
-                                "Apache",
-                                "File[/etc/httpd/conf.d/README]"
-                            ],
-                            "file": None,
-                            "new_value": "absent",
-                            "message": "removed",
-                            "property": "ensure",
-                            "line": None,
-                            "resource_type": "File",
-                            "containing_class": "Apache"}])
-        assert report.node == 'node2.puppet.board'
-        assert report.hash_ == 'hash#'
-        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
-        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
-        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
-        assert report.version == '1482347613'
-        assert report.format_ == 4
-        assert report.agent_version == '4.2.1'
-        assert report.run_time == report.end - report.start
-        assert len(report.events) == 1
-
 
 class TestEvent(object):
     """Test the Event object."""
