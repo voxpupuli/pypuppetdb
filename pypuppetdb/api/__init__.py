@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-import logging
-
 import json
+import logging
 import requests
 
 from datetime import datetime, timedelta
@@ -17,6 +16,11 @@ from pypuppetdb.types import (
     Node, Fact, Resource,
     Report, Event, Catalog
 )
+
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -236,7 +240,7 @@ class BaseAPI(object):
         )
 
         if path is not None:
-            url = '{0}/{1}'.format(url, path)
+            url = '{0}/{1}'.format(url, quote(path))
 
         return url
 
