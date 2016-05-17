@@ -2,6 +2,13 @@
 Changelog
 #########
 
+0.2.3
+=====
+
+* Removed deprecation of :func:`pypuppetdb.types.Report.events()`. Expanded
+  resource events data timestamps are not parseable.
+* Escaping additional path parameters passed to _url() with urllib.quote
+
 0.2.2
 =====
 
