@@ -104,6 +104,22 @@ class TestNode(object):
         assert node.name == 'node'
         assert node.latest_report_hash == 'hash#1'
 
+    def test_with_cached_catalog_status(self):
+        node1 = Node('_', 'node', cached_catalog_status='explicitly_requested')
+        node2 = Node('_', 'node', cached_catalog_status='on_failure')
+        node3 = Node('_', 'node', cached_catalog_status='not_used')
+        assert node1.name == 'node'
+        assert node1.cached_catalog_status == 'explicitly_requested'
+        assert node2.name == 'node'
+        assert node2.cached_catalog_status == 'on_failure'
+        assert node3.name == 'node'
+        assert node3.cached_catalog_status == 'not_used'
+
+    def test_with_latest_report_noop(self):
+        node = Node('_', 'node', latest_report_noop=False)
+        assert node.name == 'node'
+        assert not node.latest_report_noop
+
 
 class TestFact(object):
     """Test the Fact object."""

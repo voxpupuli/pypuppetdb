@@ -399,23 +399,21 @@ class BaseAPI(object):
             )
 
         for node in nodes:
-            node['unreported_time'] = None
             node['status'] = None
             node['events'] = None
-            latest_report_hash = None
 
             if with_status:
                 status = [s for s in latest_events
                           if s['subject']['title'] == node['certname']]
 
                 try:
-                    node['status'] = node['latest_report_status']
-                    latest_report_hash = node['latest_report_hash']
+                    if node['latest_report_noop']:
+                        node['status'] = 'noop'
+                    else:
+                        node['status'] = node['latest_report_status']
 
                     if status:
-                        node['events'] = status = status[0]
-                        if status['noops'] > 0:
-                            node['status'] = 'noop'
+                        node['events'] = status[0]
                 except KeyError:
                     if status:
                         node['events'] = status = status[0]
@@ -429,25 +427,20 @@ class BaseAPI(object):
                         node['status'] = 'unchanged'
 
                 # node report age
-                if node['report_timestamp'] is not None:
-                    try:
-                        last_report = json_to_datetime(
-                            node['report_timestamp'])
-                        last_report = last_report.replace(tzinfo=None)
-                        now = datetime.utcnow()
-                        unreported_border = now - timedelta(hours=unreported)
-                        if last_report < unreported_border:
-                            delta = (datetime.utcnow() - last_report)
-                            node['status'] = 'unreported'
-                            node['unreported_time'] = '{0}d {1}h {2}m'.format(
-                                delta.days,
-                                int(delta.seconds / 3600),
-                                int((delta.seconds % 3600) / 60)
-                            )
-                    except AttributeError:
+                try:
+                    last_report = json_to_datetime(
+                        node['report_timestamp']).replace(tzinfo=None)
+                    now = datetime.utcnow()
+                    unreported_border = now - timedelta(hours=unreported)
+                    if last_report < unreported_border:
+                        delta = (now - last_report)
                         node['status'] = 'unreported'
-
-                if not node['report_timestamp']:
+                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                            delta.days,
+                            int(delta.seconds / 3600),
+                            int((delta.seconds % 3600) / 60)
+                        )
+                except (AttributeError, KeyError):
                     node['status'] = 'unreported'
 
             yield Node(self,
@@ -459,11 +452,11 @@ class BaseAPI(object):
                        facts_timestamp=node['facts_timestamp'],
                        status=node['status'],
                        events=node['events'],
-                       unreported_time=node['unreported_time'],
+                       unreported_time=node.get('unreported_time'),
                        report_environment=node['report_environment'],
                        catalog_environment=node['catalog_environment'],
                        facts_environment=node['facts_environment'],
-                       latest_report_hash=latest_report_hash
+                       latest_report_hash=node.get('latest_report_hash')
                        )
 
     def node(self, name):
