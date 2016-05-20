@@ -24,14 +24,18 @@ class BinaryOperator(object):
     """
     def __init__(self, operator, field, value):
         self.operator = operator
-        self.field = field
+
+        if type(field) == str:
+            self.field = '"' + field + '"'
+        else:
+            self.field = field
 
         if type(value) == str:
             self.value = '"' + value + '"'
         else:
             self.value = value
 
-        self.__string = '["{0}", "{1}", {2}]'.format(
+        self.__string = '["{0}", {1}, {2}]'.format(
             self.operator,
             self.field,
             self.value)

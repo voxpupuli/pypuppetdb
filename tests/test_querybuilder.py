@@ -21,12 +21,16 @@ class TestBinaryOperator(object):
             == '["=", "is_virtual", True]'
         assert str(EqualsOperator("bios_version", ["6.00", 5.00]))\
             == '["=", "bios_version", [\'6.00\', 5.0]]'
+        assert str(EqualsOperator(['parameter', 'ensure'], "present"))\
+            == '["=", [\'parameter\', \'ensure\'], "present"]'
 
     def test_greater_operator(self):
         assert str(GreaterOperator("uptime", 150))\
             == '[">", "uptime", 150]'
         assert str(GreaterOperator("end_time", '"2016-05-11T23:22:48.709Z"'))\
             == '[">", "end_time", ""2016-05-11T23:22:48.709Z""]'
+        assert str(GreaterOperator(['parameter', 'version'], 4.0))\
+            == '[">", [\'parameter\', \'version\'], 4.0]'
 
     def test_less_operator(self):
         assert str(LessOperator("uptime_seconds", 300))\
@@ -35,6 +39,8 @@ class TestBinaryOperator(object):
             "producer_timestamp",
             "2016-05-11T23:53:29.962Z"))\
             == '["<", "producer_timestamp", "2016-05-11T23:53:29.962Z"]'
+        assert str(LessOperator(['parameter', 'version'], 4.0))\
+            == '["<", [\'parameter\', \'version\'], 4.0]'
 
     def test_greater_equal_operator(self):
         assert str(GreaterEqualOperator("uptime_days", 3))\
@@ -43,16 +49,22 @@ class TestBinaryOperator(object):
             "start_time",
             "2016-05-11T23:53:29.962Z"))\
             == '[">=", "start_time", "2016-05-11T23:53:29.962Z"]'
+        assert str(GreaterEqualOperator(['parameter', 'version'], 4.0))\
+            == '[">=", [\'parameter\', \'version\'], 4.0]'
 
     def test_less_equal_operator(self):
         assert str(LessEqualOperator("kernelmajversion", 4))\
             == '["<=", "kernelmajversion", 4]'
         assert str(LessEqualOperator("end_time", "2016-05-11T23:53:29.962Z"))\
             == '["<=", "end_time", "2016-05-11T23:53:29.962Z"]'
+        assert str(LessEqualOperator(['parameter', 'version'], 4.0))\
+            == '["<=", [\'parameter\', \'version\'], 4.0]'
 
     def test_regex_operator(self):
         assert str(RegexOperator("certname", "www\\d+\\.example\\.com"))\
             == '["~", "certname", "www\\d+\\.example\\.com"]'
+        assert str(RegexOperator(['parameter', 'version'], "4\\.\\d+"))\
+            == '["~", [\'parameter\', \'version\'], "4\\.\\d+"]'
 
     def test_regex_array_operator(self):
         assert str(RegexArrayOperator(
@@ -67,9 +79,3 @@ class TestBinaryOperator(object):
             == '["null?", "report_environment", False]'
         with pytest.raises(ValueError):
             NullOperator("environment", "test")
-
-
-class TestBooleanOperator(object):
-    """
-    Test the BooleanOperator object and all sub-classes.
-    """
