@@ -427,20 +427,24 @@ class BaseAPI(object):
                         node['status'] = 'unchanged'
 
                 # node report age
-                try:
-                    last_report = json_to_datetime(
-                        node['report_timestamp']).replace(tzinfo=None)
-                    now = datetime.utcnow()
-                    unreported_border = now - timedelta(hours=unreported)
-                    if last_report < unreported_border:
-                        delta = (now - last_report)
+                if node['report_timestamp'] is not None:
+                    try:
+                        last_report = json_to_datetime(
+                            node['report_timestamp']).replace(tzinfo=None)
+                        now = datetime.utcnow()
+                        unreported_border = now - timedelta(hours=unreported)
+                        if last_report < unreported_border:
+                            delta = (now - last_report)
+                            node['status'] = 'unreported'
+                            node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                                delta.days,
+                                int(delta.seconds / 3600),
+                                int((delta.seconds % 3600) / 60)
+                            )
+                    except AttributeError:
                         node['status'] = 'unreported'
-                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
-                            delta.days,
-                            int(delta.seconds / 3600),
-                            int((delta.seconds % 3600) / 60)
-                        )
-                except (AttributeError, KeyError):
+
+                if not node['report_timestamp']:
                     node['status'] = 'unreported'
 
             yield Node(self,
