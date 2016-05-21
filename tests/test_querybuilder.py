@@ -103,3 +103,36 @@ class TestBooleanOperator(object):
 
         with pytest.raises(ValueError):
             op.add({"query1": '["=", "catalog_environment", "production"]'})
+
+    def test_or_operator(self):
+        op = OrOperator()
+        op.add(EqualsOperator("operatingsystem", "CentOS"))
+        op.add([EqualsOperator("architecture", "x86_64"),
+                GreaterOperator("operatingsystemmajrelease", 6)])
+
+        assert str(op) == '["or",["=", "operatingsystem", "CentOS"],'\
+            '["=", "architecture", "x86_64"],'\
+            '[">", "operatingsystemmajrelease", 6]]'
+        assert repr(op) == 'Query: ["or",["=", "operatingsystem", "CentOS"],'\
+            '["=", "architecture", "x86_64"],'\
+            '[">", "operatingsystemmajrelease", 6]]'
+        assert unicode(op) == '["or",["=", "operatingsystem", "CentOS"],'\
+            '["=", "architecture", "x86_64"],'\
+            '[">", "operatingsystemmajrelease", 6]]'
+
+        with pytest.raises(ValueError):
+            op.add({"query1": '["=", "catalog_environment", "production"]'})
+
+    def test_not_operator(self):
+        op = NotOperator()
+        op.add(EqualsOperator("operatingsystem", "CentOS"))
+
+        assert str(op) == '["not",["=", "operatingsystem", "CentOS"]]'
+        assert repr(op) == 'Query: ["not",["=", "operatingsystem", "CentOS"]]'
+        assert unicode(op) == '["not",["=", "operatingsystem", "CentOS"]]'
+
+        with pytest.raises(ValueError):
+            op.add(GreaterOperator("operatingsystemmajrelease", 6))
+        with pytest.raises(ValueError):
+            op.add([EqualsOperator("architecture", "x86_64"),
+                    GreaterOperator("operatingsystemmajrelease", 6)])

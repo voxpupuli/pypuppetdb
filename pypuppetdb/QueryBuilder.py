@@ -220,3 +220,31 @@ class AndOperator(BooleanOperator):
     """
     def __init__(self):
         super(AndOperator, self).__init__("and")
+
+
+class OrOperator(BooleanOperator):
+    """
+    Builds an OR boolean filter. Only results that match ANY
+    criteria from the included query strings will be returned
+    from PuppetDB.
+    """
+    def __init__(self):
+        super(OrOperator, self).__init__("or")
+
+
+class NotOperator(BooleanOperator):
+    """
+    Builds a NOT boolean filter. Only results that DO NOT match
+    criteria from the included query strings will be returned
+    from PuppetDB.
+
+    Unlike the other Boolean Operator objects this operator only
+    accepts a single query string.
+    """
+    def __init__(self):
+        super(NotOperator, self).__init__("not")
+
+    def add(self, query):
+        if len(self.operations) > 0:
+            raise ValueError("This operator only accept one query string")
+        super(NotOperator, self).add(query)
