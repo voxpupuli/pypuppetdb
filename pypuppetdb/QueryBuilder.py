@@ -50,6 +50,44 @@ class BinaryOperator(object):
         return self.__string
 
 
+class BooleanOperator(object):
+    """
+    This is a parent helper class used to create PuppetDB AST queries
+    for available boolean queries. See
+    https://docs.puppet.com/puppetdb/4.0/api/query/v4/ast.html#binary-operators
+    for more information.
+
+    :param operator: The boolean query operation to perform.
+    :type operator: :obj:`string`
+    """
+    def __init__(self, operator):
+        self.operator = operator
+        self.operations = []
+
+    def add(self, query):
+        if type(query) == list:
+            for i in query:
+                self.add(i)
+        elif (type(query) == str or
+                isinstance(query, (BinaryOperator, BooleanOperator))):
+            self.operations.append(str(query))
+        else:
+            raise ValueError("Can only accpet fixed-string queries, arrays " +
+                             "or operator objects")
+
+    def __repr__(self):
+        return 'Query: ["{0}",{1}]'.format(self.operator,
+                                           ",".join(self.operations))
+
+    def __str__(self):
+        return str('["{0}",{1}]'.format(self.operator,
+                   ",".join(self.operations)))
+
+    def __unicode__(self):
+        return '["{0}",{1}]'.format(self.operator,
+                                    ",".join(self.operations))
+
+
 class EqualsOperator(BinaryOperator):
     """
     Builds an equality filter based on the supplied field-value pair.
@@ -172,3 +210,13 @@ class NullOperator(BinaryOperator):
             raise ValueError("NullOperator value must be boolean")
 
         super(NullOperator, self).__init__("null?", field, value)
+
+
+class AndOperator(BooleanOperator):
+    """
+    Builds an AND boolean filter. Only results that match ALL
+    criteria from the included query strings will be returned
+    from PuppetDB.
+    """
+    def __init__(self):
+        super(AndOperator, self).__init__("and")

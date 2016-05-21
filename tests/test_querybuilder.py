@@ -79,3 +79,27 @@ class TestBinaryOperator(object):
             == '["null?", "report_environment", False]'
         with pytest.raises(ValueError):
             NullOperator("environment", "test")
+
+
+class TestBooleanOperator(object):
+    """
+    Test the BooleanOperator object and all sub-classes.
+    """
+    def test_and_operator(self):
+        op = AndOperator()
+        op.add(EqualsOperator("operatingsystem", "CentOS"))
+        op.add([EqualsOperator("architecture", "x86_64"),
+                GreaterOperator("operatingsystemmajrelease", 6)])
+
+        assert str(op) == '["and",["=", "operatingsystem", "CentOS"],'\
+            '["=", "architecture", "x86_64"],'\
+            '[">", "operatingsystemmajrelease", 6]]'
+        assert repr(op) == 'Query: ["and",["=", "operatingsystem", "CentOS"],'\
+            '["=", "architecture", "x86_64"],'\
+            '[">", "operatingsystemmajrelease", 6]]'
+        assert unicode(op) == '["and",["=", "operatingsystem", "CentOS"],'\
+            '["=", "architecture", "x86_64"],'\
+            '[">", "operatingsystemmajrelease", 6]]'
+
+        with pytest.raises(ValueError):
+            op.add({"query1": '["=", "catalog_environment", "production"]'})
