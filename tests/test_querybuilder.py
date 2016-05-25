@@ -147,12 +147,20 @@ class TestExtractOperator(object):
         op = ExtractOperator()
 
         with pytest.raises(pypuppetdb.errors.APIError):
+            repr(op)
+        with pytest.raises(pypuppetdb.errors.APIError):
             str(op)
+        with pytest.raises(pypuppetdb.errors.APIError):
+            unicode(op)
 
         op.add_field("certname")
         op.add_field(['fact_environment', 'catalog_environment'])
 
+        assert repr(op) == 'Query: ["extract",'\
+            '["certname","fact_environment","catalog_environment"]]'
         assert str(op) == '["extract",'\
+            '["certname","fact_environment","catalog_environment"]]'
+        assert unicode(op) == '["extract",'\
             '["certname","fact_environment","catalog_environment"]]'
 
         with pytest.raises(pypuppetdb.errors.APIError):
@@ -168,7 +176,13 @@ class TestExtractOperator(object):
 
         op.add_query(EqualsOperator('domain', 'example.com'))
 
+        assert repr(op) == 'Query: ["extract",'\
+            '["certname","fact_environment","catalog_environment"],'\
+            '["=", "domain", "example.com"]]'
         assert str(op) == '["extract",'\
+            '["certname","fact_environment","catalog_environment"],'\
+            '["=", "domain", "example.com"]]'
+        assert unicode(op) == '["extract",'\
             '["certname","fact_environment","catalog_environment"],'\
             '["=", "domain", "example.com"]]'
 
@@ -185,7 +199,15 @@ class TestExtractOperator(object):
         with pytest.raises(pypuppetdb.errors.APIError):
             op.add_group_by({"deactivated": False})
 
+        assert repr(op) == 'Query: ["extract",'\
+            '["certname","fact_environment","catalog_environment"],'\
+            '["=", "domain", "example.com"],'\
+            '["group_by","fact_environment","catalog_environment"]]'
         assert str(op) == '["extract",'\
+            '["certname","fact_environment","catalog_environment"],'\
+            '["=", "domain", "example.com"],'\
+            '["group_by","fact_environment","catalog_environment"]]'
+        assert unicode(op) == '["extract",'\
             '["certname","fact_environment","catalog_environment"],'\
             '["=", "domain", "example.com"],'\
             '["group_by","fact_environment","catalog_environment"]]'

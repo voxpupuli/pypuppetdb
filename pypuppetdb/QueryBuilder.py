@@ -136,7 +136,35 @@ class ExtractOperator(object):
             raise APIError("ExtractOperator.add_group_by only supports "
                            "lists and strings")
 
+    def __repr__(self):
+        if len(self.fields) == 0:
+            raise APIError("ExtractOperator needs at least one field")
+
+        arr = ['"extract"']
+        arr.append("[{0}]".format(",".join(self.fields)))
+
+        if self.query is not None:
+            arr.append(self.query)
+        if len(self.group_by) > 0:
+            arr.append("[{0}]".format(",".join(self.group_by)))
+
+        return str('Query: [{0}]'.format(",".join(arr)))
+
     def __str__(self):
+        if len(self.fields) == 0:
+            raise APIError("ExtractOperator needs at least one field")
+
+        arr = ['"extract"']
+        arr.append("[{0}]".format(",".join(self.fields)))
+
+        if self.query is not None:
+            arr.append(self.query)
+        if len(self.group_by) > 0:
+            arr.append("[{0}]".format(",".join(self.group_by)))
+
+        return str('[{0}]'.format(",".join(arr)))
+
+    def __unicode__(self):
         if len(self.fields) == 0:
             raise APIError("ExtractOperator needs at least one field")
 
