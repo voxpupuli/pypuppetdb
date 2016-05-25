@@ -3,6 +3,8 @@ from __future__ import absolute_import
 
 import logging
 
+from pypuppetdb.errors import *
+
 log = logging.getLogger(__name__)
 
 
@@ -86,6 +88,67 @@ class BooleanOperator(object):
     def __unicode__(self):
         return '["{0}",{1}]'.format(self.operator,
                                     ",".join(self.operations))
+
+
+class ExtractOperator(object):
+    """
+    Queries that either do not or cannot require all the key-value pairs
+    from an endpoint can use the Extract Operator as described in
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#projection-operators.
+
+    The syntax of this operator requires a function and/or a list of fields,
+    a standard query and an optional group by clause.
+    """
+    def __init__(self):
+        self.fields = []
+        self.query = None
+        self.group_by = []
+
+    def add_field(self, field):
+        if isinstance(field, list):
+            for i in field:
+                self.add_field(i)
+        elif isinstance(field, str):
+            self.fields.append('"{0}"'.format(str(field)))
+        else:
+            raise APIError("ExtractOperator.add_field only supports "
+                           "lists and strings")
+
+    def add_query(self, query):
+        if self.query is not None:
+            raise APIError("Only one query is supported by ExtractOperator")
+        elif isinstance(query, (str, BinaryOperator, BooleanOperator)):
+            self.query = str(query)
+        else:
+            raise APIError("ExtractOperator.add_query only supports "
+                           "strings, BinaryOperator and BooleanOperator"
+                           "objects")
+
+    def add_group_by(self, field):
+        if isinstance(field, list):
+            for i in field:
+                self.add_group_by(i)
+        elif isinstance(field, str):
+            if len(self.group_by) == 0:
+                self.group_by.append('"group_by"')
+            self.group_by.append('"{0}"'.format(str(field)))
+        else:
+            raise APIError("ExtractOperator.add_group_by only supports "
+                           "lists and strings")
+
+    def __str__(self):
+        if len(self.fields) == 0:
+            raise APIError("ExtractOperator needs at least one field")
+
+        arr = ['"extract"']
+        arr.append("[{0}]".format(",".join(self.fields)))
+
+        if self.query is not None:
+            arr.append(self.query)
+        if len(self.group_by) > 0:
+            arr.append("[{0}]".format(",".join(self.group_by)))
+
+        return str('[{0}]'.format(",".join(arr)))
 
 
 class EqualsOperator(BinaryOperator):

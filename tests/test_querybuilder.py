@@ -1,4 +1,5 @@
 import pytest
+import pypuppetdb
 import sys
 
 from pypuppetdb.QueryBuilder import *
@@ -136,3 +137,55 @@ class TestBooleanOperator(object):
         with pytest.raises(ValueError):
             op.add([EqualsOperator("architecture", "x86_64"),
                     GreaterOperator("operatingsystemmajrelease", 6)])
+
+
+class TestExtractOperator(object):
+    """
+    Test the ExtractOperator object and all sub-classes.
+    """
+    def test_with_add_field(self):
+        op = ExtractOperator()
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            str(op)
+
+        op.add_field("certname")
+        op.add_field(['fact_environment', 'catalog_environment'])
+
+        assert str(op) == '["extract",'\
+            '["certname","fact_environment","catalog_environment"]]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op.add_field({'equal': 'operatingsystemrelease'})
+
+    def test_with_add_query(self):
+        op = ExtractOperator()
+
+        op.add_field(['certname', 'fact_environment', 'catalog_environment'])
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op.add_query({'less': 42, 'greater': 50})
+
+        op.add_query(EqualsOperator('domain', 'example.com'))
+
+        assert str(op) == '["extract",'\
+            '["certname","fact_environment","catalog_environment"],'\
+            '["=", "domain", "example.com"]]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op.add_query(GreaterOperator("processorcount", 1))
+
+    def test_with_add_group_by(self):
+        op = ExtractOperator()
+
+        op.add_field(['certname', 'fact_environment', 'catalog_environment'])
+        op.add_query(EqualsOperator('domain', 'example.com'))
+        op.add_group_by(["fact_environment", "catalog_environment"])
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op.add_group_by({"deactivated": False})
+
+        assert str(op) == '["extract",'\
+            '["certname","fact_environment","catalog_environment"],'\
+            '["=", "domain", "example.com"],'\
+            '["group_by","fact_environment","catalog_environment"]]'
