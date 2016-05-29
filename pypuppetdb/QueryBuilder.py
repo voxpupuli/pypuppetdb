@@ -110,6 +110,8 @@ class ExtractOperator(object):
                 self.add_field(i)
         elif isinstance(field, str):
             self.fields.append('"{0}"'.format(str(field)))
+        elif isinstance(field, FunctionOperator):
+            self.fields.append(str(field))
         else:
             raise APIError("ExtractOperator.add_field only supports "
                            "lists and strings")
@@ -132,6 +134,10 @@ class ExtractOperator(object):
             if len(self.group_by) == 0:
                 self.group_by.append('"group_by"')
             self.group_by.append('"{0}"'.format(str(field)))
+        elif isinstance(field, FunctionOperator):
+            if len(self.group_by) == 0:
+                self.group_by.append('"group_by"')
+            self.group_by.append(str(field))
         else:
             raise APIError("ExtractOperator.add_group_by only supports "
                            "lists and strings")
@@ -177,6 +183,45 @@ class ExtractOperator(object):
             arr.append("[{0}]".format(",".join(self.group_by)))
 
         return str('[{0}]'.format(",".join(arr)))
+
+
+class FunctionOperator(object):
+    """
+    Performs an aggregate function on the result of a subquery, full
+    documentation is available at
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#function
+
+    :param function: The name of the function to perform.
+    :type function: :obj:`str`
+    :param field: The name of the field to perform the function on. All
+        functions with the exception of count require this value.
+    :type field: :obj:`str`
+    """
+    def __init__(self, function, field=None, fmt=None):
+        if function not in ['count', 'avg', 'sum', 'min', 'max', 'to_string']:
+            raise APIError("Unsupport function: {0}".format(function))
+        elif (function != "count" and field is None):
+            raise APIError("Function {0} requires a field value".format(
+                function))
+        elif (function == 'to_string' and fmt is None):
+            raise APIError("Function {0} requires an extra 'fmt' parameter")
+
+        self.arr = ['"function"', '"{0}"'.format(function)]
+
+        if field is not None:
+            self.arr.append('"{0}"'.format(field))
+
+        if function == 'to_string':
+            self.arr.append('"{0}"'.format(fmt))
+
+    def __repr__(self):
+        return str('Query: [{0}]'.format(",".join(self.arr)))
+
+    def __str__(self):
+        return str('[{0}]'.format(",".join(self.arr)))
+
+    def __unicode__(self):
+        return str('[{0}]'.format(",".join(self.arr)))
 
 
 class EqualsOperator(BinaryOperator):

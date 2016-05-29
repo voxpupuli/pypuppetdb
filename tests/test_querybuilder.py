@@ -211,3 +211,118 @@ class TestExtractOperator(object):
             '["certname","fact_environment","catalog_environment"],'\
             '["=", "domain", "example.com"],'\
             '["group_by","fact_environment","catalog_environment"]]'
+
+    def test_with_add_function_operator(self):
+        op = ExtractOperator()
+
+        op.add_field(FunctionOperator('to_string',
+                                      'producer_timestamp',
+                                      'FMDAY'))
+        op.add_field(FunctionOperator('count'))
+        op.add_group_by(FunctionOperator('to_string',
+                                         'producer_timestamp',
+                                         'FMDAY'))
+
+        assert str(op) == '["extract",'\
+            '[["function","to_string","producer_timestamp","FMDAY"],'\
+            '["function","count"]],'\
+            '["group_by",'\
+            '["function","to_string","producer_timestamp","FMDAY"]]]'
+        assert repr(op) == 'Query: ["extract",'\
+            '[["function","to_string","producer_timestamp","FMDAY"],'\
+            '["function","count"]],'\
+            '["group_by",'\
+            '["function","to_string","producer_timestamp","FMDAY"]]]'
+        assert unicode(op) == '["extract",'\
+            '[["function","to_string","producer_timestamp","FMDAY"],'\
+            '["function","count"]],'\
+            '["group_by",'\
+            '["function","to_string","producer_timestamp","FMDAY"]]]'
+
+
+class TestFunctionOperator(object):
+    """
+    Test the FunctionOperator object and all sub-classes.
+    """
+    def test_count_function(self):
+        assert str(FunctionOperator('count')) == \
+            '["function","count"]'
+        assert repr(FunctionOperator('count')) == \
+            'Query: ["function","count"]'
+        assert unicode(FunctionOperator('count')) == \
+            '["function","count"]'
+        assert str(FunctionOperator('count', 'domain')) == \
+            '["function","count","domain"]'
+        assert repr(FunctionOperator('count', 'domain')) == \
+            'Query: ["function","count","domain"]'
+        assert unicode(FunctionOperator('count', 'domain')) == \
+            '["function","count","domain"]'
+
+    def test_avg_function(self):
+        assert (str(FunctionOperator('avg', 'uptime'))) == \
+            '["function","avg","uptime"]'
+        assert (repr(FunctionOperator('avg', 'uptime'))) == \
+            'Query: ["function","avg","uptime"]'
+        assert (unicode(FunctionOperator('avg', 'uptime'))) == \
+            '["function","avg","uptime"]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("avg")
+
+    def test_sum_function(self):
+        assert str(FunctionOperator('sum', 'memoryfree_mb')) == \
+            '["function","sum","memoryfree_mb"]'
+        assert repr(FunctionOperator('sum', 'memoryfree_mb')) == \
+            'Query: ["function","sum","memoryfree_mb"]'
+        assert unicode(FunctionOperator('sum', 'memoryfree_mb')) == \
+            '["function","sum","memoryfree_mb"]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("sum")
+
+    def test_min_function(self):
+        assert str(FunctionOperator('min', 'kernelversion')) == \
+            '["function","min","kernelversion"]'
+        assert repr(FunctionOperator('min', 'kernelversion')) == \
+            'Query: ["function","min","kernelversion"]'
+        assert unicode(FunctionOperator('min', 'kernelversion')) == \
+            '["function","min","kernelversion"]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("min")
+
+    def test_max_function(self):
+        assert str(FunctionOperator('max', 'facterversion')) == \
+            '["function","max","facterversion"]'
+        assert repr(FunctionOperator('max', 'facterversion')) == \
+            'Query: ["function","max","facterversion"]'
+        assert unicode(FunctionOperator('max', 'facterversion')) == \
+            '["function","max","facterversion"]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("max")
+
+    def test_to_string_function(self):
+        assert str(FunctionOperator("to_string",
+                                    'producer_timestamp',
+                                    'FMDAY')) == \
+            '["function","to_string","producer_timestamp","FMDAY"]'
+        assert repr(FunctionOperator("to_string",
+                                     'producer_timestamp',
+                                     'FMDAY')) == \
+            'Query: ["function","to_string","producer_timestamp","FMDAY"]'
+        assert unicode(FunctionOperator("to_string",
+                                        'producer_timestamp',
+                                        'FMDAY')) == \
+            '["function","to_string","producer_timestamp","FMDAY"]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("to_string")
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("to_string", 'receive_time')
+
+    def test_unknown_function(self):
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("std_dev")
+        with pytest.raises(pypuppetdb.errors.APIError):
+            FunctionOperator("last")
