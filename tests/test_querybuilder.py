@@ -7,6 +7,7 @@ from pypuppetdb.QueryBuilder import *
 if sys.version_info >= (3, 0):
     unicode = str
 
+
 class TestBinaryOperator(object):
     """
     Test the BinaryOperator object and all sub-classes.
