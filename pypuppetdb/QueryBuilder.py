@@ -210,7 +210,9 @@ class FunctionOperator(object):
     """
     Performs an aggregate function on the result of a subquery, full
     documentation is available at
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#function
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#function.
+    This object can only be used in the field list or group by list of
+    an ExtractOperator object.
 
     :param function: The name of the function to perform.
     :type function: :obj:`str`
