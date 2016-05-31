@@ -572,7 +572,10 @@ class Catalog(object):
         return self.__string
 
     def get_resources(self):
-        return self.resources.itervalues()
+        try:
+            return self.resources.itervalues()
+        except AttributeError:
+            return self.resources.values()
 
     def get_resource(self, resource_type, resource_title):
         identifier = resource_type + \
