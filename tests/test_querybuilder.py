@@ -78,7 +78,7 @@ class TestBinaryOperator(object):
             == '["null?", "expired", True]'
         assert str(NullOperator("report_environment", False))\
             == '["null?", "report_environment", False]'
-        with pytest.raises(ValueError):
+        with pytest.raises(APIError):
             NullOperator("environment", "test")
 
 
@@ -102,7 +102,7 @@ class TestBooleanOperator(object):
             '["=", "architecture", "x86_64"],'\
             '[">", "operatingsystemmajrelease", 6]]'
 
-        with pytest.raises(ValueError):
+        with pytest.raises(APIError):
             op.add({"query1": '["=", "catalog_environment", "production"]'})
 
     def test_or_operator(self):
@@ -121,7 +121,7 @@ class TestBooleanOperator(object):
             '["=", "architecture", "x86_64"],'\
             '[">", "operatingsystemmajrelease", 6]]'
 
-        with pytest.raises(ValueError):
+        with pytest.raises(APIError):
             op.add({"query1": '["=", "catalog_environment", "production"]'})
 
     def test_not_operator(self):
@@ -132,11 +132,41 @@ class TestBooleanOperator(object):
         assert repr(op) == 'Query: ["not",["=", "operatingsystem", "CentOS"]]'
         assert unicode(op) == '["not",["=", "operatingsystem", "CentOS"]]'
 
-        with pytest.raises(ValueError):
+        with pytest.raises(APIError):
             op.add(GreaterOperator("operatingsystemmajrelease", 6))
-        with pytest.raises(ValueError):
+        with pytest.raises(APIError):
             op.add([EqualsOperator("architecture", "x86_64"),
                     GreaterOperator("operatingsystemmajrelease", 6)])
+
+    def test_and_with_no_operations(self):
+        op = AndOperator()
+
+        with pytest.raises(APIError):
+            repr(op)
+        with pytest.raises(APIError):
+            str(op)
+        with pytest.raises(APIError):
+            unicode(op)
+
+    def test_or_with_no_operations(self):
+        op = OrOperator()
+
+        with pytest.raises(APIError):
+            repr(op)
+        with pytest.raises(APIError):
+            str(op)
+        with pytest.raises(APIError):
+            unicode(op)
+
+    def test_not_with_no_operations(self):
+        op = NotOperator()
+
+        with pytest.raises(APIError):
+            repr(op)
+        with pytest.raises(APIError):
+            str(op)
+        with pytest.raises(APIError):
+            unicode(op)
 
 
 class TestExtractOperator(object):

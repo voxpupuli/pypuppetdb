@@ -11,7 +11,16 @@ log = logging.getLogger(__name__)
 class BinaryOperator(object):
     """
     This is a parent helper class used to create PuppetDB AST queries
-    for single key-value pairs for the available operators. See
+    for single key-value pairs for the available operators.
+
+    It is possible to directly declare the various types of queries
+    from this class. For instance the code
+    BinaryOperator('=', 'certname', 'node1.example.com') generates the
+    PuppetDB query '["=", "certname", "node1.example.com"]'. It is preferred
+    to use the child classes as they may have restrictions specific
+    to that operator.
+
+    See
     https://docs.puppet.com/puppetdb/4.0/api/query/v4/ast.html#binary-operators
     for more information.
 
@@ -25,22 +34,20 @@ class BinaryOperator(object):
     :type value: any
     """
     def __init__(self, operator, field, value):
-        self.operator = operator
-
         if type(field) == str:
-            self.field = '"' + field + '"'
+            field = '"{0}"'.format(field)
         else:
-            self.field = field
+            field = field
 
         if type(value) == str:
-            self.value = '"' + value + '"'
+            value = '"{0}"'.format(value)
         else:
-            self.value = value
+            value = value
 
         self.__string = '["{0}", {1}, {2}]'.format(
-            self.operator,
-            self.field,
-            self.value)
+            operator,
+            field,
+            value)
 
     def __repr__(self):
         return str('Query: {0}'.format(self.__string))
@@ -55,7 +62,14 @@ class BinaryOperator(object):
 class BooleanOperator(object):
     """
     This is a parent helper class used to create PuppetDB AST queries
-    for available boolean queries. See
+    for available boolean queries.
+
+    It is possible to directly declare a boolean query from this class.
+    For instance the code BooleanOperator("and") will create an empty
+    query '["and",]'. An error will be raised if there are no queries
+    added via :func:`~pypuppetdb.QueryBuilder.BooleanOperator.add`
+
+    See
     https://docs.puppet.com/puppetdb/4.0/api/query/v4/ast.html#binary-operators
     for more information.
 
@@ -74,18 +88,24 @@ class BooleanOperator(object):
                 isinstance(query, (BinaryOperator, BooleanOperator))):
             self.operations.append(str(query))
         else:
-            raise ValueError("Can only accpet fixed-string queries, arrays " +
-                             "or operator objects")
+            raise APIError("Can only accpet fixed-string queries, arrays " +
+                           "or operator objects")
 
     def __repr__(self):
+        if len(self.operations) == 0:
+            raise APIError("At least one query operation is required")
         return 'Query: ["{0}",{1}]'.format(self.operator,
                                            ",".join(self.operations))
 
     def __str__(self):
+        if len(self.operations) == 0:
+            raise APIError("At least one query operation is required")
         return str('["{0}",{1}]'.format(self.operator,
                    ",".join(self.operations)))
 
     def __unicode__(self):
+        if len(self.operations) == 0:
+            raise APIError("At least one query operation is required")
         return '["{0}",{1}]'.format(self.operator,
                                     ",".join(self.operations))
 
@@ -97,7 +117,8 @@ class ExtractOperator(object):
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#projection-operators.
 
     The syntax of this operator requires a function and/or a list of fields,
-    a standard query and an optional group by clause.
+    an optional standard query and an optional group by clause including a
+    list of fields.
     """
     def __init__(self):
         self.fields = []
@@ -226,7 +247,9 @@ class FunctionOperator(object):
 
 class EqualsOperator(BinaryOperator):
     """
-    Builds an equality filter based on the supplied field-value pair.
+    Builds an equality filter based on the supplied field-value pair as
+    described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#equality.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -240,7 +263,9 @@ class EqualsOperator(BinaryOperator):
 
 class GreaterOperator(BinaryOperator):
     """
-    Builds a greater-than filter based on the supplied field-value pair.
+    Builds a greater-than filter based on the supplied field-value pair as
+    described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#greater-than.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -254,7 +279,9 @@ class GreaterOperator(BinaryOperator):
 
 class LessOperator(BinaryOperator):
     """
-    Builds a less-than filter based on the supplied field-value pair.
+    Builds a less-than filter based on the supplied field-value pair as
+    described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#less-than.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -269,7 +296,8 @@ class LessOperator(BinaryOperator):
 class GreaterEqualOperator(BinaryOperator):
     """
     Builds a greater-than or equal-to filter based on the supplied
-    field-value pair.
+    field-value pair as described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#greater-than-or-equal-to.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -285,7 +313,8 @@ class GreaterEqualOperator(BinaryOperator):
 class LessEqualOperator(BinaryOperator):
     """
     Builds a less-than or equal-to filter based on the supplied
-    field-value pair.
+    field-value pair as described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#less-than-or-equal-to.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -301,7 +330,8 @@ class LessEqualOperator(BinaryOperator):
 class RegexOperator(BinaryOperator):
     """
     Builds a regular expression filter based on the supplied field-value
-    pair.
+    pair as described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#regexp-match.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -316,7 +346,9 @@ class RegexOperator(BinaryOperator):
 class RegexArrayOperator(BinaryOperator):
     """
     Builds a regular expression array filter based on the supplied
-    field-value pair. This query only works on fields with paths.
+    field-value pair. This query only works on fields with paths as
+    described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#regexp-array-match.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -330,9 +362,11 @@ class RegexArrayOperator(BinaryOperator):
 
 class NullOperator(BinaryOperator):
     """
-    Builds a null filter based on the field and boolean value pair.
+    Builds a null filter based on the field and boolean value pair as
+    described
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#null-is-null.
     This filter only works on field that may be null. Value may only
-    be True or False
+    be True or False.
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -343,7 +377,7 @@ class NullOperator(BinaryOperator):
     """
     def __init__(self, field, value):
         if type(value) != bool:
-            raise ValueError("NullOperator value must be boolean")
+            raise APIError("NullOperator value must be boolean")
 
         super(NullOperator, self).__init__("null?", field, value)
 
@@ -352,7 +386,8 @@ class AndOperator(BooleanOperator):
     """
     Builds an AND boolean filter. Only results that match ALL
     criteria from the included query strings will be returned
-    from PuppetDB.
+    from PuppetDB. Full documentation is available
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#and
     """
     def __init__(self):
         super(AndOperator, self).__init__("and")
@@ -362,7 +397,8 @@ class OrOperator(BooleanOperator):
     """
     Builds an OR boolean filter. Only results that match ANY
     criteria from the included query strings will be returned
-    from PuppetDB.
+    from PuppetDB. Full documentation is available
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#or.
     """
     def __init__(self):
         super(OrOperator, self).__init__("or")
@@ -372,7 +408,8 @@ class NotOperator(BooleanOperator):
     """
     Builds a NOT boolean filter. Only results that DO NOT match
     criteria from the included query strings will be returned
-    from PuppetDB.
+    from PuppetDB. Full documentation is available
+    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#not
 
     Unlike the other Boolean Operator objects this operator only
     accepts a single query string.
@@ -382,5 +419,5 @@ class NotOperator(BooleanOperator):
 
     def add(self, query):
         if len(self.operations) > 0:
-            raise ValueError("This operator only accept one query string")
+            raise APIError("This operator only accept one query string")
         super(NotOperator, self).add(query)
