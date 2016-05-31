@@ -104,6 +104,22 @@ class TestNode(object):
         assert node.name == 'node'
         assert node.latest_report_hash == 'hash#1'
 
+    def test_with_cached_catalog_status(self):
+        node1 = Node('_', 'node', cached_catalog_status='explicitly_requested')
+        node2 = Node('_', 'node', cached_catalog_status='on_failure')
+        node3 = Node('_', 'node', cached_catalog_status='not_used')
+        assert node1.name == 'node'
+        assert node1.cached_catalog_status == 'explicitly_requested'
+        assert node2.name == 'node'
+        assert node2.cached_catalog_status == 'on_failure'
+        assert node3.name == 'node'
+        assert node3.cached_catalog_status == 'not_used'
+
+    def test_with_latest_report_noop(self):
+        node = Node('_', 'node', latest_report_noop=False)
+        assert node.name == 'node'
+        assert not node.latest_report_noop
+
 
 class TestFact(object):
     """Test the Fact object."""
@@ -227,41 +243,6 @@ class TestReport(object):
         assert str(report) == str('hash#')
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
-
-    def test_report_with_event(self):
-        report = Report('_', 'node2.puppet.board', 'hash#',
-                        '2015-08-31T21:07:00.000Z',
-                        '2015-08-31T21:09:00.000Z',
-                        '2015-08-31T21:10:00.000Z',
-                        '1482347613', 4, '4.2.1',
-                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
-                        events=[{
-                            "status": "success",
-                            "timestamp": '2015-08-31T21:09:00.000Z',
-                            "old_value": "file",
-                            "resource_title": "/etc/httpd/conf.d/README",
-                            "containment_path": [
-                                "Stage['main']",
-                                "Apache",
-                                "File[/etc/httpd/conf.d/README]"
-                            ],
-                            "file": None,
-                            "new_value": "absent",
-                            "message": "removed",
-                            "property": "ensure",
-                            "line": None,
-                            "resource_type": "File",
-                            "containing_class": "Apache"}])
-        assert report.node == 'node2.puppet.board'
-        assert report.hash_ == 'hash#'
-        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
-        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
-        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
-        assert report.version == '1482347613'
-        assert report.format_ == 4
-        assert report.agent_version == '4.2.1'
-        assert report.run_time == report.end - report.start
-        assert len(report.events) == 1
 
 
 class TestEvent(object):

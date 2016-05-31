@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-import logging
-
 import json
+import logging
 import requests
 
 from datetime import datetime, timedelta
@@ -17,6 +16,11 @@ from pypuppetdb.types import (
     Node, Fact, Resource,
     Report, Event, Catalog
 )
+
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -236,7 +240,7 @@ class BaseAPI(object):
         )
 
         if path is not None:
-            url = '{0}/{1}'.format(url, path)
+            url = '{0}/{1}'.format(url, quote(path))
 
         return url
 
@@ -395,23 +399,21 @@ class BaseAPI(object):
             )
 
         for node in nodes:
-            node['unreported_time'] = None
             node['status'] = None
             node['events'] = None
-            latest_report_hash = None
 
             if with_status:
                 status = [s for s in latest_events
                           if s['subject']['title'] == node['certname']]
 
                 try:
-                    node['status'] = node['latest_report_status']
-                    latest_report_hash = node['latest_report_hash']
+                    if node['latest_report_noop']:
+                        node['status'] = 'noop'
+                    else:
+                        node['status'] = node['latest_report_status']
 
                     if status:
-                        node['events'] = status = status[0]
-                        if status['noops'] > 0:
-                            node['status'] = 'noop'
+                        node['events'] = status[0]
                 except KeyError:
                     if status:
                         node['events'] = status = status[0]
@@ -428,12 +430,11 @@ class BaseAPI(object):
                 if node['report_timestamp'] is not None:
                     try:
                         last_report = json_to_datetime(
-                            node['report_timestamp'])
-                        last_report = last_report.replace(tzinfo=None)
+                            node['report_timestamp']).replace(tzinfo=None)
                         now = datetime.utcnow()
                         unreported_border = now - timedelta(hours=unreported)
                         if last_report < unreported_border:
-                            delta = (datetime.utcnow() - last_report)
+                            delta = (now - last_report)
                             node['status'] = 'unreported'
                             node['unreported_time'] = '{0}d {1}h {2}m'.format(
                                 delta.days,
@@ -455,11 +456,13 @@ class BaseAPI(object):
                        facts_timestamp=node['facts_timestamp'],
                        status=node['status'],
                        events=node['events'],
-                       unreported_time=node['unreported_time'],
+                       unreported_time=node.get('unreported_time'),
                        report_environment=node['report_environment'],
                        catalog_environment=node['catalog_environment'],
                        facts_environment=node['facts_environment'],
-                       latest_report_hash=latest_report_hash
+                       latest_report_hash=node.get('latest_report_hash'),
+                       cached_catalog_status=node.get('cached_catalog_status'),
+                       latest_report_noop=node.get('latest_report_noop')
                        )
 
     def node(self, name):
@@ -522,16 +525,13 @@ class BaseAPI(object):
         :rtype: :class:`pypuppetdb.types.Fact`
         """
         if name is not None and value is not None:
-            query = '["and",' \
-                '["=", "name", "{0}"],' \
-                '["=", "value", "{1}"]]'.format(
-                    name, value)
+            path = '{0}/{1}'.format(name, value)
         elif name is not None and value is None:
-            query = '["=", "name", "{0}"]'.format(name)
+            path = name
         else:
-            query = None
+            path = None
 
-        facts = self._query('facts', query=query, **kwargs)
+        facts = self._query('facts', path=path, **kwargs)
         for fact in facts:
             yield Fact(
                 node=fact['certname'],
@@ -811,6 +811,5 @@ class BaseAPI(object):
                 logs=report['logs']['data'],
                 code_id=report.get('code_id'),
                 catalog_uuid=report.get('catalog_uuid'),
-                cached_catalog_status=report.get('cached_catalog_status'),
-                events=report['resource_events']['data']
+                cached_catalog_status=report.get('cached_catalog_status')
             )

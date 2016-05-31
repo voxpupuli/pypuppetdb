@@ -151,6 +151,12 @@ class TestBaseAPIURL(object):
         assert url == \
             'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
 
+    def test_quote(self, baseapi):
+        url = baseapi._url("facts", path="macaddress/02:42:ec:94:80:f0")
+        assert url == \
+            'http://localhost:8080/pdb/query/v4/' \
+            + 'facts/macaddress/02%3A42%3Aec%3A94%3A80%3Af0'
+
 
 class TesteAPIQuery(object):
     @mock.patch.object(requests.Session, 'request')

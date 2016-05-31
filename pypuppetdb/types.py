@@ -134,9 +134,6 @@ class Report(object):
         error. Can be one of 'explicitly_requested', 'on_failure',\
         'not_used' not 'null'.
     :type cached_catalog_status: :obj:`string`
-    :param events: (Optional) All the resource events that changed in this\
-        report.
-    :type events: :obj:`list`
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -163,15 +160,12 @@ class Report(object):
     :ivar cached_catalog_status: :obj:`string` identifying if this Puppet run\
         used a cached catalog, if so weather it was a result of an error or\
         otherwise.
-    :ivar events: :obj:`list` of :class:`pypuppetdb.types.Event` objects\
-        that occured in this report run. This replaces\
-        :func:`pypuppetdb.types.Report.events`.
     """
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
                  noop=False, code_id=None, catalog_uuid=None,
-                 cached_catalog_status=None, events=[]):
+                 cached_catalog_status=None):
 
         self.node = node
         self.hash_ = hash_
@@ -190,28 +184,10 @@ class Report(object):
         self.code_id = code_id
         self.catalog_uuid = catalog_uuid
         self.cached_catalog_status = cached_catalog_status
-        self.events = []
         self.__string = '{0}'.format(self.hash_)
 
         self.__api = api
         self.__query_scope = '["=", "report", "{0}"]'.format(self.hash_)
-
-        for event in events:
-            e = Event(node=self.node,
-                      status=event['status'],
-                      timestamp=event['timestamp'],
-                      hash_=self.hash_,
-                      title=event['resource_title'],
-                      property_=event['property'],
-                      message=event['message'],
-                      new_value=event['new_value'],
-                      old_value=event['old_value'],
-                      type_=event['resource_type'],
-                      class_=event['containing_class'],
-                      execution_path=event['containment_path'],
-                      source_file=event['file'],
-                      line_number=event['line'])
-            self.events.append(e)
 
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))
@@ -225,11 +201,7 @@ class Report(object):
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be
         specified that will be passed to the query function.
-
-        This function has been deprecated in favour of the events variable.
         """
-        log.warn("Use of :func:`pypuppetdb.types.Report.events` has been\
-                 deprecated in favour of the events variable.")
         return self.__api.events(query=self.__query_scope, **kwargs)
 
 
@@ -372,6 +344,13 @@ class Node(object):
     :param latest_report_hash: The hash of the latest report from this node,\
             is only available in PuppetDB 3.2 and later
     :type latest_report_hash: :obj:`string`
+    :param cached_catalog_status: Cached catalog status of the last puppet run\
+            on this node, possible values are 'explicitly_requested',\
+            'on_failure', 'not_used' or None.
+    :type cache_catalog_status: :obj:`string`
+    :param latest_report_noop: Determines weather the latest report was\
+            generated with the '--noop' flag.
+    :type latest_report_noop: :obj:`bool`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -391,6 +370,10 @@ class Node(object):
     :ivar latest_report_hash: :obj:`string` the hash value of the latest\
             report the current node reported. Available in PuppetDB 3.2\
             and later.
+    :ivar cached_catalog_status: :obj:`string` the status of the cached\
+            catalog from the last puppet run.
+    :ivar latest_report_noop: :obj:`bool` the latest report run with the\
+            '--noop' flag.
     """
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
@@ -398,7 +381,8 @@ class Node(object):
                  unreported_time=None, report_environment='production',
                  catalog_environment='production',
                  facts_environment='production',
-                 latest_report_hash=None):
+                 latest_report_hash=None, cached_catalog_status=None,
+                 latest_report_noop=None):
         self.name = name
         self.status = status
         self.events = events
@@ -410,6 +394,8 @@ class Node(object):
         self.catalog_environment = catalog_environment
         self.facts_environment = facts_environment
         self.latest_report_hash = latest_report_hash
+        self.cached_catalog_status = cached_catalog_status
+        self.latest_report_noop = latest_report_noop
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)
@@ -586,7 +572,10 @@ class Catalog(object):
         return self.__string
 
     def get_resources(self):
-        return self.resources.itervalues()
+        try:
+            return self.resources.itervalues()
+        except AttributeError:
+            return self.resources.values()
 
     def get_resource(self, resource_type, resource_title):
         identifier = resource_type + \
