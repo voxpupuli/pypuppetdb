@@ -16,6 +16,7 @@ from pypuppetdb.types import (
     Node, Fact, Resource,
     Report, Event, Catalog
 )
+from pypuppetdb.QueryBuilder import *
 
 try:
     from urllib import quote
@@ -296,7 +297,7 @@ class BaseAPI(object):
 
         payload = {}
         if query is not None:
-            payload['query'] = query
+            payload['query'] = str(query)
         if order_by is not None:
             payload[PARAMETERS['order_by']] = order_by
         if limit is not None:
@@ -394,7 +395,7 @@ class BaseAPI(object):
 
         if with_status:
             latest_events = self.event_counts(
-                query='["=", "latest_report?", true]',
+                query=EqualsOperator("latest_report?", True),
                 summarize_by='certname'
             )
 
