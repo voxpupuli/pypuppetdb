@@ -4,6 +4,8 @@ import sys
 
 from pypuppetdb.QueryBuilder import *
 
+if sys.version_info >= (3, 0):
+    unicode = str
 
 class TestBinaryOperator(object):
     """
@@ -289,11 +291,11 @@ class TestFunctionOperator(object):
             '["function","count","domain"]'
 
     def test_avg_function(self):
-        assert (str(FunctionOperator('avg', 'uptime'))) == \
+        assert str(FunctionOperator('avg', 'uptime')) == \
             '["function","avg","uptime"]'
-        assert (repr(FunctionOperator('avg', 'uptime'))) == \
+        assert repr(FunctionOperator('avg', 'uptime')) == \
             'Query: ["function","avg","uptime"]'
-        assert (unicode(FunctionOperator('avg', 'uptime'))) == \
+        assert unicode(FunctionOperator('avg', 'uptime')) == \
             '["function","avg","uptime"]'
 
         with pytest.raises(pypuppetdb.errors.APIError):
