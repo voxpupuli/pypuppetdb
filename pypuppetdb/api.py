@@ -297,7 +297,7 @@ class BaseAPI(object):
 
         payload = {}
         if query is not None:
-            payload['query'] = str(query)
+            payload['query'] = query
         if order_by is not None:
             payload[PARAMETERS['order_by']] = order_by
         if limit is not None:
