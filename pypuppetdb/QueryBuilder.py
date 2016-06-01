@@ -2,10 +2,14 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import logging
+import sys
 
 from pypuppetdb.errors import *
 
 log = logging.getLogger(__name__)
+
+if sys.version_info >= (3, 0):
+    unicode = str
 
 
 class BinaryOperator(object):
@@ -34,13 +38,15 @@ class BinaryOperator(object):
     :type value: any
     """
     def __init__(self, operator, field, value):
-        if type(field) == str:
+        if isinstance(field, (str, unicode)):
             field = '"{0}"'.format(field)
         else:
             field = field
 
-        if type(value) == str:
+        if isinstance(value, (str, unicode)):
             value = '"{0}"'.format(value)
+        elif isinstance(value, bool):
+            value = 'true' if value else 'false'
         else:
             value = value
 

@@ -22,11 +22,13 @@ class TestBinaryOperator(object):
         assert str(EqualsOperator("start_time", "2016-05-11T23:22:48.709Z"))\
             == '["=", "start_time", "2016-05-11T23:22:48.709Z"]'
         assert str(EqualsOperator("is_virtual", True))\
-            == '["=", "is_virtual", True]'
+            == '["=", "is_virtual", true]'
         assert str(EqualsOperator("bios_version", ["6.00", 5.00]))\
             == '["=", "bios_version", [\'6.00\', 5.0]]'
         assert str(EqualsOperator(['parameter', 'ensure'], "present"))\
             == '["=", [\'parameter\', \'ensure\'], "present"]'
+        assert str(EqualsOperator(u"latest_report?", True))\
+            == '["=", "latest_report?", true]'
 
     def test_greater_operator(self):
         assert str(GreaterOperator("uptime", 150))\
@@ -78,9 +80,9 @@ class TestBinaryOperator(object):
 
     def test_null_operator(self):
         assert str(NullOperator("expired", True))\
-            == '["null?", "expired", True]'
+            == '["null?", "expired", true]'
         assert str(NullOperator("report_environment", False))\
-            == '["null?", "report_environment", False]'
+            == '["null?", "report_environment", false]'
         with pytest.raises(APIError):
             NullOperator("environment", "test")
 
