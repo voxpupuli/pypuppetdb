@@ -116,12 +116,17 @@ Users can use the following code block to create the same thing:
 
 .. code-block:: python
 
+   >>> from pypuppetdb.QueryBuilder import *
    >>> op = AndOperator()
    >>> op.add(EqualOperator("facts_environment", "production"))
    >>> op.add(EqualOperator("catalog_environment", "production"))
 
 The ``op`` object can then be directly input to the query parameter of any
 PuppetDB call.
+
+.. code-block:: python
+
+   >>> pypuppetdb.nodes(query=op)
 
 .. autoclass:: pypuppetdb.QueryBuilder.BinaryOperator
    :members:
