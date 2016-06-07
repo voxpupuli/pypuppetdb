@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import logging
 from pypuppetdb.utils import json_to_datetime
+from pypuppetdb.QueryBuilder import *
 
 log = logging.getLogger(__name__)
 
@@ -187,7 +188,6 @@ class Report(object):
         self.__string = '{0}'.format(self.hash_)
 
         self.__api = api
-        self.__query_scope = '["=", "report", "{0}"]'.format(self.hash_)
 
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))
@@ -202,7 +202,8 @@ class Report(object):
         """Get all events for this report. Additional arguments may also be
         specified that will be passed to the query function.
         """
-        return self.__api.events(query=self.__query_scope, **kwargs)
+        return self.__api.events(query=EqualsOperator("report", self.hash_),
+                                 **kwargs)
 
 
 class Fact(object):
@@ -419,7 +420,6 @@ class Node(object):
             self.catalog_timestamp = catalog_timestamp
 
         self.__api = api
-        self.__query_scope = '["=", "certname", "{0}"]'.format(self.name)
         self.__string = self.name
 
     def __repr__(self):
@@ -435,7 +435,8 @@ class Node(object):
         """Get all facts of this node. Additional arguments may also be
         specified that will be passed to the query function.
         """
-        return self.__api.facts(query=self.__query_scope, **kwargs)
+        return self.__api.facts(query=EqualsOperator("certname", self.name),
+                                **kwargs)
 
     def fact(self, name):
         """Get a single fact from this node."""
@@ -448,16 +449,20 @@ class Node(object):
         to the query function.
         """
         if type_ is None:
-            resources = self.__api.resources(query=self.__query_scope,
-                                             **kwargs)
+            resources = self.__api.resources(
+                query=EqualsOperator("certname", self.name),
+                **kwargs)
         elif type_ is not None and title is None:
-            resources = self.__api.resources(type_=type_,
-                                             query=self.__query_scope,
-                                             **kwargs)
+            resources = self.__api.resources(
+                type_=type_,
+                query=EqualsOperator("certname", self.name),
+                **kwargs)
         else:
-            resources = self.__api.resources(type_=type_, title=title,
-                                             query=self.__query_scope,
-                                             **kwargs)
+            resources = self.__api.resources(
+                type_=type_,
+                title=title,
+                query=EqualsOperator("certname", self.name),
+                **kwargs)
         return resources
 
     def resource(self, type_, title, **kwargs):
@@ -465,16 +470,20 @@ class Node(object):
         arguments may also be specified that will be passed to the query
         function.
         """
-        resources = self.__api.resources(type_=type_, title=title,
-                                         query=self.__query_scope,
-                                         **kwargs)
+        resources = self.__api.resources(
+            type_=type_,
+            title=title,
+            query=EqualsOperator("certname", self.name),
+            **kwargs)
         return next(resource for resource in resources)
 
     def reports(self, **kwargs):
         """Get all reports for this node. Additional arguments may also be
         specified that will be passed to the query function.
         """
-        return self.__api.reports(query=self.__query_scope, **kwargs)
+        return self.__api.reports(
+            query=EqualsOperator("certname", self.name),
+            **kwargs)
 
 
 class Catalog(object):
