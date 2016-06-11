@@ -2,6 +2,13 @@
 Changelog
 #########
 
+0.3.0
+=====
+
+* New QueryBuilder module allows users to build PuppetDB queries in an
+  Object-Oriented fashion.
+* Adding support for new fields provided in PuppetDB 4.1.0.
+
 0.2.3
 =====
 

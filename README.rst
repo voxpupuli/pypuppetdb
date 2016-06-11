@@ -183,6 +183,32 @@ catalog contains the defined Resources and Edges.
 Will return all Relationships of a given Resource defined by type and title.
 This will list all linked other Resources and the type of relationship.
 
+Query Builder
+-------------
+
+Starting with version 0.3.0 pypuppetdb comes shipped with a QueryBuilder component
+that, as the name suggests, allows users to build PuppetDB AST queries in an
+Object-Oriented fashion. Vastly superior to constructing long strings than adding
+additional clauses to fulfill new requirements.
+
+The following code will build a query for the Nodes endpoint to find all nodes
+belonging to the production environment.
+
+.. code-block:: python
+
+   >>> from pypuppetdb.QueryBuilder import *
+   >>> op = AndOperator()
+   >>> op.add(EqualsOperator('catalog_environment', 'production'))
+   >>> op.add(EqualsOperator('facts_environment', 'production'))
+   >>> echo op
+   '["and",["=", "catalog_environment", "production"],["=", "facts_environment", "production"]]'
+
+This functionality is based on the PuppetDB AST query string syntax documented
+`here`_. However, we do not yet support subqueries. That is planned in a future
+release.
+
+.. _here: https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html
+
 Getting Help
 ============
 This project is still very new so it's not inconceivable you'll run into
