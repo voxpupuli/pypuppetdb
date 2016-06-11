@@ -100,6 +100,54 @@ In that case, we'll throw an exception at you.
 .. autoexception:: pypuppetdb.errors.EmptyResponseError
    :show-inheritance:
 
+Query Builder
+-------------
+
+With the increasing complexities of some queries it can be very difficult
+to maintain query strings as string objects. The 0.3.0 release introduces
+a new feature called the Query Builder which removes the need of string
+object concatenation into an Object-Oriented fashion.
+
+In order to create the following query:
+
+``'["and", ["=", "facts_environment", "production"], ["=", "catalog_environment", "production"]]'``
+
+Users can use the following code block to create the same thing:
+
+.. code-block:: python
+
+   >>> from pypuppetdb.QueryBuilder import *
+   >>> op = AndOperator()
+   >>> op.add(EqualOperator("facts_environment", "production"))
+   >>> op.add(EqualOperator("catalog_environment", "production"))
+
+The ``op`` object can then be directly input to the query parameter of any
+PuppetDB call.
+
+.. code-block:: python
+
+   >>> pypuppetdb.nodes(query=op)
+
+.. autoclass:: pypuppetdb.QueryBuilder.BinaryOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.EqualsOperator
+.. autoclass:: pypuppetdb.QueryBuilder.GreaterOperator
+.. autoclass:: pypuppetdb.QueryBuilder.LessOperator
+.. autoclass:: pypuppetdb.QueryBuilder.GreaterEqualOperator
+.. autoclass:: pypuppetdb.QueryBuilder.LessEqualOperator
+.. autoclass:: pypuppetdb.QueryBuilder.RegexOperator
+.. autoclass:: pypuppetdb.QueryBuilder.RegexArrayOperator
+.. autoclass:: pypuppetdb.QueryBuilder.NullOperator
+.. autoclass:: pypuppetdb.QueryBuilder.BooleanOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.AndOperator
+.. autoclass:: pypuppetdb.QueryBuilder.OrOperator
+.. autoclass:: pypuppetdb.QueryBuilder.NotOperator
+.. autoclass:: pypuppetdb.QueryBuilder.ExtractOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.FunctionOperator
+   :members:
+
 Utilities
 ---------
 
