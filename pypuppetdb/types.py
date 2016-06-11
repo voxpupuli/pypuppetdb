@@ -348,9 +348,6 @@ class Node(object):
             on this node, possible values are 'explicitly_requested',\
             'on_failure', 'not_used' or None.
     :type cache_catalog_status: :obj:`string`
-    :param latest_report_noop: Determines weather the latest report was\
-            generated with the '--noop' flag.
-    :type latest_report_noop: :obj:`bool`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\
@@ -372,8 +369,6 @@ class Node(object):
             and later.
     :ivar cached_catalog_status: :obj:`string` the status of the cached\
             catalog from the last puppet run.
-    :ivar latest_report_noop: :obj:`bool` the latest report run with the\
-            '--noop' flag.
     """
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
@@ -381,8 +376,7 @@ class Node(object):
                  unreported_time=None, report_environment='production',
                  catalog_environment='production',
                  facts_environment='production',
-                 latest_report_hash=None, cached_catalog_status=None,
-                 latest_report_noop=None):
+                 latest_report_hash=None, cached_catalog_status=None):
         self.name = name
         self.status = status
         self.events = events
@@ -395,7 +389,6 @@ class Node(object):
         self.facts_environment = facts_environment
         self.latest_report_hash = latest_report_hash
         self.cached_catalog_status = cached_catalog_status
-        self.latest_report_noop = latest_report_noop
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)

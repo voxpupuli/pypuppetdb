@@ -461,8 +461,7 @@ class BaseAPI(object):
                        catalog_environment=node['catalog_environment'],
                        facts_environment=node['facts_environment'],
                        latest_report_hash=node.get('latest_report_hash'),
-                       cached_catalog_status=node.get('cached_catalog_status'),
-                       latest_report_noop=node.get('latest_report_noop')
+                       cached_catalog_status=node.get('cached_catalog_status')
                        )
 
     def node(self, name):
