@@ -189,6 +189,13 @@ class TestBooleanOperator(object):
         with pytest.raises(APIError):
             unicode(op)
 
+    def test_not_with_list(self):
+        op = NotOperator()
+
+        with pytest.raises(APIError):
+            str(op.add([EqualsOperator('clientversion', '4.5.1'),
+                        EqualsOperator('facterversion', '3.2.0')]))
+
 
 class TestExtractOperator(object):
     """

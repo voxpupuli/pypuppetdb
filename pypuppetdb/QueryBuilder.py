@@ -524,4 +524,6 @@ class NotOperator(BooleanOperator):
     def add(self, query):
         if len(self.operations) > 0:
             raise APIError("This operator only accept one query string")
+        elif isinstance(query, list) and len(query) > 1:
+            raise APIError("This operator only accept one query string")
         super(NotOperator, self).add(query)
