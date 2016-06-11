@@ -31,7 +31,7 @@ class TestBinaryOperator(object):
         assert str(EqualsOperator(u"latest_report?", True))\
             == '["=", "latest_report?", true]'
         assert str(EqualsOperator("report_timestamp",
-                                  datetime.datetime(2016, 06, 11)))\
+                                  datetime.datetime(2016, 6, 11)))\
             == '["=", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_greater_operator(self):
@@ -42,7 +42,7 @@ class TestBinaryOperator(object):
         assert str(GreaterOperator(['parameter', 'version'], 4.0))\
             == '[">", [\'parameter\', \'version\'], 4.0]'
         assert str(GreaterOperator("report_timestamp",
-                                   datetime.datetime(2016, 06, 11)))\
+                                   datetime.datetime(2016, 6, 11)))\
             == '[">", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_less_operator(self):
@@ -55,7 +55,7 @@ class TestBinaryOperator(object):
         assert str(LessOperator(['parameter', 'version'], 4.0))\
             == '["<", [\'parameter\', \'version\'], 4.0]'
         assert str(LessOperator("report_timestamp",
-                                datetime.datetime(2016, 06, 11)))\
+                                datetime.datetime(2016, 6, 11)))\
             == '["<", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_greater_equal_operator(self):
@@ -68,7 +68,7 @@ class TestBinaryOperator(object):
         assert str(GreaterEqualOperator(['parameter', 'version'], 4.0))\
             == '[">=", [\'parameter\', \'version\'], 4.0]'
         assert str(GreaterEqualOperator("report_timestamp",
-                                        datetime.datetime(2016, 06, 11)))\
+                                        datetime.datetime(2016, 6, 11)))\
             == '[">=", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_less_equal_operator(self):
@@ -79,7 +79,7 @@ class TestBinaryOperator(object):
         assert str(LessEqualOperator(['parameter', 'version'], 4.0))\
             == '["<=", [\'parameter\', \'version\'], 4.0]'
         assert str(LessEqualOperator("report_timestamp",
-                                     datetime.datetime(2016, 06, 11)))\
+                                     datetime.datetime(2016, 6, 11)))\
             == '["<=", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_regex_operator(self):
