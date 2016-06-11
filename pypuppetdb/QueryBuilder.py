@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+import datetime
 import logging
 import sys
 
@@ -43,7 +44,7 @@ class BinaryOperator(object):
         else:
             field = field
 
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, (str, unicode, datetime.datetime)):
             value = '"{0}"'.format(value)
         elif isinstance(value, bool):
             value = 'true' if value else 'false'

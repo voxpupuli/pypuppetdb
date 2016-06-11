@@ -1,3 +1,4 @@
+import datetime
 import pytest
 import pypuppetdb
 import sys
@@ -29,6 +30,9 @@ class TestBinaryOperator(object):
             == '["=", [\'parameter\', \'ensure\'], "present"]'
         assert str(EqualsOperator(u"latest_report?", True))\
             == '["=", "latest_report?", true]'
+        assert str(EqualsOperator("report_timestamp",
+                                  datetime.datetime(2016, 06, 11)))\
+            == '["=", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_greater_operator(self):
         assert str(GreaterOperator("uptime", 150))\
@@ -37,6 +41,9 @@ class TestBinaryOperator(object):
             == '[">", "end_time", ""2016-05-11T23:22:48.709Z""]'
         assert str(GreaterOperator(['parameter', 'version'], 4.0))\
             == '[">", [\'parameter\', \'version\'], 4.0]'
+        assert str(GreaterOperator("report_timestamp",
+                                   datetime.datetime(2016, 06, 11)))\
+            == '[">", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_less_operator(self):
         assert str(LessOperator("uptime_seconds", 300))\
@@ -47,6 +54,9 @@ class TestBinaryOperator(object):
             == '["<", "producer_timestamp", "2016-05-11T23:53:29.962Z"]'
         assert str(LessOperator(['parameter', 'version'], 4.0))\
             == '["<", [\'parameter\', \'version\'], 4.0]'
+        assert str(LessOperator("report_timestamp",
+                                datetime.datetime(2016, 06, 11)))\
+            == '["<", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_greater_equal_operator(self):
         assert str(GreaterEqualOperator("uptime_days", 3))\
@@ -57,6 +67,9 @@ class TestBinaryOperator(object):
             == '[">=", "start_time", "2016-05-11T23:53:29.962Z"]'
         assert str(GreaterEqualOperator(['parameter', 'version'], 4.0))\
             == '[">=", [\'parameter\', \'version\'], 4.0]'
+        assert str(GreaterEqualOperator("report_timestamp",
+                                        datetime.datetime(2016, 06, 11)))\
+            == '[">=", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_less_equal_operator(self):
         assert str(LessEqualOperator("kernelmajversion", 4))\
@@ -65,6 +78,9 @@ class TestBinaryOperator(object):
             == '["<=", "end_time", "2016-05-11T23:53:29.962Z"]'
         assert str(LessEqualOperator(['parameter', 'version'], 4.0))\
             == '["<=", [\'parameter\', \'version\'], 4.0]'
+        assert str(LessEqualOperator("report_timestamp",
+                                     datetime.datetime(2016, 06, 11)))\
+            == '["<=", "report_timestamp", "2016-06-11 00:00:00"]'
 
     def test_regex_operator(self):
         assert str(RegexOperator("certname", "www\\d+\\.example\\.com"))\
