@@ -115,11 +115,6 @@ class TestNode(object):
         assert node3.name == 'node'
         assert node3.cached_catalog_status == 'not_used'
 
-    def test_with_latest_report_noop(self):
-        node = Node('_', 'node', latest_report_noop=False)
-        assert node.name == 'node'
-        assert not node.latest_report_noop
-
 
 class TestFact(object):
     """Test the Fact object."""
