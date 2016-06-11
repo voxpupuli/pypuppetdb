@@ -260,6 +260,14 @@ class EqualsOperator(BinaryOperator):
     described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#equality.
 
+    In order to create the following query:
+
+    ["=", "environment", "production"]
+
+    The following code can be used.
+
+    EqualsOperator('environment', 'production')
+
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
     :type field: any
@@ -275,6 +283,14 @@ class GreaterOperator(BinaryOperator):
     Builds a greater-than filter based on the supplied field-value pair as
     described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#greater-than.
+
+    In order to create the following query:
+
+    [">", "catalog_timestamp", "2016-06-01 00:00:00"]
+
+    The following code can be used.
+
+    GreaterOperator('catalog_timestamp', datetime.datetime(2016, 06, 01))
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -292,6 +308,14 @@ class LessOperator(BinaryOperator):
     described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#less-than.
 
+    In order to create the following query:
+
+    ["<", "catalog_timestamp", "2016-06-01 00:00:00"]
+
+    The following code can be used.
+
+    LessOperator('catalog_timestamp', datetime.datetime(2016, 06, 01))
+
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
     :type field: any
@@ -307,6 +331,14 @@ class GreaterEqualOperator(BinaryOperator):
     Builds a greater-than or equal-to filter based on the supplied
     field-value pair as described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#greater-than-or-equal-to.
+
+    In order to create the following query:
+
+    [">=", "facts_timestamp", "2016-06-01 00:00:00"]
+
+    The following code can be used.
+
+    GreaterEqualOperator('facts_timestamp', datetime.datetime(2016, 06, 01))
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -325,6 +357,14 @@ class LessEqualOperator(BinaryOperator):
     field-value pair as described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#less-than-or-equal-to.
 
+    In order to create the following query:
+
+    ["<=", "facts_timestamp", "2016-06-01 00:00:00"]
+
+    The following code can be used.
+
+    LessEqualOperator('facts_timestamp', datetime.datetime(2016, 06, 01))
+
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
     :type field: any
@@ -341,6 +381,14 @@ class RegexOperator(BinaryOperator):
     Builds a regular expression filter based on the supplied field-value
     pair as described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#regexp-match.
+
+    In order to create the following query:
+
+    ["~", "certname", "www\\d+\\.example\\.com"]
+
+    The following code can be used.
+
+    RegexOperator('certname', 'www\\d+\\.example\\.com')
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -359,6 +407,14 @@ class RegexArrayOperator(BinaryOperator):
     described
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#regexp-array-match.
 
+    In order to create the following query:
+
+    ["~", "path", ["networking", "eth.*", "macaddress"]]
+
+    The following code can be used.
+
+    RegexArrayOperator('path', ["networking", "eth.*", "macaddress"])
+
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
     :type field: any
@@ -376,6 +432,14 @@ class NullOperator(BinaryOperator):
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#null-is-null.
     This filter only works on field that may be null. Value may only
     be True or False.
+
+    In order to create the following query:
+
+    ["null?", "deactivated", true]
+
+    The following code can be used.
+
+    NullOperator('deactivated', True)
 
     :param field: The PuppetDB endpoint query field. See endpoint
                   documentation for valid values.
@@ -397,6 +461,18 @@ class AndOperator(BooleanOperator):
     criteria from the included query strings will be returned
     from PuppetDB. Full documentation is available
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#and
+
+    In order to create the following query:
+
+    ["and",
+      ["=", "catalog_environment", "production"],
+      ["=", "facts_environment", "production"]]
+
+    The following code can be used:
+
+    op = AndOperator()
+    op.add(EqualsOperator("catalog_environment", "production"))
+    op.add(EqualsOperator("facts_environment", "production"))
     """
     def __init__(self):
         super(AndOperator, self).__init__("and")
@@ -408,6 +484,16 @@ class OrOperator(BooleanOperator):
     criteria from the included query strings will be returned
     from PuppetDB. Full documentation is available
     https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#or.
+
+    In order to create the following query:
+
+    ["or", ["=", "name", "hostname"], ["=", "name", "architecture"]]
+
+    The following code can be used:
+
+    op = OrOperator()
+    op.add(EqualsOperator("name", "hostname"))
+    op.add(EqualsOperator("name", "architecture"))
     """
     def __init__(self):
         super(OrOperator, self).__init__("or")
@@ -422,6 +508,15 @@ class NotOperator(BooleanOperator):
 
     Unlike the other Boolean Operator objects this operator only
     accepts a single query string.
+
+    In order to create the following query:
+
+    ["not", ["=", "osfamily", "RedHat"]]
+
+    The following code can be used.
+
+    op = NotOperator()
+    op.add(EqualsOperator("osfamily", "RedHat"))
     """
     def __init__(self):
         super(NotOperator, self).__init__("not")
