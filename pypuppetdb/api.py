@@ -43,6 +43,7 @@ ENDPOINTS = {
     'fact-paths': 'pdb/query/v4/fact-paths',
     'fact-contents': 'pdb/query/v4/fact-contents',
     'edges': 'pdb/query/v4/edges',
+    'pql': 'pdb/query/v4',
 }
 
 PARAMETERS = {
