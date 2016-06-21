@@ -387,6 +387,7 @@ class BaseAPI(object):
         :rtype: :class:`pypuppetdb.types.Node`
         """
         nodes = self._query('nodes', **kwargs)
+        now = datetime.datetime.utcnow()
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
@@ -431,8 +432,8 @@ class BaseAPI(object):
                 if node['report_timestamp'] is not None:
                     try:
                         last_report = json_to_datetime(
-                            node['report_timestamp']).replace(tzinfo=None)
-                        now = datetime.utcnow()
+                            node['report_timestamp'])
+                        last_report = last_report.replace(tzinfo=None)
                         unreported_border = now - timedelta(hours=unreported)
                         if last_report < unreported_border:
                             delta = (now - last_report)
