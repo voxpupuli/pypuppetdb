@@ -2,6 +2,12 @@
 Changelog
 #########
 
+0.3.1
+=====
+
+* Fixed a datetime related bug in :func:`pypuppetdb.api.nodes()` that caused
+  all returned nodes to be an unreported status
+
 0.3.0
 =====
 
