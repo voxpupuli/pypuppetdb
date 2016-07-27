@@ -5,10 +5,6 @@ python:
   - 3.3
   - 3.4
   - 3.5
-  - nightly
-matrix:
-  allow_failures:
-    - python: nigthly
 install:
   - pip install -q -r requirements.txt --use-wheel
   - pip install -q coverage coveralls --use-wheel
