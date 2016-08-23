@@ -240,6 +240,29 @@ class TestReport(object):
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
 
+    def test_report_with_producer(self):
+        report = Report('_', "test.test.com", "hash#",
+                        '2015-08-31T21:07:00.000Z',
+                        '2015-08-31T21:09:00.000Z',
+                        '2015-08-31T21:10:00.000Z',
+                        '1482347613', 4, '4.2.1',
+                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+                        producer="puppet01.test.com")
+
+        assert report.node == "test.test.com"
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '4.2.1'
+        assert report.run_time == report.end - report.start
+        assert report.producer == "puppet01.test.com"
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
 
 class TestEvent(object):
     """Test the Event object."""
@@ -321,6 +344,20 @@ class TestCatalog(object):
         assert repr(catalog) == str(
             '<Catalog: node/None>')
         assert catalog.catalog_uuid == 'univerallyuniqueidentifier'
+
+    def test_catalog_producer(self):
+        catalog = Catalog('node', [], [], 'unique', None,
+                          producer="puppet01.test.com")
+        assert catalog.node == 'node'
+        assert catalog.version == 'unique'
+        assert catalog.transaction_uuid is None
+        assert catalog.resources == {}
+        assert catalog.edges == []
+        assert catalog.producer == 'puppet01.test.com'
+        assert str(catalog) == str('node/None')
+        assert unicode(catalog) == unicode('node/None')
+        assert repr(catalog) == str(
+            '<Catalog: node/None>')
 
 
 class TestEdge(object):
