@@ -179,7 +179,7 @@ class Report(object):
         self.run_time = self.end - self.start
         self.transaction = transaction
         self.environment = environment
-        self.status = 'noop' if noop else status
+        self.status = 'noop' if noop and status != 'unchanged' else status
         self.metrics = metrics
         self.logs = logs
         self.code_id = code_id
