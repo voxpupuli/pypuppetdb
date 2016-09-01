@@ -411,7 +411,10 @@ class BaseAPI(object):
 
                 try:
                     if node['latest_report_noop']:
-                        node['status'] = 'noop'
+                        if node['latest_report_status'] == 'unchanged':
+                            node['status'] = 'unchanged'
+                        else:
+                            node['status'] = 'noop'
                     else:
                         node['status'] = node['latest_report_status']
 
