@@ -120,6 +120,9 @@ class Report(object):
     :param noop: (Default `False`) A flag indicating weather the report was\
         produced by a noop run.
     :type noop: :obj:`bool`
+    :param noop_pending: (Default `False`) A flag indicating weather the \
+        report was changes produced by a noop run.
+    :type noop_pending: :obj:`bool`
     :param metrics: (Optional) All metrics associated with this report.
     :type metrics: :obj:`list` containing :obj:`dict` with Metrics
     :param logs: (Optional) All logs associated with this report.
@@ -165,8 +168,8 @@ class Report(object):
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
-                 noop=False, code_id=None, catalog_uuid=None,
-                 cached_catalog_status=None):
+                 noop=False, noop_pending=False, code_id=None,
+                 catalog_uuid=None, cached_catalog_status=None):
 
         self.node = node
         self.hash_ = hash_
@@ -179,7 +182,7 @@ class Report(object):
         self.run_time = self.end - self.start
         self.transaction = transaction
         self.environment = environment
-        self.status = 'noop' if noop else status
+        self.status = 'noop' if noop and noop_pending else status
         self.metrics = metrics
         self.logs = logs
         self.code_id = code_id
