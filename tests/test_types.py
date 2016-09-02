@@ -54,6 +54,152 @@ class TestNode(object):
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
 
+    def test_apiv4_with_failed_status(self):
+        node = Node('_', 'node',
+                    status='failed',
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'failed'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_unchanged_status(self):
+        node = Node('_', 'node',
+                    status='unchanged',
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'unchanged'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_unchanged_noop_status(self):
+        node = Node('_', 'node',
+                    status='unchanged',
+                    noop=True,
+                    noop_pending=False,
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'unchanged'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_pending_noop_status(self):
+        node = Node('_', 'node',
+                    status='unchanged',
+                    noop=True,
+                    noop_pending=True,
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'noop'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_failed_noop_status(self):
+        node = Node('_', 'node',
+                    status='failed',
+                    noop=True,
+                    noop_pending=False,
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'failed'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
     def test_apiv4_without_status(self):
         node = Node('_', 'node',
                     report_environment='development',

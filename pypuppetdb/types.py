@@ -121,7 +121,7 @@ class Report(object):
         produced by a noop run.
     :type noop: :obj:`bool`
     :param noop_pending: (Default `False`) A flag indicating weather the \
-        report was changes produced by a noop run.
+        report had pending changes produced by a noop run.
     :type noop_pending: :obj:`bool`
     :param metrics: (Optional) All metrics associated with this report.
     :type metrics: :obj:`list` containing :obj:`dict` with Metrics
@@ -332,6 +332,13 @@ class Node(object):
     :param status: (default `None`) Status of the node\
             changed | unchanged | unreported | failed
     :type status: :obj:`string`
+    :param noop: (Default `False`) A flag indicating whether the latest \
+        report of the node was produced by a noop run.
+    :type noop: :obj:`bool`
+    :param noop_pending: (Default `False`) A flag indicating whether \
+        the latest report of the node had pending changes \
+        produced by a noop run.
+    :type noop_pending: :obj:`bool`
     :param events: (default `None`) Counted events from latest Report
     :type events: :obj:`dict`
     :param unreported_time: (default `None`) Time since last report
@@ -376,13 +383,14 @@ class Node(object):
     """
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
-                 facts_timestamp=None, status=None, events=None,
+                 facts_timestamp=None, status=None,
+                 noop=False, noop_pending=False, events=None,
                  unreported_time=None, report_environment='production',
                  catalog_environment='production',
                  facts_environment='production',
                  latest_report_hash=None, cached_catalog_status=None):
         self.name = name
-        self.status = status
+        self.status = 'noop' if noop and noop_pending else status
         self.events = events
         self.unreported_time = unreported_time
         self.report_timestamp = report_timestamp
