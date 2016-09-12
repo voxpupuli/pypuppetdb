@@ -54,6 +54,152 @@ class TestNode(object):
         assert unicode(node) == unicode('node')
         assert repr(node) == str('<Node: node>')
 
+    def test_apiv4_with_failed_status(self):
+        node = Node('_', 'node',
+                    status='failed',
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'failed'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_unchanged_status(self):
+        node = Node('_', 'node',
+                    status='unchanged',
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'unchanged'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_unchanged_noop_status(self):
+        node = Node('_', 'node',
+                    status='unchanged',
+                    noop=True,
+                    noop_pending=False,
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'unchanged'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_pending_noop_status(self):
+        node = Node('_', 'node',
+                    status='unchanged',
+                    noop=True,
+                    noop_pending=True,
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'noop'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_apiv4_with_failed_noop_status(self):
+        node = Node('_', 'node',
+                    status='failed',
+                    noop=True,
+                    noop_pending=False,
+                    report_environment='development',
+                    catalog_environment='development',
+                    facts_environment='development',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    )
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_environment == 'development'
+        assert node.catalog_environment == 'development'
+        assert node.facts_environment == 'development'
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'failed'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
     def test_apiv4_without_status(self):
         node = Node('_', 'node',
                     report_environment='development',
@@ -194,8 +340,61 @@ class TestReport(object):
                         '2015-08-31T21:10:00.000Z',
                         '1482347613', 4, '4.2.1',
                         'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
-                        status='success',
-                        noop=True)
+                        status='unchanged',
+                        noop=True,
+                        noop_pending=False)
+
+        assert report.node == 'node2.puppet.board'
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '4.2.1'
+        assert report.run_time == report.end - report.start
+        assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
+        assert report.status == 'unchanged'
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
+    def test_report_with_failed_noop(self):
+        report = Report('_', 'node2.puppet.board', 'hash#',
+                        '2015-08-31T21:07:00.000Z',
+                        '2015-08-31T21:09:00.000Z',
+                        '2015-08-31T21:10:00.000Z',
+                        '1482347613', 4, '4.2.1',
+                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+                        status='failed',
+                        noop=True,
+                        noop_pending=False)
+
+        assert report.node == 'node2.puppet.board'
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '4.2.1'
+        assert report.run_time == report.end - report.start
+        assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
+        assert report.status == 'failed'
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
+    def test_report_with_pending_noop(self):
+        report = Report('_', 'node2.puppet.board', 'hash#',
+                        '2015-08-31T21:07:00.000Z',
+                        '2015-08-31T21:09:00.000Z',
+                        '2015-08-31T21:10:00.000Z',
+                        '1482347613', 4, '4.2.1',
+                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+                        status='unchanged',
+                        noop=True,
+                        noop_pending=True)
 
         assert report.node == 'node2.puppet.board'
         assert report.hash_ == 'hash#'

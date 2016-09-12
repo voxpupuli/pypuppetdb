@@ -120,6 +120,9 @@ class Report(object):
     :param noop: (Default `False`) A flag indicating weather the report was\
         produced by a noop run.
     :type noop: :obj:`bool`
+    :param noop_pending: (Default `False`) A flag indicating weather the \
+        report had pending changes produced by a noop run.
+    :type noop_pending: :obj:`bool`
     :param metrics: (Optional) All metrics associated with this report.
     :type metrics: :obj:`list` containing :obj:`dict` with Metrics
     :param logs: (Optional) All logs associated with this report.
@@ -165,8 +168,8 @@ class Report(object):
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
-                 noop=False, code_id=None, catalog_uuid=None,
-                 cached_catalog_status=None):
+                 noop=False, noop_pending=False, code_id=None,
+                 catalog_uuid=None, cached_catalog_status=None):
 
         self.node = node
         self.hash_ = hash_
@@ -179,7 +182,7 @@ class Report(object):
         self.run_time = self.end - self.start
         self.transaction = transaction
         self.environment = environment
-        self.status = 'noop' if noop else status
+        self.status = 'noop' if noop and noop_pending else status
         self.metrics = metrics
         self.logs = logs
         self.code_id = code_id
@@ -329,6 +332,13 @@ class Node(object):
     :param status: (default `None`) Status of the node\
             changed | unchanged | unreported | failed
     :type status: :obj:`string`
+    :param noop: (Default `False`) A flag indicating whether the latest \
+        report of the node was produced by a noop run.
+    :type noop: :obj:`bool`
+    :param noop_pending: (Default `False`) A flag indicating whether \
+        the latest report of the node had pending changes \
+        produced by a noop run.
+    :type noop_pending: :obj:`bool`
     :param events: (default `None`) Counted events from latest Report
     :type events: :obj:`dict`
     :param unreported_time: (default `None`) Time since last report
@@ -373,13 +383,14 @@ class Node(object):
     """
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
-                 facts_timestamp=None, status=None, events=None,
+                 facts_timestamp=None, status=None,
+                 noop=False, noop_pending=False, events=None,
                  unreported_time=None, report_environment='production',
                  catalog_environment='production',
                  facts_environment='production',
                  latest_report_hash=None, cached_catalog_status=None):
         self.name = name
-        self.status = status
+        self.status = 'noop' if noop and noop_pending else status
         self.events = events
         self.unreported_time = unreported_time
         self.report_timestamp = report_timestamp
