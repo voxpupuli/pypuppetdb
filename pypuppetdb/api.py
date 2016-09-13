@@ -412,10 +412,7 @@ class BaseAPI(object):
                           if s['subject']['title'] == node['certname']]
 
                 try:
-                    if node['latest_report_noop']:
-                        node['status'] = 'noop'
-                    else:
-                        node['status'] = node['latest_report_status']
+                    node['status'] = node['latest_report_status']
 
                     if status:
                         node['events'] = status[0]
@@ -460,6 +457,8 @@ class BaseAPI(object):
                        catalog_timestamp=node['catalog_timestamp'],
                        facts_timestamp=node['facts_timestamp'],
                        status=node['status'],
+                       noop=node.get('latest_report_noop'),
+                       noop_pending=node.get('latest_report_noop_pending'),
                        events=node['events'],
                        unreported_time=node.get('unreported_time'),
                        report_environment=node['report_environment'],
@@ -810,7 +809,8 @@ class BaseAPI(object):
                 transaction=report['transaction_uuid'],
                 environment=report['environment'],
                 status=report['status'],
-                noop=report['noop'],
+                noop=report.get('noop'),
+                noop_pending=report.get('noop_pending'),
                 metrics=report['metrics']['data'],
                 logs=report['logs']['data'],
                 code_id=report.get('code_id'),
