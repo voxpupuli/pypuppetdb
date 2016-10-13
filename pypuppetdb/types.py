@@ -329,8 +329,8 @@ class Node(object):
             collected.
     :type facts_timestamp: :obj:`string` formatted as\
             ``%Y-%m-%dT%H:%M:%S.%fZ``
-    :param status: (default `None`) Status of the node\
-            changed | unchanged | unreported | failed
+    :param status_report: (default `None`) Status of latest report \
+            from the node changed | unchanged | failed
     :type status: :obj:`string`
     :param noop: (Default `False`) A flag indicating whether the latest \
         report of the node was produced by a noop run.
@@ -341,6 +341,8 @@ class Node(object):
     :type noop_pending: :obj:`bool`
     :param events: (default `None`) Counted events from latest Report
     :type events: :obj:`dict`
+    :param unreported: (default `False`) if node is considered unreported
+    :type unreported_time: :obj:`bool`
     :param unreported_time: (default `None`) Time since last report
     :type unreported_time: :obj:`string`
     :param report_environment: (default 'production') The environment of the\
@@ -383,14 +385,14 @@ class Node(object):
     """
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
-                 facts_timestamp=None, status=None,
+                 facts_timestamp=None, status_report=None,
                  noop=False, noop_pending=False, events=None,
-                 unreported_time=None, report_environment='production',
+                 unreported=False, unreported_time=None,
+                 report_environment='production',
                  catalog_environment='production',
                  facts_environment='production',
                  latest_report_hash=None, cached_catalog_status=None):
         self.name = name
-        self.status = 'noop' if noop and noop_pending else status
         self.events = events
         self.unreported_time = unreported_time
         self.report_timestamp = report_timestamp
@@ -401,6 +403,13 @@ class Node(object):
         self.facts_environment = facts_environment
         self.latest_report_hash = latest_report_hash
         self.cached_catalog_status = cached_catalog_status
+
+        if unreported:
+            self.status = 'unreported'
+        elif noop and noop_pending:
+            self.status = 'noop'
+        else:
+            self.status = status_report
 
         if deactivated is not None:
             self.deactivated = json_to_datetime(deactivated)
