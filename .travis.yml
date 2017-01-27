@@ -5,10 +5,11 @@ python:
   - 3.3
   - 3.4
   - 3.5
+  - 3.6
 install:
   - pip install -q -r requirements.txt --use-wheel
   - pip install -q coverage coveralls --use-wheel
-script: coverage run --source pypuppetdb -m py.test --pep8
+script: py.test --cov=puppetboard --pep8  -v
 after_success:
   - coveralls
 notifications:
