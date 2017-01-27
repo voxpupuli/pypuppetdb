@@ -3,7 +3,8 @@ import sys
 from pypuppetdb.utils import json_to_datetime
 from pypuppetdb.types import (
     Node, Fact, Resource,
-    Report, Event, Catalog, Edge
+    Report, Event, Catalog, Edge,
+    Inventory
     )
 
 if sys.version_info >= (3, 0):
@@ -438,6 +439,29 @@ class TestReport(object):
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
 
+    def test_report_with_producer(self):
+        report = Report('_', "test.test.com", "hash#",
+                        '2015-08-31T21:07:00.000Z',
+                        '2015-08-31T21:09:00.000Z',
+                        '2015-08-31T21:10:00.000Z',
+                        '1482347613', 4, '4.2.1',
+                        'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+                        producer="puppet01.test.com")
+
+        assert report.node == "test.test.com"
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '4.2.1'
+        assert report.run_time == report.end - report.start
+        assert report.producer == "puppet01.test.com"
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
 
 class TestEvent(object):
     """Test the Event object."""
@@ -520,6 +544,20 @@ class TestCatalog(object):
             '<Catalog: node/None>')
         assert catalog.catalog_uuid == 'univerallyuniqueidentifier'
 
+    def test_catalog_producer(self):
+        catalog = Catalog('node', [], [], 'unique', None,
+                          producer="puppet01.test.com")
+        assert catalog.node == 'node'
+        assert catalog.version == 'unique'
+        assert catalog.transaction_uuid is None
+        assert catalog.resources == {}
+        assert catalog.edges == []
+        assert catalog.producer == 'puppet01.test.com'
+        assert str(catalog) == str('node/None')
+        assert unicode(catalog) == unicode('node/None')
+        assert repr(catalog) == str(
+            '<Catalog: node/None>')
+
 
 class TestEdge(object):
     """Test the Edge object."""
@@ -545,3 +583,42 @@ class TestEdge(object):
             'file[/etc/ssh/sshd_config] - notify - service[sshd]')
         assert repr(edge) == str(
             '<Edge: file[/etc/ssh/sshd_config] - notify - service[sshd]>')
+
+
+class TestInventory(object):
+    def test_inventory(self):
+        inv = Inventory(node="test1.test.com",
+                        environment="production",
+                        time='2016-08-18T21:00:00.000Z',
+                        facts={
+                            "hostname": "test1.test.com",
+                            "domain": "test.com",
+                            "puppetversion": "4.6.0"
+                        },
+                        trusted={
+                            "authenticated": "remote",
+                            "domain": "test.com",
+                            "certname": "test1.test.com",
+                            "extensions": {},
+                            "hostname": "test1"
+                        })
+
+        assert inv.node == "test1.test.com"
+        assert inv.environment == "production"
+        assert inv.time == json_to_datetime('2016-08-18T21:00:00.000Z')
+        assert inv.facts == {
+            "hostname": "test1.test.com",
+            "domain": "test.com",
+            "puppetversion": "4.6.0"
+        }
+        assert inv.trusted == {
+            "authenticated": "remote",
+            "domain": "test.com",
+            "certname": "test1.test.com",
+            "extensions": {},
+            "hostname": "test1"
+        }
+
+        assert str(inv) == str("test1.test.com")
+        assert unicode(inv) == unicode("test1.test.com")
+        assert repr(inv) == str("<Inventory: test1.test.com>")

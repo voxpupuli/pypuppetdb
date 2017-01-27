@@ -138,6 +138,9 @@ class Report(object):
         error. Can be one of 'explicitly_requested', 'on_failure',\
         'not_used' not 'null'.
     :type cached_catalog_status: :obj:`string`
+    :param producer: (Optional) The certname of the Puppet Master that\
+        sent the report to PuppetDB
+    :type producer: :obj:`string`
 
     :ivar node: The hostname this report originated from.
     :ivar hash\_: Unique identifier of this report.
@@ -164,12 +167,15 @@ class Report(object):
     :ivar cached_catalog_status: :obj:`string` identifying if this Puppet run\
         used a cached catalog, if so weather it was a result of an error or\
         otherwise.
+    :ivar producer: :obj:`string` representing the certname of the Puppet\
+        Master that sent the report to PuppetDB
     """
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
                  noop=False, noop_pending=False, code_id=None,
-                 catalog_uuid=None, cached_catalog_status=None):
+                 catalog_uuid=None, cached_catalog_status=None,
+                 producer=None):
 
         self.node = node
         self.hash_ = hash_
@@ -188,6 +194,7 @@ class Report(object):
         self.code_id = code_id
         self.catalog_uuid = catalog_uuid
         self.cached_catalog_status = cached_catalog_status
+        self.producer = producer
         self.__string = '{0}'.format(self.hash_)
 
         self.__api = api
@@ -517,6 +524,9 @@ class Catalog(object):
     :type code_id: :obj:`string`
     :param catalog_uuid: Universally unique identifier of this catalog.
     :type catalog_uuid: :obj:`string`
+    :param producer: The certname of the Puppet Master that sent the catalog\
+        to PuppetDB
+    :type producer: :obj:`string`
 
     :ivar node: :obj:`string` Name of the host
     :ivar version: :obj:`string` Catalog version from Puppet
@@ -532,9 +542,12 @@ class Catalog(object):
     :ivar code_id: :obj:`string` ties the catalog to the Puppet code that\
         generated the catalog
     :ivar catalog_uuid: :obj:`string` uniquely identifying this catalog.
+    :ivar producer: :obj:`string` of the Puppet Master that sent the catalog\
+        to PuppetDB
     """
     def __init__(self, node, edges, resources, version, transaction_uuid,
-                 environment=None, code_id=None, catalog_uuid=None):
+                 environment=None, code_id=None, catalog_uuid=None,
+                 producer=None):
 
         self.node = node
         self.version = version
@@ -542,6 +555,7 @@ class Catalog(object):
         self.environment = environment
         self.code_id = code_id
         self.catalog_uuid = catalog_uuid
+        self.producer = producer
 
         self.resources = dict()
         for resource in resources:
@@ -634,4 +648,49 @@ class Edge(object):
         return str('{0}').format(self.__string)
 
     def __unicode__(self):
+        return self.__string
+
+
+class Inventory(object):
+    """This object represents a Node Inventory entry returned from
+    the Inventory endpoint.
+
+    :param node: The certname of the node associated with the inventory.
+    :type node: :obj:`string`
+    :param time: The time at which PuppetDB received the facts in the
+        inventory.
+    :type time: :obj:`string` formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
+    :param environment: The environment associated with the inventory's
+        certname.
+    :type environment: :obj:`string`
+    :param facts: The dictionary of key-value pairs for the nodes
+        assosciated facts.
+    :type facts: :obj:`dict`
+    :param trusted: The trusted data from the node.
+    :type trusted: :obj:`dict`
+
+    :ivar node: The certname of the node associated with the inventory.
+    :ivar time: The time at which PuppetDB received the facts in the
+        inventory.
+    :ivar environment: The environment associated with the inventory's
+        certname.
+    :ivar facts: The dictionary of key-value pairs for the nodes
+        assosciated facts.
+    :ivar trusted: The trusted data from the node.
+    """
+    def __init__(self, node, time, environment, facts, trusted):
+        self.node = node
+        self.time = json_to_datetime(time)
+        self.environment = environment
+        self.facts = facts
+        self.trusted = trusted
+        self.__string = self.node
+
+    def __repr__(self):
+        return str('<Inventory: {0}>').format(self.__string)
+
+    def __str__(self):
+        return str("{0}").format(self.__string)
+
+    def __unicode(self):
         return self.__string

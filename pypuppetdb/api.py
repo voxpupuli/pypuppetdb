@@ -14,7 +14,8 @@ from pypuppetdb.errors import (
 )
 from pypuppetdb.types import (
     Node, Fact, Resource,
-    Report, Event, Catalog
+    Report, Event, Catalog,
+    Inventory
 )
 from pypuppetdb.QueryBuilder import *
 
@@ -44,6 +45,7 @@ ENDPOINTS = {
     'fact-contents': 'pdb/query/v4/fact-contents',
     'edges': 'pdb/query/v4/edges',
     'pql': 'pdb/query/v4',
+    'inventory': 'pdb/query/v4/inventory',
 }
 
 PARAMETERS = {
@@ -814,4 +816,25 @@ class BaseAPI(object):
                 code_id=report.get('code_id'),
                 catalog_uuid=report.get('catalog_uuid'),
                 cached_catalog_status=report.get('cached_catalog_status')
+            )
+
+    def inventory(self, **kwargs):
+        """Get Node and Fact information with an alternative query syntax
+        for structured facts instead of using the facts, fact-contents and
+        factsets endpoints for many fact-related queries.
+
+        :param \*\*kwargs: The rest of the keyword arguments are passed
+                           to the _query function.
+
+        :returns: A generator yielding Inventory
+        :rtype: :class:`pypuppetdb.types.Inventory`
+        """
+        inventory = self._query('inventory', **kwargs)
+        for inv in inventory:
+            yield Inventory(
+                node=inv.certname,
+                time=inv.timestamp,
+                environment=inv.environment,
+                facts=inv.facts,
+                trusted=inv.trusted
             )
