@@ -110,12 +110,12 @@ class TestBaseAPIInitOptions(object):
         assert api.password is None
 
     def test_password(self):
-        api = pypuppetdb.api.BaseAPI(password='password123')
+        api = pypuppetdb.api.BaseAPI(password='password123')  # nosec
         assert api.username is None
         assert api.password is None
 
     def test_username_and_password(self):
-        api = pypuppetdb.api.BaseAPI(username='puppetdb',
+        api = pypuppetdb.api.BaseAPI(username='puppetdb',  # nosec
                                      password='password123')
         assert api.username == 'puppetdb'
         assert api.password == 'password123'

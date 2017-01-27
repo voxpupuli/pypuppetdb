@@ -9,7 +9,9 @@ python:
 install:
   - pip install -q -r requirements.txt --use-wheel
   - pip install -q coverage coveralls --use-wheel
-script: py.test --cov=puppetboard --pep8  -v
+script:
+  - py.test --cov=pypuppetdb --pep8  -v
+  - ./bandit.sh
 after_success:
   - coveralls
 notifications:

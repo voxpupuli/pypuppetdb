@@ -1,3 +1,4 @@
+bandit
 cov-core==1.15.0
 coverage==4.0
 git+https://github.com/gabrielfalcao/HTTPretty.git@python-3.3-support#egg=httpretty
