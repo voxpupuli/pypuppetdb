@@ -1,9 +1,9 @@
-requests==2.1.0
-pytest==2.7.3
-mock==1.0.1
-git+https://github.com/gabrielfalcao/HTTPretty.git@python-3.3-support#egg=httpretty
-pytest-pep8==1.0.5
-cov-core==1.15.0
-coverage==3.7.1
-pytest-cov==1.8.1
 bandit
+cov-core==1.15.0
+coverage==4.0
+git+https://github.com/gabrielfalcao/HTTPretty.git@python-3.3-support#egg=httpretty
+mock==1.0.1
+pytest==3.0.1
+pytest-cov==2.2.1
+pytest-pep8==1.0.5
+requests==2.1.0
