@@ -2,6 +2,14 @@
 Changelog
 #########
 
+0.3.2
+=====
+
+* Fixed noop puppet runs reporting unchanged instead of noop.
+* Fixed unreported nodes shown as 'noop' in puppetdb > 4.1.0.
+* Add Inventory API endpoint for PuppetDB 4.2.0.
+* Support for producer field on catalogs, facts and report types.
+
 0.3.1
 =====
 

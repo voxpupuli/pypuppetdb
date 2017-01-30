@@ -32,7 +32,7 @@ with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
 
 setup(
     name='pypuppetdb',
-    version='0.3.1',
+    version='0.3.2',
     author='Corey Hammerton',
     author_email='corey.hammerton@gmail.com',
     packages=find_packages(),
