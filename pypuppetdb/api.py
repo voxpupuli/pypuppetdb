@@ -404,7 +404,7 @@ class BaseAPI(object):
             )
 
         for node in nodes:
-            node['status'] = None
+            node['status_report'] = None
             node['events'] = None
 
             if with_status:
@@ -412,7 +412,7 @@ class BaseAPI(object):
                           if s['subject']['title'] == node['certname']]
 
                 try:
-                    node['status'] = node['latest_report_status']
+                    node['status_report'] = node['latest_report_status']
 
                     if status:
                         node['events'] = status[0]
@@ -420,13 +420,13 @@ class BaseAPI(object):
                     if status:
                         node['events'] = status = status[0]
                         if status['successes'] > 0:
-                            node['status'] = 'changed'
+                            node['status_report'] = 'changed'
                         if status['noops'] > 0:
-                            node['status'] = 'noop'
+                            node['status_report'] = 'noop'
                         if status['failures'] > 0:
-                            node['status'] = 'failed'
+                            node['status_report'] = 'failed'
                     else:
-                        node['status'] = 'unchanged'
+                        node['status_report'] = 'unchanged'
 
                 # node report age
                 if node['report_timestamp'] is not None:
@@ -437,17 +437,17 @@ class BaseAPI(object):
                         unreported_border = now - timedelta(hours=unreported)
                         if last_report < unreported_border:
                             delta = (now - last_report)
-                            node['status'] = 'unreported'
+                            node['unreported'] = True
                             node['unreported_time'] = '{0}d {1}h {2}m'.format(
                                 delta.days,
                                 int(delta.seconds / 3600),
                                 int((delta.seconds % 3600) / 60)
                             )
                     except AttributeError:
-                        node['status'] = 'unreported'
+                        node['unreported'] = True
 
                 if not node['report_timestamp']:
-                    node['status'] = 'unreported'
+                    node['unreported'] = True
 
             yield Node(self,
                        name=node['certname'],
@@ -456,10 +456,11 @@ class BaseAPI(object):
                        report_timestamp=node['report_timestamp'],
                        catalog_timestamp=node['catalog_timestamp'],
                        facts_timestamp=node['facts_timestamp'],
-                       status=node['status'],
+                       status_report=node['status_report'],
                        noop=node.get('latest_report_noop'),
                        noop_pending=node.get('latest_report_noop_pending'),
                        events=node['events'],
+                       unreported=node.get('unreported'),
                        unreported_time=node.get('unreported_time'),
                        report_environment=node['report_environment'],
                        catalog_environment=node['catalog_environment'],

@@ -37,7 +37,8 @@ class TestNode(object):
                     report_timestamp='2013-08-01T09:57:00.000Z',
                     catalog_timestamp='2013-08-01T09:57:00.000Z',
                     facts_timestamp='2013-08-01T09:57:00.000Z',
-                    status='unreported',
+                    status_report='unchanged',
+                    unreported=True,
                     unreported_time='0d 5h 20m',)
 
         assert node.name == 'node'
@@ -49,7 +50,55 @@ class TestNode(object):
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
-        assert node.status is 'unreported'
+        assert node.status == 'unreported'
+        assert node.unreported_time is '0d 5h 20m'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_with_status_unreported_from_noop(self):
+        node = Node('_', 'node',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    status_report='noop',
+                    unreported=True,
+                    unreported_time='0d 5h 20m',)
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'unreported'
+        assert node.unreported_time is '0d 5h 20m'
+        assert str(node) == str('node')
+        assert unicode(node) == unicode('node')
+        assert repr(node) == str('<Node: node>')
+
+    def test_with_status_unreported_from_failed(self):
+        node = Node('_', 'node',
+                    report_timestamp='2013-08-01T09:57:00.000Z',
+                    catalog_timestamp='2013-08-01T09:57:00.000Z',
+                    facts_timestamp='2013-08-01T09:57:00.000Z',
+                    status_report='failed',
+                    unreported=True,
+                    unreported_time='0d 5h 20m',)
+
+        assert node.name == 'node'
+        assert node.deactivated is False
+        assert node.expired is False
+        assert node.report_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.facts_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.catalog_timestamp == \
+            json_to_datetime('2013-08-01T09:57:00.000Z')
+        assert node.status == 'unreported'
         assert node.unreported_time is '0d 5h 20m'
         assert str(node) == str('node')
         assert unicode(node) == unicode('node')
@@ -57,7 +106,7 @@ class TestNode(object):
 
     def test_apiv4_with_failed_status(self):
         node = Node('_', 'node',
-                    status='failed',
+                    status_report='failed',
                     report_environment='development',
                     catalog_environment='development',
                     facts_environment='development',
@@ -85,7 +134,7 @@ class TestNode(object):
 
     def test_apiv4_with_unchanged_status(self):
         node = Node('_', 'node',
-                    status='unchanged',
+                    status_report='unchanged',
                     report_environment='development',
                     catalog_environment='development',
                     facts_environment='development',
@@ -113,7 +162,7 @@ class TestNode(object):
 
     def test_apiv4_with_unchanged_noop_status(self):
         node = Node('_', 'node',
-                    status='unchanged',
+                    status_report='unchanged',
                     noop=True,
                     noop_pending=False,
                     report_environment='development',
@@ -143,7 +192,7 @@ class TestNode(object):
 
     def test_apiv4_with_pending_noop_status(self):
         node = Node('_', 'node',
-                    status='unchanged',
+                    status_report='unchanged',
                     noop=True,
                     noop_pending=True,
                     report_environment='development',
@@ -173,7 +222,7 @@ class TestNode(object):
 
     def test_apiv4_with_failed_noop_status(self):
         node = Node('_', 'node',
-                    status='failed',
+                    status_report='failed',
                     noop=True,
                     noop_pending=False,
                     report_environment='development',
