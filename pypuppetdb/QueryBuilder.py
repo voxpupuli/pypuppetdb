@@ -92,10 +92,11 @@ class BooleanOperator(object):
             for i in query:
                 self.add(i)
         elif (type(query) == str or
-                isinstance(query, (BinaryOperator, BooleanOperator))):
+                isinstance(query, (BinaryOperator, InOperator,
+                                   BooleanOperator))):
             self.operations.append(str(query))
         else:
-            raise APIError("Can only accpet fixed-string queries, arrays " +
+            raise APIError("Can only accept fixed-string queries, arrays " +
                            "or operator objects")
 
     def __repr__(self):
