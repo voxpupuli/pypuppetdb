@@ -398,35 +398,31 @@ class BaseAPI(object):
             nodes = [nodes, ]
 
         if with_status:
-            latest_events = self.event_counts(
-                query=EqualsOperator("latest_report?", True),
-                summarize_by='certname'
-            )
+            reports = {}
+            list_query = OrOperator()
+
+            def _query_reports():
+                query = AndOperator()
+                query.add(list_query)
+                query.add(EqualsOperator("latest_report?", True))
+                for report in self.reports(query=query):
+                    reports[report.node] = report
+
+            for node in nodes:
+                list_query.add(EqualsOperator('certname', node['certname']))
+                # Fixed string size set to 4K - Avoid RequestTooLong error
+                if len(str(list_query)) > 4096:
+                    _query_reports()
+                    list_query = OrOperator()
+            _query_reports()
 
         for node in nodes:
-            node['status_report'] = None
-            node['events'] = None
-
             if with_status:
-                status = [s for s in latest_events
-                          if s['subject']['title'] == node['certname']]
-
-                try:
-                    node['status_report'] = node['latest_report_status']
-
-                    if status:
-                        node['events'] = status[0]
-                except KeyError:
-                    if status:
-                        node['events'] = status = status[0]
-                        if status['successes'] > 0:
-                            node['status_report'] = 'changed'
-                        if status['noops'] > 0:
-                            node['status_report'] = 'noop'
-                        if status['failures'] > 0:
-                            node['status_report'] = 'failed'
-                    else:
-                        node['status_report'] = 'unchanged'
+                report = reports.get(node['certname'], None)
+                if report:
+                    status = report.status
+                else:
+                    status = 'unreported'
 
                 # node report age
                 if node['report_timestamp'] is not None:
@@ -449,6 +445,13 @@ class BaseAPI(object):
                 if not node['report_timestamp']:
                     node['unreported'] = True
 
+            else:
+                report = None
+                try:
+                    status = node['latest_report_status']
+                except KeyError:
+                    status = None
+
             yield Node(self,
                        name=node['certname'],
                        deactivated=node['deactivated'],
@@ -456,10 +459,10 @@ class BaseAPI(object):
                        report_timestamp=node['report_timestamp'],
                        catalog_timestamp=node['catalog_timestamp'],
                        facts_timestamp=node['facts_timestamp'],
-                       status_report=node['status_report'],
+                       status_report=status,
+                       report=report,
                        noop=node.get('latest_report_noop'),
                        noop_pending=node.get('latest_report_noop_pending'),
-                       events=node['events'],
                        unreported=node.get('unreported'),
                        unreported_time=node.get('unreported_time'),
                        report_environment=node['report_environment'],

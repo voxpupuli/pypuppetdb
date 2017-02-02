@@ -173,7 +173,7 @@ class Report(object):
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
-                 noop=False, noop_pending=False, code_id=None,
+                 noop=None, noop_pending=None, code_id=None,
                  catalog_uuid=None, cached_catalog_status=None,
                  producer=None):
 
@@ -197,6 +197,19 @@ class Report(object):
         self.producer = producer
         self.__string = '{0}'.format(self.hash_)
 
+        if noop is None and noop_pending is None:
+            is_noop = False
+            for m in metrics:
+                if m.get('category') == 'events':
+                    val = m.get('value')
+                    if m.get('name') == 'noop' and val > 0:
+                        is_noop = True
+                    if m.get('name') in ['success', 'failure'] and val > 0:
+                        break
+            else:
+                if is_noop:
+                    self.status = 'noop'
+
         self.__api = api
 
     def __repr__(self):
@@ -207,6 +220,25 @@ class Report(object):
 
     def __unicode__(self):
         return self.__string
+
+    def metrics_dict(self):
+        metrics = {}
+        for m in self.metrics:
+            category = m.get('category', None)
+            name = m.get('name', None)
+            value = m.get('value', None)
+            if category and name and value:
+                if category not in metrics:
+                    metrics[category] = {}
+                metrics[category][name] = value
+        return metrics
+
+    def events_count(self):
+        events = {}
+        for m in self.metrics:
+            if m.get('category') == 'events':
+                events[m.get('name')] = m.get('value')
+        return events
 
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be
@@ -346,8 +378,8 @@ class Node(object):
         the latest report of the node had pending changes \
         produced by a noop run.
     :type noop_pending: :obj:`bool`
-    :param events: (default `None`) Counted events from latest Report
-    :type events: :obj:`dict`
+    :param report: (default `None`) Last report from the node
+    :type report: :obj:`Report`
     :param unreported: (default `False`) if node is considered unreported
     :type unreported_time: :obj:`bool`
     :param unreported_time: (default `None`) Time since last report
@@ -393,14 +425,14 @@ class Node(object):
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
                  facts_timestamp=None, status_report=None,
-                 noop=False, noop_pending=False, events=None,
+                 noop=False, noop_pending=False, report=None,
                  unreported=False, unreported_time=None,
                  report_environment='production',
                  catalog_environment='production',
                  facts_environment='production',
                  latest_report_hash=None, cached_catalog_status=None):
         self.name = name
-        self.events = events
+        self.report = report
         self.unreported_time = unreported_time
         self.report_timestamp = report_timestamp
         self.catalog_timestamp = catalog_timestamp
@@ -450,6 +482,13 @@ class Node(object):
 
     def __unicode__(self):
         return self.__string
+
+    @property
+    def events(self):
+        if self.report:
+            self.report.events_count()
+        else:
+            return None
 
     def facts(self, **kwargs):
         """Get all facts of this node. Additional arguments may also be
