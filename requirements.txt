@@ -6,4 +6,4 @@ mock==1.0.1
 pytest==3.0.1
 pytest-cov==2.2.1
 pytest-pep8==1.0.5
-requests==2.1.0
+requests==2.13.0
