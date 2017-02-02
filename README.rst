@@ -200,14 +200,32 @@ belonging to the production environment.
    >>> op = AndOperator()
    >>> op.add(EqualsOperator('catalog_environment', 'production'))
    >>> op.add(EqualsOperator('facts_environment', 'production'))
-   >>> echo op
-   '["and",["=", "catalog_environment", "production"],["=", "facts_environment", "production"]]'
+   >>> print(op)
+   ["and",["=", "catalog_environment", "production"],["=", "facts_environment", "production"]]
 
 This functionality is based on the PuppetDB AST query string syntax documented
-`here`_. However, we do not yet support subqueries. That is planned in a future
-release.
+`here`_.
 
 .. _here: https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html
+
+Subqueries are implemented using corresponding operators (like documented).
+
+* SubqueryOperator
+* InOperator
+* ExtractOperator
+
+.. code-block:: python
+
+   >>> from pypuppetdb.QueryBuilder import *
+   >>> op = InOperator('certname')
+   >>> ex = ExtractOperator()
+   >>> ex.add_field(str('certname'))
+   >>> sub = SubqueryOperator('events')
+   >>> sub.add_query(EqualsOperator('status', 'noop'))
+   >>> ex.add_query(sub)
+   >>> op.add_query(ex)
+   >>> print(op)
+   ["in","certname",["extract",["certname"],["select_events",["=", "status", "noop"]]]]
 
 Getting Help
 ============

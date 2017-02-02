@@ -384,3 +384,51 @@ class TestFunctionOperator(object):
             FunctionOperator("std_dev")
         with pytest.raises(pypuppetdb.errors.APIError):
             FunctionOperator("last")
+
+
+class TestSubqueryOperator(object):
+    """
+    Test the SubqueryOperator object
+    """
+    def test_events_endpoint(self):
+        assert str(SubqueryOperator('events')) == \
+            '["select_events"]'
+
+        op = SubqueryOperator('events')
+        op.add_query(EqualsOperator('status', 'noop'))
+
+        assert repr(op) == 'Query: ["select_events",'\
+            '["=", "status", "noop"]]'
+
+    def test_multiple_add_query(self):
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = SubqueryOperator('events')
+            op.add_query(EqualsOperator('status', 'noop'))
+            op.add_query(EqualsOperator('status', 'changed'))
+
+    def test_unknown_endpoint(self):
+        with pytest.raises(pypuppetdb.errors.APIError):
+            SubqueryOperator('cats')
+
+
+class TestInOperator(object):
+    """
+    Test the InOperator object
+    """
+    def test_events_endpoint(self):
+        assert str(InOperator('certname')) == \
+            '["in","certname"]'
+
+        op = InOperator('certname')
+        ex = ExtractOperator()
+        ex.add_field("certname")
+        op.add_query(ex)
+
+        assert repr(op) == 'Query: ["in","certname",' \
+            '["extract",["certname"]]]'
+
+    def test_multiple_add_query(self):
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+            op.add_query(ExtractOperator())
+            op.add_query(ExtractOperator())

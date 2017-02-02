@@ -92,10 +92,11 @@ class BooleanOperator(object):
             for i in query:
                 self.add(i)
         elif (type(query) == str or
-                isinstance(query, (BinaryOperator, BooleanOperator))):
+                isinstance(query, (BinaryOperator, InOperator,
+                                   BooleanOperator))):
             self.operations.append(str(query))
         else:
-            raise APIError("Can only accpet fixed-string queries, arrays " +
+            raise APIError("Can only accept fixed-string queries, arrays " +
                            "or operator objects")
 
     def __repr__(self):
@@ -147,12 +148,13 @@ class ExtractOperator(object):
     def add_query(self, query):
         if self.query is not None:
             raise APIError("Only one query is supported by ExtractOperator")
-        elif isinstance(query, (str, BinaryOperator, BooleanOperator)):
+        elif isinstance(query, (str, BinaryOperator, SubqueryOperator,
+                                BooleanOperator)):
             self.query = str(query)
         else:
             raise APIError("ExtractOperator.add_query only supports "
-                           "strings, BinaryOperator and BooleanOperator"
-                           "objects")
+                           "strings, BinaryOperator, BooleanOperator "
+                           "and SubqueryOperator objects")
 
     def add_group_by(self, field):
         if isinstance(field, list):
@@ -243,6 +245,78 @@ class FunctionOperator(object):
 
         if function == 'to_string':
             self.arr.append('"{0}"'.format(fmt))
+
+    def __repr__(self):
+        return str('Query: [{0}]'.format(",".join(self.arr)))
+
+    def __str__(self):
+        return str('[{0}]'.format(",".join(self.arr)))
+
+    def __unicode__(self):
+        return str('[{0}]'.format(",".join(self.arr)))
+
+
+class SubqueryOperator(object):
+    """
+    Performs a subquery to another puppetDB object, full
+    documentation is available at
+    https://docs.puppet.com/puppetdb/3.2/api/query/v4/operators.html#subquery-operators
+    This object must be used in combination with the InOperator according
+    to documentation.
+
+    :param endpoint: The name of the subquery object
+    :type function: :obj:`str`
+    """
+    def __init__(self, endpoint):
+        if endpoint not in ['catalogs', 'edges', 'environments', 'events',
+                            'facts', 'fact_contents', 'fact_paths', 'nodes',
+                            'reports', 'resources']:
+            raise APIError("Unsupported endpoint: {0}".format(endpoint))
+
+        self.query = None
+        self.arr = ['"select_{0}"'.format(endpoint)]
+
+    def add_query(self, query):
+        if self.query is not None:
+            raise APIError("Only one query is supported by ExtractOperator")
+        else:
+            self.query = True
+            self.arr.append(str(query))
+
+    def __repr__(self):
+        return str('Query: [{0}]'.format(",".join(self.arr)))
+
+    def __str__(self):
+        return str('[{0}]'.format(",".join(self.arr)))
+
+    def __unicode__(self):
+        return str('[{0}]'.format(",".join(self.arr)))
+
+
+class InOperator(object):
+    """
+    Performs boolean compare between a field a subquery result
+    https://docs.puppet.com/puppetdb/3.2/api/query/v4/operators.html#subquery-operators
+    This object must be used in combination with the SubqueryOperator according
+    to documentation.
+
+    :param field: The name of the subquery object
+    :type function: :obj:`str`
+    """
+    def __init__(self, field):
+        self.query = None
+        self.arr = ['"in"', '"{0}"'.format(field)]
+
+    def add_query(self, query):
+        if self.query is not None:
+            raise APIError("Only one query is supported by ExtractOperator")
+        elif isinstance(query, (str, ExtractOperator)):
+            self.query = True
+            self.arr.append(str(query))
+        else:
+            raise APIError("InOperator.add_query only supports "
+                           "strings and ExtractOperator"
+                           "objects")
 
     def __repr__(self):
         return str('Query: [{0}]'.format(",".join(self.arr)))
