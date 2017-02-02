@@ -184,11 +184,10 @@ class TesteAPIQuery(object):
         with pytest.raises(requests.exceptions.HTTPError):
             baseapi._query('nodes')
 
-    def test_setting_headers_with_token(self, baseapi):
+    def test_setting_headers_with_token(self, token_baseapi):
         httpretty.enable()
         stub_request('https://localhost:8080/pdb/query/v4/nodes')
-        baseapi.token = 'tokenstring'
-        baseapi._query('nodes')  # need to query some endpoint
+        token_baseapi._query('nodes')  # need to query some endpoint
         request_headers = dict(httpretty.last_request().headers)
         assert request_headers['Accept'] == 'application/json'
         assert request_headers['Content-Type'] == 'application/json'
@@ -200,7 +199,6 @@ class TesteAPIQuery(object):
         httpretty.reset()
 
     def test_setting_headers_without_token(self, baseapi):
-        api = pypuppetdb.api.BaseAPI(token='tokenstring')
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes')  # need to query some endpoint
@@ -244,11 +242,10 @@ class TesteAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_with_token_authorization(self, baseapi):
+    def test_with_token_authorization(self, token_baseapi):
         httpretty.enable()
         stub_request('https://localhost:8080/pdb/query/v4/nodes')
-        baseapi.token = 'tokenstring'
-        baseapi._query('nodes')
+        token_baseapi._query('nodes')
         assert httpretty.last_request().path == '/pdb/query/v4/nodes'
         assert httpretty.last_request().headers['X-Authentication'] == \
             'tokenstring'
