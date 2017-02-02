@@ -211,6 +211,7 @@ class Report(object):
                     self.status = 'noop'
 
         self.__api = api
+        self.metrics_dict = None
 
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))
@@ -221,24 +222,24 @@ class Report(object):
     def __unicode__(self):
         return self.__string
 
-    def metrics_dict(self):
-        metrics = {}
-        for m in self.metrics:
-            category = m.get('category', None)
-            name = m.get('name', None)
-            value = m.get('value', None)
-            if category and name and value:
-                if category not in metrics:
-                    metrics[category] = {}
-                metrics[category][name] = value
-        return metrics
+    def metrics_to_dict(self):
+        if not self.metrics_dict:
+            self.metrics_dict = {}
+            for m in self.metrics:
+                category = m.get('category', None)
+                name = m.get('name', None)
+                value = m.get('value', None)
+                if category and name and value:
+                    if category not in self.metrics_dict:
+                        self.metrics_dict[category] = {}
+                    self.metrics_dict[category][name] = value
+        return self.metrics_dict
+
+    def metric(self, category, name):
+        return self.metrics_to_dict().get(category, {}).get(name, None)
 
     def events_count(self):
-        events = {}
-        for m in self.metrics:
-            if m.get('category') == 'events':
-                events[m.get('name')] = m.get('value')
-        return events
+        return self.metrics_to_dict().get('events', None)
 
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be

@@ -402,11 +402,12 @@ class BaseAPI(object):
             list_query = OrOperator()
 
             def _query_reports():
-                query = AndOperator()
-                query.add(list_query)
-                query.add(EqualsOperator("latest_report?", True))
-                for report in self.reports(query=query):
-                    reports[report.node] = report
+                if len(list_query.operations) > 0:
+                    query = AndOperator()
+                    query.add(list_query)
+                    query.add(EqualsOperator("latest_report?", True))
+                    for report in self.reports(query=query):
+                        reports[report.node] = report
 
             for node in nodes:
                 list_query.add(EqualsOperator('certname', node['certname']))
