@@ -300,7 +300,7 @@ class BaseAPI(object):
 
         payload = {}
         if query is not None:
-            payload['query'] = query
+            payload['query'] = str(query)
         if order_by is not None:
             payload[PARAMETERS['order_by']] = order_by
         if limit is not None:
@@ -328,7 +328,7 @@ class BaseAPI(object):
                                       timeout=self.timeout,
                                       auth=(self.username, self.password))
             elif request_method.upper() == 'POST':
-                r = self._session.post(url, params=payload,
+                r = self._session.post(url, json=payload,
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,
@@ -406,13 +406,13 @@ class BaseAPI(object):
                     query = AndOperator()
                     query.add(list_query)
                     query.add(EqualsOperator("latest_report?", True))
-                    for report in self.reports(query=query):
+                    for report in self.reports(query=query,
+                                               request_method='POST'):
                         reports[report.node] = report
 
             for node in nodes:
                 list_query.add(EqualsOperator('certname', node['certname']))
-                # Fixed string size set to 4K - Avoid RequestTooLong error
-                if len(str(list_query)) > 4096:
+                if len(list_query.operations) > 100:
                     _query_reports()
                     list_query = OrOperator()
             _query_reports()
