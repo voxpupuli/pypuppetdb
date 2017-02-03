@@ -398,6 +398,7 @@ class BaseAPI(object):
             nodes = [nodes, ]
 
         if with_status:
+            total = self.last_total
             reports = {}
             list_query = OrOperator()
 
@@ -416,6 +417,8 @@ class BaseAPI(object):
                     _query_reports()
                     list_query = OrOperator()
             _query_reports()
+
+            self.last_total = total
 
         for node in nodes:
             if with_status:
