@@ -320,19 +320,23 @@ class BaseAPI(object):
         if not (payload):
             payload = None
 
+        auth = None
+        if self.username is not None and self.password is not None:
+            auth = (self.username, self.password)
+
         try:
             if request_method.upper() == 'GET':
                 r = self._session.get(url, params=payload,
                                       verify=self.ssl_verify,
                                       cert=(self.ssl_cert, self.ssl_key),
                                       timeout=self.timeout,
-                                      auth=(self.username, self.password))
+                                      auth=auth)
             elif request_method.upper() == 'POST':
                 r = self._session.post(url, params=payload,
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,
-                                       auth=(self.username, self.password))
+                                       auth=auth)
             else:
                 log.error("Only GET or POST supported, {0} unsupported".format(
                           request_method))

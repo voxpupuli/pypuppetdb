@@ -178,6 +178,34 @@ class TesteAPIQuery(object):
         with pytest.raises(requests.exceptions.HTTPError):
             baseapi._query('nodes')
 
+    @mock.patch.object(requests.Session, 'request')
+    def test_auth_none(self, get, baseapi):
+        baseapi._query('nodes')
+        get.assert_called_once()
+        assert "auth=None" in str(get.call_args)
+
+    @mock.patch.object(requests.Session, 'request')
+    def test_auth_no_user(self, get, baseapi):
+        baseapi.password='world'
+        baseapi._query('nodes')
+        get.assert_called_once()
+        assert "auth=None" in str(get.call_args)
+
+    @mock.patch.object(requests.Session, 'request')
+    def test_auth_no_pass(self, get, baseapi):
+        baseapi.username='hello'
+        baseapi._query('nodes')
+        get.assert_called_once()
+        assert "auth=None" in str(get.call_args)
+
+    @mock.patch.object(requests.Session, 'request')
+    def test_auth_user_and_pass(self, get, baseapi):
+        baseapi.username='hello'
+        baseapi.password='world'
+        baseapi._query('nodes')
+        get.assert_called_once()
+        assert "auth=('hello', 'world')" in str(get.call_args)
+
     def test_setting_headers(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
