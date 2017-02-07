@@ -172,7 +172,7 @@ class Report(object):
     """
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
-                 metrics={}, logs={}, environment=None,
+                 metrics=[], logs={}, environment=None,
                  noop=None, noop_pending=None, code_id=None,
                  catalog_uuid=None, cached_catalog_status=None,
                  producer=None):
@@ -197,21 +197,16 @@ class Report(object):
         self.producer = producer
         self.__string = '{0}'.format(self.hash_)
 
-        if noop is None and noop_pending is None:
-            is_noop = False
-            for m in metrics:
-                if m.get('category') == 'events':
-                    val = m.get('value')
-                    if m.get('name') == 'noop' and val > 0:
-                        is_noop = True
-                    if m.get('name') in ['success', 'failure'] and val > 0:
-                        break
-            else:
-                if is_noop:
-                    self.status = 'noop'
-
-        self.__api = api
         self.metrics_dict = None
+        self.__api = api
+
+        if status == 'unchanged' and noop_pending is None:
+            if (
+                self.metric('events', 'noop') and
+                not self.metric('events', 'success') and
+                not self.metric('events', 'failure')
+            ):
+                self.status = 'noop'
 
     def __repr__(self):
         return str('Report: {0}'.format(self.__string))

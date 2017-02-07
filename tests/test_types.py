@@ -461,6 +461,66 @@ class TestReport(object):
         assert unicode(report) == unicode('hash#')
         assert repr(report) == str('Report: hash#')
 
+    def test_report_with_none_noop_pending_status_noop(self):
+        report = Report(
+            '_', 'node2.puppet.board', 'hash#',
+            '2015-08-31T21:07:00.000Z',
+            '2015-08-31T21:09:00.000Z',
+            '2015-08-31T21:10:00.000Z',
+            '1482347613', 4, '3.8.1',
+            'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+            status='unchanged',
+            noop=False,
+            metrics=[
+                {"name": "failure", "value": 0, "category": "events"},
+                {"name": "noop", "value": 1, "category": "events"},
+                {"name": "success", "value": 0, "category": "events"}])
+
+        assert report.node == 'node2.puppet.board'
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '3.8.1'
+        assert report.run_time == report.end - report.start
+        assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
+        assert report.status == 'noop'
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
+    def test_report_with_none_noop_pending_status_unchanged(self):
+        report = Report(
+            '_', 'node2.puppet.board', 'hash#',
+            '2015-08-31T21:07:00.000Z',
+            '2015-08-31T21:09:00.000Z',
+            '2015-08-31T21:10:00.000Z',
+            '1482347613', 4, '3.8.1',
+            'af9f16e3-75f6-4f90-acc6-f83d6524a6f3',
+            status='unchanged',
+            noop=False,
+            metrics=[
+                {"name": "failure", "value": 1, "category": "events"},
+                {"name": "noop", "value": 1, "category": "events"},
+                {"name": "success", "value": 0, "category": "events"}])
+
+        assert report.node == 'node2.puppet.board'
+        assert report.hash_ == 'hash#'
+        assert report.start == json_to_datetime('2015-08-31T21:07:00.000Z')
+        assert report.end == json_to_datetime('2015-08-31T21:09:00.000Z')
+        assert report.received == json_to_datetime('2015-08-31T21:10:00.000Z')
+        assert report.version == '1482347613'
+        assert report.format_ == 4
+        assert report.agent_version == '3.8.1'
+        assert report.run_time == report.end - report.start
+        assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
+        assert report.status == 'unchanged'
+        assert str(report) == str('hash#')
+        assert unicode(report) == unicode('hash#')
+        assert repr(report) == str('Report: hash#')
+
     def test_report_with_cataloguuid_codeid(self):
         report = Report('_', 'node2.puppet.board', 'hash#',
                         '2015-08-31T21:07:00.000Z',
