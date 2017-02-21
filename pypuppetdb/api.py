@@ -158,7 +158,7 @@ class BaseAPI(object):
                 'content-type': 'application/json',
                 'accept': 'application/json',
                 'accept-charset': 'utf-8',
-                'X-Authentication': self.token
+                'x-authentication': self.token
             }
         else:
             self.token = None

@@ -9,6 +9,11 @@ def baseapi():
 
 
 @pytest.fixture
+def token_baseapi():
+    return pypuppetdb.api.BaseAPI(token='tokenstring')
+
+
+@pytest.fixture
 def utc():
     """Create a UTC object."""
     return pypuppetdb.utils.UTC()
