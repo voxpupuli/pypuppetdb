@@ -124,7 +124,7 @@ your OS or must be added to that set. Those certificates are usually found in
 ``/etc/ssl/certs`` on Linux-y machines.
 
 For Debian, install your Puppet Master's certificate in
-``/usr/local/share/ca-certifiactes`` with a ``.crt`` extension and then run
+``/usr/local/share/ca-certificates`` with a ``.crt`` extension and then run
 ``dpkg-reconfigure ca-certificates`` as per
 ``/usr/share/doc/ca-certificates/README.Debian``. This of course requires the
 ``ca-certificates`` package to be installed.
