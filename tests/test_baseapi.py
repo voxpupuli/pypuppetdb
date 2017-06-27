@@ -30,6 +30,7 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.ssl_verify is True
         assert baseapi.ssl_key is None
         assert baseapi.ssl_cert is None
+        assert baseapi.token is None
         assert baseapi.timeout == 10
         assert baseapi.protocol == 'http'
         assert baseapi.url_path == ''
@@ -48,6 +49,11 @@ class TestBaseAPIInitOptions(object):
         api = pypuppetdb.api.BaseAPI(ssl_verify=False)
         assert api.ssl_verify is False
         assert api.protocol == 'http'
+
+    def test_token(self):
+        api = pypuppetdb.api.BaseAPI(token='tokenstring')
+        assert api.token == 'tokenstring'
+        assert api.protocol == 'https'
 
     def test_ssl_key(self):
         api = pypuppetdb.api.BaseAPI(ssl_key='/a/b/c.pem')
@@ -178,7 +184,21 @@ class TesteAPIQuery(object):
         with pytest.raises(requests.exceptions.HTTPError):
             baseapi._query('nodes')
 
-    def test_setting_headers(self, baseapi):
+    def test_setting_headers_with_token(self, token_baseapi):
+        httpretty.enable()
+        stub_request('https://localhost:8080/pdb/query/v4/nodes')
+        token_baseapi._query('nodes')  # need to query some endpoint
+        request_headers = dict(httpretty.last_request().headers)
+        assert request_headers['Accept'] == 'application/json'
+        assert request_headers['Content-Type'] == 'application/json'
+        assert request_headers['Accept-Charset'] == 'utf-8'
+        assert request_headers['Host'] == 'localhost:8080'
+        assert request_headers['X-Authentication'] == 'tokenstring'
+        assert httpretty.last_request().path == '/pdb/query/v4/nodes'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_setting_headers_without_token(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi._query('nodes')  # need to query some endpoint
@@ -208,7 +228,7 @@ class TesteAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_with_authorization(self, baseapi):
+    def test_with_password_authorization(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
         baseapi.username = 'puppetdb'
@@ -221,6 +241,14 @@ class TesteAPIQuery(object):
             'Basic {0}'.format(bs_authheader)
         httpretty.disable()
         httpretty.reset()
+
+    def test_with_token_authorization(self, token_baseapi):
+        httpretty.enable()
+        stub_request('https://localhost:8080/pdb/query/v4/nodes')
+        token_baseapi._query('nodes')
+        assert httpretty.last_request().path == '/pdb/query/v4/nodes'
+        assert httpretty.last_request().headers['X-Authentication'] == \
+            'tokenstring'
 
     def test_with_query(self, baseapi):
         httpretty.enable()
