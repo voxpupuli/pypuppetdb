@@ -116,11 +116,14 @@ class BaseAPI(object):
             authentication
     :type password: :obj:`None` or :obj:`string`
 
+    :param token: (optional) The X-auth token to use for X-Authentication
+    :type token: :obj:`None` or :obj:`string`
+
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     """
     def __init__(self, host='localhost', port=8080, ssl_verify=True,
                  ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-                 url_path=None, username=None, password=None):
+                 url_path=None, username=None, password=None, token=None):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
@@ -132,6 +135,7 @@ class BaseAPI(object):
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.timeout = timeout
+        self.token = token
 
         # Standardise the URL path to a format similar to /puppetdb
         if url_path:
@@ -157,12 +161,17 @@ class BaseAPI(object):
             'accept-charset': 'utf-8'
         }
 
+        if self.token:
+            self._session.headers['X-Authentication'] = self.token
+
         if protocol is not None:
             protocol = protocol.lower()
             if protocol not in ['http', 'https']:
                 raise ValueError('Protocol specified must be http or https')
             self.protocol = protocol
         elif self.ssl_key is not None and self.ssl_cert is not None:
+            self.protocol = 'https'
+        elif self.token is not None:
             self.protocol = 'https'
         else:
             self.protocol = 'http'
@@ -320,19 +329,24 @@ class BaseAPI(object):
         if not (payload):
             payload = None
 
+        if not self.token:
+            auth = (self.username, self.password)
+        else:
+            auth = None
+
         try:
             if request_method.upper() == 'GET':
                 r = self._session.get(url, params=payload,
                                       verify=self.ssl_verify,
                                       cert=(self.ssl_cert, self.ssl_key),
                                       timeout=self.timeout,
-                                      auth=(self.username, self.password))
+                                      auth=auth)
             elif request_method.upper() == 'POST':
                 r = self._session.post(url, params=payload,
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,
-                                       auth=(self.username, self.password))
+                                       auth=auth)
             else:
                 log.error("Only GET or POST supported, {0} unsupported".format(
                           request_method))

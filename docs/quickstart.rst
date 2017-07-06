@@ -131,3 +131,24 @@ For Debian, install your Puppet Master's certificate in
 
 If you do not wish to do so or for whatever reason want to disable the
 verification of PuppetDB's certificate you can pass in ``ssl_verify=False``.
+
+RBAC Token Authentication
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using Puppet Enterprise Puppetdb >=4.0.2 - an RBAC token can be passed
+to pypuppetdb's ``connect()``:
+
+.. code-block:: python
+
+   >>> db = connect(token='tokenstring')
+
+If this argument is passed, pypuppetdb will automatically switch over to using HTTPS.
+This is handled via the addition of ``X-Authentication`` to the session headers
+
+If you need to disable validation of the certificate PuppetDB is serving, please follow the
+steps documented in the ``Configure pypuppetdb for SSL`` section
+
+It should also be noted that when using RBAC token authentication,
+the ``ssl_key`` and ``ssl_cert`` options should not be used and are not required
+
+If you require more information regarding RBAC token generation in PuppetDB,
