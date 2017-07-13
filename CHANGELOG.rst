@@ -2,6 +2,12 @@
 Changelog
 #########
 
+0.3.3
+=====
+
+* Add support for authentication with tokens
+* Fix bug with parsing results from inventory endpoint
+
 0.3.2
 =====
 
