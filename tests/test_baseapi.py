@@ -407,7 +407,7 @@ class TestAPIMethods(object):
     def test_inventory(self, baseapi):
         inventory_body = [{
             'certname': 'test_certname',
-            'timestamp': '2017-07-13T18:39:53.895118579+00:00',
+            'timestamp': '2017-06-05T20:18:23.374Z',
             'environment': 'test_environment',
             'facts': 'test_facts',
             'trusted': 'test_trusted'
