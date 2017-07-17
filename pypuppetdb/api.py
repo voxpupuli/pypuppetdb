@@ -847,9 +847,9 @@ class BaseAPI(object):
         inventory = self._query('inventory', **kwargs)
         for inv in inventory:
             yield Inventory(
-                node=inv.certname,
-                time=inv.timestamp,
-                environment=inv.environment,
-                facts=inv.facts,
-                trusted=inv.trusted
+                node=inv['certname'],
+                time=inv['timestamp'],
+                environment=inv['environment'],
+                facts=inv['facts'],
+                trusted=inv['trusted']
             )

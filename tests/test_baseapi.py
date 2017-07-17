@@ -362,6 +362,27 @@ class TestAPIMethods(object):
         httpretty.disable()
         httpretty.reset()
 
+    def test_facts(self, baseapi):
+        facts_body = [{
+            'certname': 'test_certname',
+            'name': 'test_name',
+            'value': 'test_value',
+            'environment': 'test_environment',
+        }]
+        facts_url = 'http://localhost:8080/pdb/query/v4/facts'
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET, facts_url,
+                               body=json.dumps(facts_body))
+
+        for fact in baseapi.facts():
+            pass
+
+        assert httpretty.last_request().path == '/pdb/query/v4/facts'
+
+        httpretty.disable()
+        httpretty.reset()
+
     def test_fact_names(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/fact-names')
@@ -380,5 +401,26 @@ class TestAPIMethods(object):
         stub_request('http://localhost:8080/pdb/query/v4/environments')
         baseapi.environments()
         assert httpretty.last_request().path == '/pdb/query/v4/environments'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_inventory(self, baseapi):
+        inventory_body = [{
+            'certname': 'test_certname',
+            'timestamp': '2017-06-05T20:18:23.374Z',
+            'environment': 'test_environment',
+            'facts': 'test_facts',
+            'trusted': 'test_trusted'
+        }]
+        inventory_url = 'http://localhost:8080/pdb/query/v4/inventory'
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET, inventory_url,
+                               body=json.dumps(inventory_body))
+        for inv in baseapi.inventory():
+            pass
+
+        assert httpretty.last_request().path == '/pdb/query/v4/inventory'
+
         httpretty.disable()
         httpretty.reset()
