@@ -16,10 +16,10 @@ using the `requests`_ library.
 **pypuppetdb >= 0.2.0 requires PuppetDB 3.0.0 or later. There is no support for
 previous versions beyond 0.1.1**
 
-**pypuppetdb >= 0.2.2 supports PuppetDB 4.0.0. Backwards compatability with 3.x
+**pypuppetdb >= 0.2.2 supports PuppetDB 4.0.0. Backwards compatibility with 3.x
 is available.**
 
-This library is a thin wrapper around the REST API providing some convinience
+This library is a thin wrapper around the REST API providing some convenience
 functions and objects to request and hold data from PuppetDB.
 
 To use this library you will need:
@@ -255,7 +255,7 @@ You can build the documentation manually by doing:
    $ cd docs
    $ make html
 
-Doing so will only work if you have Sphinx installed, which you can acheive
+Doing so will only work if you have Sphinx installed, which you can achieve
 through:
 
 .. code-block:: bash
@@ -300,7 +300,7 @@ messages have a look at this post by `Tim Pope`_.
 Tests
 -----
 Commits are expected to contain tests or updates to tests if they add to or
-modify the current behaviour.
+modify the current behavior.
 
 The test suite is powered by `pytest`_ and requires `pytest`_, `pytest-pep8`_,
 `httpretty`_ and `pytest-httpretty`_ which will be installed for you if you
