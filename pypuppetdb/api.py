@@ -46,6 +46,7 @@ ENDPOINTS = {
     'edges': 'pdb/query/v4/edges',
     'pql': 'pdb/query/v4',
     'inventory': 'pdb/query/v4/inventory',
+    'status': 'status/v1/services/puppetdb-status',
 }
 
 PARAMETERS = {
@@ -853,3 +854,11 @@ class BaseAPI(object):
                 facts=inv['facts'],
                 trusted=inv['trusted']
             )
+
+    def status(self):
+        """Get PuppetDB server status.
+
+        :returns: A dict with the PuppetDB status information
+        :rtype: :obj:`dict`
+        """
+        return self._query('status')
