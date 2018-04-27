@@ -424,3 +424,14 @@ class TestAPIMethods(object):
 
         httpretty.disable()
         httpretty.reset()
+
+    def test_status(self, baseapi):
+        httpretty.enable()
+        stub_request(
+            'http://localhost:8080/status/v1/services/puppetdb-status'
+            )
+        baseapi.status()
+        assert httpretty.last_request().path == \
+            '/status/v1/services/puppetdb-status'
+        httpretty.disable()
+        httpretty.reset()
