@@ -7,13 +7,13 @@ import requests
 import pypuppetdb
 
 
-def stub_request(url, data=None, **kwargs):
+def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
     if data is None:
         body = '[]'
     else:
         with open(data, 'r') as d:
             body = json.load(d.read())
-    return httpretty.register_uri(httpretty.GET, url, body=body, status=200,
+    return httpretty.register_uri(method, url, body=body, status=status,
                                   **kwargs)
 
 
