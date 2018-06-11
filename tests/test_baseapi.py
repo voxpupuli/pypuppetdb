@@ -366,6 +366,25 @@ class TesteAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
+    def test_query_with_post_body(self, baseapi):
+        httpretty.reset()
+        httpretty.enable()
+        query = '["certname", "=", "node1"]'
+        stub_request('http://localhost:8080/pdb/query/v4/nodes',
+                     method=httpretty.POST)
+        baseapi._query('nodes',
+                       query=query,
+                       count_by=1,
+                       request_method='POST',
+                       post_as_body=True)
+        last_request = httpretty.last_request()
+        assert last_request.querystring == {}
+        assert last_request.headers['Content-Type'] == 'application/json'
+        assert last_request.method == httpretty.POST
+        assert last_request.body == json.dumps({'query': query, 'count_by': 1})
+        httpretty.disable()
+        httpretty.reset()
+
 
 class TestAPIMethods(object):
     def test_metric(self, baseapi):
