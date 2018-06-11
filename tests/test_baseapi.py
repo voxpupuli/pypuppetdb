@@ -5,6 +5,7 @@ import httpretty
 import pytest
 import requests
 import pypuppetdb
+import six
 
 
 def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
@@ -362,7 +363,7 @@ class TesteAPIQuery(object):
                        request_method='POST')
         assert httpretty.last_request().querystring == {
             'query': ['["certname", "=", "node1"]']}
-        assert httpretty.last_request().method == httpretty.POST
+        assert httpretty.last_request().method == 'POST'
         httpretty.disable()
         httpretty.reset()
 
@@ -380,8 +381,8 @@ class TesteAPIQuery(object):
         last_request = httpretty.last_request()
         assert last_request.querystring == {}
         assert last_request.headers['Content-Type'] == 'application/json'
-        assert last_request.method == httpretty.POST
-        assert last_request.body == json.dumps({'query': query, 'count_by': 1})
+        assert last_request.method == 'POST'
+        assert last_request.body == six.b(json.dumps({'query': query, 'count_by': 1}))
         httpretty.disable()
         httpretty.reset()
 
