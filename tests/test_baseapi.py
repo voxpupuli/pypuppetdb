@@ -352,6 +352,20 @@ class TesteAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
+    def test_query_with_post(self, baseapi):
+        httpretty.reset()
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/nodes',
+                     method=httpretty.POST)
+        baseapi._query('nodes',
+                       query='["certname", "=", "node1"]',
+                       request_method='POST')
+        assert httpretty.last_request().querystring == {
+            'query': ['["certname", "=", "node1"]']}
+        assert httpretty.last_request().method == httpretty.POST
+        httpretty.disable()
+        httpretty.reset()
+
 
 class TestAPIMethods(object):
     def test_metric(self, baseapi):
