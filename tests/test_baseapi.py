@@ -18,6 +18,16 @@ def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
                                   **kwargs)
 
 
+@pytest.fixture(params=['string', 'QueryBuilder'])
+def query(request):
+    key = 'certname'
+    value = 'node1'
+    if request.param == 'string':
+        return '["{0}", "=", "{1}"]'.format(key, value)
+    elif request.param == 'QueryBuilder':
+        return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
+
+
 class TestBaseAPIVersion(object):
     def test_init_defaults(self):
         v4 = pypuppetdb.api.BaseAPI()
@@ -353,24 +363,23 @@ class TesteAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_query_with_post(self, baseapi):
+    def test_query_with_post(self, baseapi, query):
         httpretty.reset()
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes',
                      method=httpretty.POST)
         baseapi._query('nodes',
-                       query='["certname", "=", "node1"]',
+                       query=query,
                        request_method='POST')
         assert httpretty.last_request().querystring == {
-            'query': ['["certname", "=", "node1"]']}
+            'query': [str(query)]}
         assert httpretty.last_request().method == 'POST'
         httpretty.disable()
         httpretty.reset()
 
-    def test_query_with_post_body(self, baseapi):
+    def test_query_with_post_body(self, baseapi, query):
         httpretty.reset()
         httpretty.enable()
-        query = '["certname", "=", "node1"]'
         stub_request('http://localhost:8080/pdb/query/v4/nodes',
                      method=httpretty.POST)
         baseapi._query('nodes',
@@ -382,7 +391,7 @@ class TesteAPIQuery(object):
         assert last_request.querystring == {}
         assert last_request.headers['Content-Type'] == 'application/json'
         assert last_request.method == 'POST'
-        assert last_request.body == six.b(json.dumps({'query': query,
+        assert last_request.body == six.b(json.dumps({'query': str(query),
                                                       'count_by': 1}))
         httpretty.disable()
         httpretty.reset()
