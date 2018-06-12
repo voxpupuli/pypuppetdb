@@ -313,9 +313,6 @@ class BaseAPI(object):
 
         payload = {}
         if query is not None:
-            if request_method == 'POST' and post_as_body:
-                # make QueryBuilder query work for JSON encoding
-                query = str(query)
             payload['query'] = query
         if order_by is not None:
             payload[PARAMETERS['order_by']] = order_by
@@ -351,7 +348,7 @@ class BaseAPI(object):
             elif request_method.upper() == 'POST':
                 if post_as_body:
                     # JSON encode payload and stick it in the body of the POST
-                    query_payload = {'data': json.dumps(payload)}
+                    query_payload = {'data': json.dumps(payload, default=str)}
                 else:
                     # form-encode the payload in the query string
                     query_payload = {'params': payload}
