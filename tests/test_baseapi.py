@@ -382,7 +382,8 @@ class TesteAPIQuery(object):
         assert last_request.querystring == {}
         assert last_request.headers['Content-Type'] == 'application/json'
         assert last_request.method == 'POST'
-        assert last_request.body == six.b(json.dumps({'query': query, 'count_by': 1}))
+        assert last_request.body == six.b(json.dumps({'query': query,
+                                                      'count_by': 1}))
         httpretty.disable()
         httpretty.reset()
 
