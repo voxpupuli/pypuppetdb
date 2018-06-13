@@ -261,7 +261,7 @@ class BaseAPI(object):
     def _query(self, endpoint, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
-               post_as_body=False, request_method='GET'):
+               request_method='GET'):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -294,9 +294,6 @@ class BaseAPI(object):
         :type count_by: :obj:`string`
         :param count_filter: (optional) Specify a filter for the results
         :type count_filter: :obj:`string`
-        :param post_as_body: (optional) With POST, send query as the body of\
-                the request instead of in the query string
-        :type post_as_body: :obj:`bool`
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
@@ -346,18 +343,12 @@ class BaseAPI(object):
                                       timeout=self.timeout,
                                       auth=auth)
             elif request_method.upper() == 'POST':
-                if post_as_body:
-                    # JSON encode payload and stick it in the body of the POST
-                    query_payload = {'data': json.dumps(payload, default=str)}
-                else:
-                    # form-encode the payload in the query string
-                    query_payload = {'params': payload}
                 r = self._session.post(url,
+                                       data=json.dumps(payload, default=str),
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,
-                                       auth=auth,
-                                       **query_payload)
+                                       auth=auth)
             else:
                 log.error("Only GET or POST supported, {0} unsupported".format(
                           request_method))
