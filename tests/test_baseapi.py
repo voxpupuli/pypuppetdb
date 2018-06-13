@@ -370,23 +370,8 @@ class TesteAPIQuery(object):
                      method=httpretty.POST)
         baseapi._query('nodes',
                        query=query,
-                       request_method='POST')
-        assert httpretty.last_request().querystring == {
-            'query': [str(query)]}
-        assert httpretty.last_request().method == 'POST'
-        httpretty.disable()
-        httpretty.reset()
-
-    def test_query_with_post_body(self, baseapi, query):
-        httpretty.reset()
-        httpretty.enable()
-        stub_request('http://localhost:8080/pdb/query/v4/nodes',
-                     method=httpretty.POST)
-        baseapi._query('nodes',
-                       query=query,
                        count_by=1,
-                       request_method='POST',
-                       post_as_body=True)
+                       request_method='POST')
         last_request = httpretty.last_request()
         assert last_request.querystring == {}
         assert last_request.headers['Content-Type'] == 'application/json'
