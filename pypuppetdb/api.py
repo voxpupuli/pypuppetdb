@@ -343,7 +343,8 @@ class BaseAPI(object):
                                       timeout=self.timeout,
                                       auth=auth)
             elif request_method.upper() == 'POST':
-                r = self._session.post(url, params=payload,
+                r = self._session.post(url,
+                                       data=json.dumps(payload, default=str),
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,

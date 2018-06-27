@@ -5,16 +5,27 @@ import httpretty
 import pytest
 import requests
 import pypuppetdb
+import six
 
 
-def stub_request(url, data=None, **kwargs):
+def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
     if data is None:
         body = '[]'
     else:
         with open(data, 'r') as d:
             body = json.load(d.read())
-    return httpretty.register_uri(httpretty.GET, url, body=body, status=200,
+    return httpretty.register_uri(method, url, body=body, status=status,
                                   **kwargs)
+
+
+@pytest.fixture(params=['string', 'QueryBuilder'])
+def query(request):
+    key = 'certname'
+    value = 'node1'
+    if request.param == 'string':
+        return '["{0}", "=", "{1}"]'.format(key, value)
+    elif request.param == 'QueryBuilder':
+        return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
 
 
 class TestBaseAPIVersion(object):
@@ -349,6 +360,24 @@ class TesteAPIQuery(object):
             baseapi._query('nodes',
                            query='["certname", "=", "node1"]',
                            request_method='DELETE')
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_query_with_post(self, baseapi, query):
+        httpretty.reset()
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/nodes',
+                     method=httpretty.POST)
+        baseapi._query('nodes',
+                       query=query,
+                       count_by=1,
+                       request_method='POST')
+        last_request = httpretty.last_request()
+        assert last_request.querystring == {}
+        assert last_request.headers['Content-Type'] == 'application/json'
+        assert last_request.method == 'POST'
+        assert last_request.body == six.b(json.dumps({'query': str(query),
+                                                      'count_by': 1}))
         httpretty.disable()
         httpretty.reset()
 
