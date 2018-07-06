@@ -432,3 +432,37 @@ class TestInOperator(object):
             op = InOperator('certname')
             op.add_query(ExtractOperator())
             op.add_query(ExtractOperator())
+
+    def test_add_arry(self):
+        arr = ['array', [1, 2, 3]]
+        op = InOperator('certname') 
+        op.test_add_arry(arr)
+
+        assert repr(op) == 'Query: ["in","certname",' \
+            '["extract",[1, 2, 3]]]'
+
+    def test_invalid_add_array(self):
+        arr = ['array', [1, 2, 3]]
+        inv1 = ['arrayfoo', [1, 2, 3]]
+        inv2 = ['arrayfoo', [1, 2, 3], 'bar']
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname') 
+            op.test_add_arry(inv1)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname') 
+            op.test_add_arry(inv2)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname') 
+            op.test_add_arry(arr)
+            op.test_add_arry(arr)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+
+            op.test_add_arry(arr)
+            ex = ExtractOperator()
+            ex.add_field("certname")
+            op.add_query(ex) 
