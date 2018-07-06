@@ -227,6 +227,26 @@ Subqueries are implemented using corresponding operators (like documented).
    >>> print(op)
    ["in","certname",["extract",["certname"],["select_events",["=", "status", "noop"]]]]
 
+
+Or using in:array querying
+
+.. code-block:: python
+
+  >>> from pypuppetdb.QueryBuilder import *
+  >>> op = InOperator('certname')
+  >>> op.add_array(["prod1.server.net", "prod2.server.net"])
+  >>> print(op)
+  ["in","certname",["array", ['prod1.server.net', 'prod2.server.net']]]
+
+
+["in", ["fact", "uptime_seconds"],
+ ["array",
+  [20000.0,
+   150.0,
+   300000]]]
+
+
+
 Getting Help
 ============
 This project is still very new so it's not inconceivable you'll run into
