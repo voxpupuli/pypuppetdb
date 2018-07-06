@@ -321,11 +321,18 @@ class InOperator(object):
     def add_array(self, values):
         if self.query is not None:
             raise APIError("Only one array is supported by the InOperator")
-        elif values[0] == "array" and isinstance(values[1], list):
-            self.query = True
-            self.arr.append(str(values))
+        elif isinstance(values, list):
+            def depth(L): return (isinstance(L, list) and len(L) != 0) \
+                and max(map(depth, L))+1
+            if (depth(values) == 1):
+                self.query = True
+                the_arr = '["array", %s]' % values
+                self.arr.append(str(the_arr))
+            else:
+                raise APIError("InOperator.add_array: cannot pass in "
+                               "nested arrays (or empty arrays)")
         else:
-            raise APIErrfor("InOperator.add_array: Ill-formatted array, "
+            raise APIError("InOperator.add_array: Ill-formatted array, "
                            "must be of the format: "
                            "['array', [<array values>]]")
 
@@ -337,6 +344,7 @@ class InOperator(object):
 
     def __unicode__(self):
         return str('[{0}]'.format(",".join(self.arr)))
+
 
 class EqualsOperator(BinaryOperator):
     """
