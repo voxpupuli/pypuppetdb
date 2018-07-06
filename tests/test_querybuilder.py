@@ -458,3 +458,11 @@ class TestInOperator(object):
             op = InOperator('certname') 
             op.test_add_arry(arr)
             op.test_add_arry(arr)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+
+            op.test_add_arry(arr)
+            ex = ExtractOperator()
+            ex.add_field("certname")
+            op.add_query(ex) 
