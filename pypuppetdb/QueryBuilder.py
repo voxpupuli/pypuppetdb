@@ -387,8 +387,6 @@ class FromOperator(object):
         def depth(L): return isinstance(L, list) and max(map(depth, L))+1
         fields_depth = depth(fields)
 
-        print fields_depth, fields
-
         if isinstance(fields, list):
             if fields_depth == 1 or fields_depth == 2:
                     self.order_by = str(fields).replace('\'', '"')
