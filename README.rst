@@ -238,6 +238,22 @@ Or using [in <array>] querying:
   >>> print(op)
   ["in","certname",["array", ['prod1.server.net', 'prod2.server.net']]]
 
+You can also access different entities from a single query on the root endpoint with the FromOperator:
+
+.. code-block:: python
+
+    >>> op = InOperator('certname')
+    >>> ex = ExtractOperator()
+    >>> ex.add_field('certname')
+    >>> fr = FromOperator('fact_contents')
+    >>> nd = AndOperator()
+    >>> nd.add(EqualsOperator("path", ["networking", "eth0", "macaddresses", 0]))
+    >>> nd.add(EqualsOperator("value", "aa:bb:cc:dd:ee:00"))
+    >>> ex.add_query(nd)
+    >>> fr.add_query(ex)
+    >>> op.add_query(fr)
+    >>> print(op)
+    ["in","certname",["from","fact_contents",["extract",["certname"],["and",["=", "path", ['networking', 'eth0', 'macaddresses', 0]],["=", "value", "aa:bb:cc:dd:ee:00"]]]]]
 
 Getting Help
 ============
