@@ -422,9 +422,9 @@ class FromOperator(object):
         if len(self.order_by) > 0:
             arr.append('["order_by", {0}]'.format(self.order_by))
         if self.limit is not None:
-            arr.append('["limit", {:d}]'.format(self.limit))
+            arr.append('["limit", {0}]'.format(self.limit))
         if self.offset is not None:
-            arr.append('["offset", {:d}]'.format(self.offset))
+            arr.append('["offset", {0}]'.format(self.offset))
 
         return str('Query: [{0}]'.format(",".join(arr)))
 
@@ -439,9 +439,9 @@ class FromOperator(object):
         if len(self.order_by) > 0:
             arr.append('["order_by", {0}]'.format(self.order_by))
         if self.limit is not None:
-            arr.append('["limit", {:d}]'.format(self.limit))
+            arr.append('["limit", {0}]'.format(self.limit))
         if self.offset is not None:
-            arr.append('["offset", {:d}]'.format(self.offset))
+            arr.append('["offset", {0}]'.format(self.offset))
 
         return str('[{0}]'.format(",".join(arr)))
 
@@ -456,9 +456,9 @@ class FromOperator(object):
         if len(self.order_by) > 0:
             arr.append('["order_by", {0}]'.format(self.order_by))
         if self.limit is not None:
-            arr.append('["limit", {:d}]'.format(self.limit))
+            arr.append('["limit", {0}]'.format(self.limit))
         if self.offset is not None:
-            arr.append('["offset", {:d}]'.format(self.offset))
+            arr.append('["offset", {0}]'.format(self.offset))
 
         return str('[{0}]'.format(",".join(arr)))
 
