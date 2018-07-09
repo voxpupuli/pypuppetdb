@@ -310,13 +310,13 @@ class InOperator(object):
     def add_query(self, query):
         if self.query is not None:
             raise APIError("Only one query is supported by ExtractOperator")
-        elif isinstance(query, (str, ExtractOperator)):
+        elif isinstance(query, (str, ExtractOperator, FromOperator)):
             self.query = True
             self.arr.append(str(query))
         else:
             raise APIError("InOperator.add_query only supports "
-                           "strings and ExtractOperator"
-                           "objects")
+                           "strings, ExtractOperator, and"
+                           "FromOperator objects")
 
     def add_array(self, values):
         if self.query is not None:
@@ -378,20 +378,20 @@ class FromOperator(object):
         elif isinstance(query, (InOperator, ExtractOperator,
                                 BinaryOperator, BooleanOperator,
                                 FunctionOperator)):
-            self.query = "str" in dir(query) and query.str(query) or str(query)
+            self.query = str(query)
         else:
             raise APIError("FromOperator.add_field only supports "
                            "Operator Objects")
 
     def add_order_by(self, fields):
-        def depth(L): return (isinstance(L, list) and len(L) != 0) \
-                and max(map(depth, L))+1
+        def depth(L): return isinstance(L, list) and max(map(depth, L))+1
         fields_depth = depth(fields)
+
+        print fields_depth, fields
 
         if isinstance(fields, list):
             if fields_depth == 1 or fields_depth == 2:
-                    self.order_by = ['"order_by"']
-                    self.order_by.append(fields)
+                    self.order_by = str(fields).replace('\'', '"')
             else:
                 raise APIError("ExtractOperator.add_order_by only "
                                "supports lists of fields of depth "
@@ -418,51 +418,51 @@ class FromOperator(object):
             raise APIError("FromOperator needs one main query")
 
         arr = ['"from"']
-        arr.append("[{0}]".format(self.endpoint))
+        arr.append('"{0}"'.format(self.endpoint))
         arr.append(self.query)
 
         if len(self.order_by) > 0:
-            arr.append(self.order_by)
+            arr.append('["order_by", {0}]'.format(self.order_by))
         if self.limit is not None:
-            arr.append(["limit", "{:d}".format(self.limit)])
+            arr.append('["limit", {:d}]'.format(self.limit))
         if self.offset is not None:
-            arr.append(["offset", "{:d}".format(self.offset)])
+            arr.append('["offset", {:d}]'.format(self.offset))
 
-        return str('Query: {0}'.format(arr))
+        return str('Query: [{0}]'.format(",".join(arr)))
 
     def __str__(self):
         if self.query is None:
             raise APIError("FromOperator needs one main query")
 
         arr = ['"from"']
-        arr.append("[{0}]".format(self.endpoint))
+        arr.append('"{0}"'.format(self.endpoint))
         arr.append(self.query)
 
         if len(self.order_by) > 0:
-            arr.append(self.order_by)
+            arr.append('["order_by", {0}]'.format(self.order_by))
         if self.limit is not None:
-            arr.append(["limit", "{:d}".format(self.limit)])
+            arr.append('["limit", {:d}]'.format(self.limit))
         if self.offset is not None:
-            arr.append(["offset", "{:d}".format(self.offset)])
+            arr.append('["offset", {:d}]'.format(self.offset))
 
-        return str('{0}'.format(arr))
+        return str('[{0}]'.format(",".join(arr)))
 
     def __unicode__(self):
         if self.query is None:
             raise APIError("FromOperator needs one main query")
 
         arr = ['"from"']
-        arr.append("[{0}]".format(self.endpoint))
+        arr.append('"{0}"'.format(self.endpoint))
         arr.append(self.query)
 
         if len(self.order_by) > 0:
-            arr.append(self.order_by)
+            arr.append('["order_by", {0}]'.format(self.order_by))
         if self.limit is not None:
-            arr.append(["limit", "{:d}".format(self.limit)])
+            arr.append('["limit", {:d}]'.format(self.limit))
         if self.offset is not None:
-            arr.append(["offset", "{:d}".format(self.offset)])
+            arr.append('["offset", {:d}]'.format(self.offset))
 
-        return str('{0}'.format(arr))
+        return str('[{0}]'.format(",".join(arr)))
 
 
 class EqualsOperator(BinaryOperator):
