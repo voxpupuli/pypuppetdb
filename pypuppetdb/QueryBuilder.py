@@ -352,7 +352,7 @@ class FromOperator(object):
     or subqueries into other entities:
     https://puppet.com/docs/puppetdb/5.1/api/query/v4/ast.html#from
 
-    Ex.) 
+    Ex.)
     fr = FromOperator("facts")
     fr.add_query(EqualsOperator("foo", "bar"))
     fr.add_order_by(["certname"])
