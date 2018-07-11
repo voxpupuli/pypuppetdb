@@ -352,7 +352,13 @@ class FromOperator(object):
     or subqueries into other entities:
     https://puppet.com/docs/puppetdb/5.1/api/query/v4/ast.html#from
 
-    note: only supports single entities froms operations
+    Ex.) 
+    fr = FromOperator("facts")
+    fr.add_query(EqualsOperator("foo", "bar"))
+    fr.add_order_by(["certname"])
+    fr.add_limit(10)
+
+    note: only supports single entity From operations
     """
     def __init__(self, endpoint):
         valid_entities = ["aggregate_event_counts", "catalogs", "edges",
