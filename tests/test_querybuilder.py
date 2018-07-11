@@ -439,7 +439,7 @@ class TestInOperator(object):
         op.add_array(arr)
 
         assert repr(op) == 'Query: ["in","certname",' \
-            '["array", [1, \'2\', 3]]]'
+            '["array", [1, "2", 3]]]'
 
     def test_invalid_add_array(self):
         arr = [1, 2, 3]
@@ -498,7 +498,7 @@ class TestInOperator(object):
         assert unicode(op) == '["in","certname",' \
             '["from","fact_contents",' \
             '["extract",["certname"],["and",["=", "path", ' \
-            "['networking', 'eth0', 'macaddresses', 0]]," \
+            '["networking", "eth0", "macaddresses", 0]],' \
             '["=", "value", "aa:bb:cc:dd:ee:00"]]]]]'
 
 

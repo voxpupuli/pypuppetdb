@@ -327,7 +327,7 @@ class InOperator(object):
             if (depth(values) == 1):
                 self.query = True
                 the_arr = '["array", %s]' % values
-                self.arr.append(str(the_arr))
+                self.arr.append(str(the_arr).replace("'", '"'))
             else:
                 raise APIError("InOperator.add_array: cannot pass in "
                                "nested arrays (or empty arrays)")
@@ -389,7 +389,7 @@ class FromOperator(object):
 
         if isinstance(fields, list):
             if fields_depth == 1 or fields_depth == 2:
-                    self.order_by = str(fields).replace('\'', '"')
+                    self.order_by = str(fields)
             else:
                 raise APIError("ExtractOperator.add_order_by only "
                                "supports lists of fields of depth "
@@ -426,7 +426,7 @@ class FromOperator(object):
         if self.offset is not None:
             arr.append('["offset", {0}]'.format(self.offset))
 
-        return str('Query: [{0}]'.format(",".join(arr)))
+        return str('Query: [{0}]'.format(",".join(arr))).replace("'", '"')
 
     def __str__(self):
         if self.query is None:
@@ -443,7 +443,7 @@ class FromOperator(object):
         if self.offset is not None:
             arr.append('["offset", {0}]'.format(self.offset))
 
-        return str('[{0}]'.format(",".join(arr)))
+        return str('[{0}]'.format(",".join(arr))).replace("'", '"')
 
     def __unicode__(self):
         if self.query is None:
@@ -460,7 +460,7 @@ class FromOperator(object):
         if self.offset is not None:
             arr.append('["offset", {0}]'.format(self.offset))
 
-        return str('[{0}]'.format(",".join(arr)))
+        return str('[{0}]'.format(",".join(arr))).replace("'", '"')
 
 
 class EqualsOperator(BinaryOperator):
