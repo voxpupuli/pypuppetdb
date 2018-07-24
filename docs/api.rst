@@ -147,6 +147,12 @@ PuppetDB call.
    :members:
 .. autoclass:: pypuppetdb.QueryBuilder.FunctionOperator
    :members:
+.. autoclass:: pypuppetdb.QueryBuilder.SubqueryOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.InOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.FromOperator
+   :members:
 
 Utilities
 ---------
