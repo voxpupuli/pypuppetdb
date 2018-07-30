@@ -310,13 +310,31 @@ class InOperator(object):
     def add_query(self, query):
         if self.query is not None:
             raise APIError("Only one query is supported by ExtractOperator")
-        elif isinstance(query, (str, ExtractOperator)):
+        elif isinstance(query, (str, ExtractOperator, FromOperator)):
             self.query = True
             self.arr.append(str(query))
         else:
             raise APIError("InOperator.add_query only supports "
-                           "strings and ExtractOperator"
-                           "objects")
+                           "strings, ExtractOperator, and"
+                           "FromOperator objects")
+
+    def add_array(self, values):
+        if self.query is not None:
+            raise APIError("Only one array is supported by the InOperator")
+        elif isinstance(values, list):
+            def depth(L): return (isinstance(L, list) and len(L) != 0) \
+                and max(map(depth, L))+1
+            if (depth(values) == 1):
+                self.query = True
+                the_arr = '["array", %s]' % values
+                self.arr.append(str(the_arr).replace("'", '"'))
+            else:
+                raise APIError("InOperator.add_array: cannot pass in "
+                               "nested arrays (or empty arrays)")
+        else:
+            raise APIError("InOperator.add_array: Ill-formatted array, "
+                           "must be of the format: "
+                           "['array', [<array values>]]")
 
     def __repr__(self):
         return str('Query: [{0}]'.format(",".join(self.arr)))
@@ -326,6 +344,129 @@ class InOperator(object):
 
     def __unicode__(self):
         return str('[{0}]'.format(",".join(self.arr)))
+
+
+class FromOperator(object):
+    """
+    From contextual operator that allows for queries on the root endpoint
+    or subqueries into other entities:
+    https://puppet.com/docs/puppetdb/5.1/api/query/v4/ast.html#from
+
+    Ex.)
+    fr = FromOperator("facts")
+    fr.add_query(EqualsOperator("foo", "bar"))
+    fr.add_order_by(["certname"])
+    fr.add_limit(10)
+
+    note: only supports single entity From operations
+    """
+    def __init__(self, endpoint):
+        valid_entities = ["aggregate_event_counts", "catalogs", "edges",
+                          "environments", "event_counts", "events", "facts",
+                          "fact_contents", "fact_names", "fact_paths", "nodes",
+                          "producers", "reports", "resources"]
+
+        if endpoint in valid_entities:
+            self.endpoint = endpoint
+        else:
+            raise APIError("Endpoint is invalid. Must be "
+                           "one of the following : %s"
+                           % valid_entities)
+
+        self.query = None
+        self.order_by = []
+        self.limit = None
+        self.offset = None
+
+    def add_query(self, query):
+        if self.query is not None:
+            raise APIError("Only one main query is supported by FromOperator")
+        elif isinstance(query, (InOperator, ExtractOperator,
+                                BinaryOperator, BooleanOperator,
+                                FunctionOperator)):
+            self.query = str(query)
+        else:
+            raise APIError("FromOperator.add_field only supports "
+                           "Operator Objects")
+
+    def add_order_by(self, fields):
+        def depth(L): return isinstance(L, list) and max(map(depth, L))+1
+        fields_depth = depth(fields)
+
+        if isinstance(fields, list):
+            if fields_depth == 1 or fields_depth == 2:
+                    self.order_by = str(fields)
+            else:
+                raise APIError("ExtractOperator.add_order_by only "
+                               "supports lists of fields of depth "
+                               "one or two: [value, <desc/asc>] or "
+                               "[value]")
+        else:
+            raise APIError("ExtractOperator.add_group_by only supports "
+                           "lists of one or more fields")
+
+    def add_limit(self, lim):
+        if isinstance(lim, int):
+            self.limit = lim
+        else:
+            raise APIError("ExtractOperator.add_limit only supports ints")
+
+    def add_offset(self, off):
+        if isinstance(off, int):
+            self.offset = off
+        else:
+            raise APIError("ExtractOperator.add_offset only supports ints")
+
+    def __repr__(self):
+        if self.query is None:
+            raise APIError("FromOperator needs one main query")
+
+        arr = ['"from"']
+        arr.append('"{0}"'.format(self.endpoint))
+        arr.append(self.query)
+
+        if len(self.order_by) > 0:
+            arr.append('["order_by", {0}]'.format(self.order_by))
+        if self.limit is not None:
+            arr.append('["limit", {0}]'.format(self.limit))
+        if self.offset is not None:
+            arr.append('["offset", {0}]'.format(self.offset))
+
+        return str('Query: [{0}]'.format(",".join(arr))).replace("'", '"')
+
+    def __str__(self):
+        if self.query is None:
+            raise APIError("FromOperator needs one main query")
+
+        arr = ['"from"']
+        arr.append('"{0}"'.format(self.endpoint))
+        arr.append(self.query)
+
+        if len(self.order_by) > 0:
+            arr.append('["order_by", {0}]'.format(self.order_by))
+        if self.limit is not None:
+            arr.append('["limit", {0}]'.format(self.limit))
+        if self.offset is not None:
+            arr.append('["offset", {0}]'.format(self.offset))
+
+        return str('[{0}]'.format(",".join(arr))).replace("'", '"')
+
+    def __unicode__(self):
+        if self.query is None:
+            raise APIError("FromOperator needs one main query")
+
+        arr = ['"from"']
+        arr.append('"{0}"'.format(self.endpoint))
+        arr.append(self.query)
+
+        if len(self.order_by) > 0:
+            arr.append('["order_by", {0}]'.format(self.order_by))
+        if self.limit is not None:
+            arr.append('["limit", {0}]'.format(self.limit))
+        if self.offset is not None:
+            arr.append('["offset", {0}]'.format(self.offset))
+
+        return str('[{0}]'.format(",".join(arr))).replace("'", '"')
 
 
 class EqualsOperator(BinaryOperator):

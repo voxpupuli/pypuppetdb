@@ -432,3 +432,175 @@ class TestInOperator(object):
             op = InOperator('certname')
             op.add_query(ExtractOperator())
             op.add_query(ExtractOperator())
+
+    def test_add_array(self):
+        arr = [1, "2", 3]
+        op = InOperator('certname')
+        op.add_array(arr)
+
+        assert repr(op) == 'Query: ["in","certname",' \
+            '["array", [1, "2", 3]]]'
+
+    def test_invalid_add_array(self):
+        arr = [1, 2, 3]
+        inv1 = [1, [2, 3]]
+        inv2 = []
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+            op.add_array(inv1)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+            op.add_array(inv2)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+            op.add_array(arr)
+            op.add_array(arr)
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            op = InOperator('certname')
+
+            op.add_array(arr)
+            ex = ExtractOperator()
+            ex.add_field("certname")
+            op.add_query(ex)
+
+    def test_fromoperator(self):
+        op = InOperator('certname')
+        ex = ExtractOperator()
+        ex.add_field(["certname", "facts"])
+        fr = FromOperator("facts")
+        fr.add_query(ex)
+        fr.add_offset(10)
+        op.add_query(fr)
+
+        assert repr(op) == 'Query: ["in","certname",' \
+            '["from","facts",["extract",' \
+            '["certname","facts"]],["offset", 10]]]'
+
+        # last example on page
+        # https://puppet.com/docs/puppetdb/5.1/api/query/v4/ast.html
+
+        op = InOperator('certname')
+        ex = ExtractOperator()
+        ex.add_field('certname')
+        fr = FromOperator('fact_contents')
+        nd = AndOperator()
+        nd.add(EqualsOperator("path",
+                              ["networking", "eth0", "macaddresses", 0]))
+        nd.add(EqualsOperator("value", "aa:bb:cc:dd:ee:00"))
+        ex.add_query(nd)
+        fr.add_query(ex)
+        op.add_query(fr)
+
+        assert unicode(op) == '["in","certname",' \
+            '["from","fact_contents",' \
+            '["extract",["certname"],["and",["=", "path", ' \
+            '["networking", "eth0", "macaddresses", 0]],' \
+            '["=", "value", "aa:bb:cc:dd:ee:00"]]]]]'
+
+
+class TestFromOperator(object):
+    """
+    Test the FromOperator object
+    """
+
+    def test_init_from(self):
+        fr = FromOperator("facts")
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            str(fr) == "unimportant_no_query"
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            fr2 = FromOperator('invalid_entity')
+
+    def test_add_query(self):
+        fr = FromOperator("facts")
+        op = EqualsOperator("certname", "test01")
+        fr.add_query(op)
+
+        assert str(fr) == '["from","facts",["=", "certname", "test01"]]'
+
+        fr2 = FromOperator("facts")
+        op2 = "test, test, test"
+        with pytest.raises(pypuppetdb.errors.APIError):
+            fr2.add_query(op2)
+        fr2.add_query(op)
+        with pytest.raises(pypuppetdb.errors.APIError):
+            fr2.add_query(op)
+
+        fr3 = FromOperator("facts")
+        op3 = ExtractOperator()
+        op3.add_field(['certname', 'fact_environment', 'catalog_environment'])
+        fr3.add_query(op3)
+
+        assert str(fr3) == \
+            '["from","facts",["extract",'\
+            '["certname","fact_environment","catalog_environment"]]]'
+
+    def test_limit_offset(self):
+        fr = FromOperator("facts")
+        op = EqualsOperator("certname", "test01")
+        fr.add_query(op)
+
+        fr.add_offset(10)
+        assert str(fr) == \
+            '["from","facts",["=", "certname", "test01"],["offset", 10]]'
+
+        fr.add_limit(5)
+        assert str(fr) == \
+            '["from","facts",["=", "certname",' \
+            ' "test01"],["limit", 5],["offset", 10]]'
+
+        fr.add_limit(15)
+        assert unicode(fr) == \
+            '["from","facts",["=", "certname",' \
+            ' "test01"],["limit", 15],["offset", 10]]'
+
+        assert repr(fr) == \
+            'Query: ["from","facts",["=", "certname",' \
+            ' "test01"],["limit", 15],["offset", 10]]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            fr.add_offset("invalid")
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            fr.add_limit(["invalid"])
+
+    def test_order_by(self):
+        fr = FromOperator("facts")
+        op = EqualsOperator("certname", "test01")
+        fr.add_query(op)
+
+        o1 = ["certname"]
+        o2 = ["certname", ["timestamp", "desc"], "facts"]
+        o3inv = ['certname', ['timestamp', 'desc', ['oops']]]
+
+        fr.add_order_by(o1)
+        assert str(fr) == \
+            '["from","facts",["=", "certname", ' \
+            '"test01"],["order_by", ["certname"]]]'
+
+        fr.add_order_by(o2)
+        assert repr(fr) == \
+            'Query: ["from","facts",' \
+            '["=", "certname", "test01"],' \
+            '["order_by", ["certname", ' \
+            '["timestamp", "desc"], "facts"]]]'
+
+        assert str(fr) == \
+            '["from","facts",' \
+            '["=", "certname", "test01"],' \
+            '["order_by", ["certname", ' \
+            '["timestamp", "desc"], "facts"]]]'
+
+        assert unicode(fr) == \
+            '["from","facts",' \
+            '["=", "certname", "test01"],' \
+            '["order_by", ["certname", ' \
+            '["timestamp", "desc"], "facts"]]]'
+
+        with pytest.raises(pypuppetdb.errors.APIError):
+            fr.add_order_by(o3inv)
