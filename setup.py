@@ -10,6 +10,15 @@ if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     sys.exit()
 
+def rc_value():
+    with open('version') as fp:
+        val = fp.read().rstrip()
+    return '{}rc0'.format(val)
+
+
+def version():
+    return os.getenv('TRAVIS_TAG', rc_value())
+
 
 class Tox(TestCommand):
 
@@ -32,7 +41,7 @@ with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
 
 setup(
     name='pypuppetdb',
-    version='0.3.3',
+    version=version(),
     author='Corey Hammerton',
     author_email='corey.hammerton@gmail.com',
     packages=find_packages(),
