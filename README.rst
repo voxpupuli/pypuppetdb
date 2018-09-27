@@ -24,7 +24,7 @@ functions and objects to request and hold data from PuppetDB.
 
 To use this library you will need:
     * Python 2.7
-    * Python 3.3, 3.4, 3.5, 3.6
+    * Python 3.5, 3.6
 
 Installation
 ============

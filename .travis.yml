@@ -1,15 +1,47 @@
+dist: trusty
 language: python
 python:
-  - 2.7
-  - 3.5
-  - 3.6
+- &latest_py2 2.7
+- 3.5
+- &latest_py3 3.6
+
+jobs:
+  fast_finish: true
+  include:
+  - python: *latest_py3
+    env: LANG=C
+  - python: *latest_py2
+    env: LANG=C
+  - stage: deploy (to PyPI for tagged commits)
+    if: tag IS present
+    python: *latest_py3
+    install: skip
+    script: skip
+    after_success: true
+    before_deploy:
+    - python setup.py sdist bdist_wheel
+    deploy:
+      provider: pypi
+      user: mterzo
+      distributions: sdist bdist_wheel
+      skip_cleanup: true
+      skip_upload_docs: true
+      password:
+        secure: dxjpyS3Xw1Ma1CZ/Ao+iEVGI7mloX/WvWFXIQCoghggosWwjo+Uo2WUcjc/SAe+ixn+4lvowXT0tkbc24ZpdP8QwroB5o4xy7xRm0SIajfp1xUZcZJo6nIIycJ8g5fP83KNgDnL3LeLj0kpazPaIZAugJyFyasExY2eI1NT207w=
+      on:
+        tags: true
+        all_branches: true
+
+cache: pip
+
 install:
-  - pip install -q -r requirements.txt
-  - pip install -q coverage coveralls
+- pip install --upgrade pip setuptools
+- pip install -r requirements.txt
+- pip install coverage coveralls
 script:
-  - py.test --cov=pypuppetdb --pep8  -v
-  - ./bandit.sh
+- py.test --cov=pypuppetdb --pep8  -v
+- "./bandit.sh"
 after_success:
-  - coveralls
+- coveralls
 notifications:
   email: false
