@@ -6,10 +6,6 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist upload')
-    sys.exit()
-
 def rc_value():
     with open('version') as fp:
         val = fp.read().rstrip()
