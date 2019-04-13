@@ -23,8 +23,8 @@ This library is a thin wrapper around the REST API providing some convenience
 functions and objects to request and hold data from PuppetDB.
 
 To use this library you will need:
-    * Python 2.6 or 2.7
-    * Python 3.3
+    * Python 2.7
+    * Python 3.3, 3.4, 3.5, 3.6
 
 Installation
 ============
