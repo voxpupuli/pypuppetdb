@@ -1,0 +1,9 @@
+-r requirements.txt
+coveralls
+bandit
+coverage==4.0
+mock==1.0.1
+pytest==3.0.1
+pytest-cov==2.2.1
+pytest-pep8==1.0.5
+cov-core==1.15.0

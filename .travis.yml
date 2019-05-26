@@ -1,15 +1,51 @@
+dist: xenial
 language: python
 python:
-  - 2.7
+  - &latest_py2 2.7
   - 3.5
-  - 3.6
+  - &latest_py3 3.6
+
+jobs:
+  fast_finish: true
+  include:
+  - python: *latest_py3
+    env: LANG=C
+  - python: *latest_py2
+    env: LANG=C
+  - stage: deploy (to PyPI for tagged commits)
+    if: tag IS present
+    python: *latest_py3
+    install: skip
+    script: skip
+    after_success: true
+    before_deploy:
+    - python setup.py sdist bdist_wheel
+    deploy:
+      provider: pypi
+      user: voxpupuliorg
+      distributions: sdist bdist_wheel
+      skip_cleanup: true
+      skip_upload_docs: true
+      password:
+        secure: "A6uYtRFghLUC2NkMeuDC2HerzWimDEh307zomIRvJa9LKpcbHCbR7zP2vaLA1qes1x1+8wxbuFpvsHQMACW5rtxJvU+xpC4b/ncm/1AC5wBGTbUD6lO62ZHMRTI4hbvAak6CqNC3MMufJtggHjy3ncr/TSs9UNdQ/A+z8Aq0vs4="
+      on:
+        tags: true
+        all_branches: true
+
+cache: pip
+
 install:
-  - pip install -q -r requirements.txt
-  - pip install -q coverage coveralls
+  - pip install -r requirements-test.txt
 script:
   - py.test --cov=pypuppetdb --pep8  -v
-  - ./bandit.sh
+  - bandit -r pypuppetdb
+  - bandit -r tests -s B101
 after_success:
   - coveralls
 notifications:
   email: false
+  irc:
+    on_success: always
+    on_failure: always
+    channels:
+      - "chat.freenode.org#voxpupuli-notifications"
