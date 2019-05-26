@@ -1,9 +1,9 @@
 dist: xenial
 language: python
 python:
-- &latest_py2 2.7
-- 3.5
-- &latest_py3 3.6
+  - &latest_py2 2.7
+  - 3.5
+  - &latest_py3 3.6
 
 jobs:
   fast_finish: true
@@ -35,14 +35,13 @@ jobs:
 cache: pip
 
 install:
-- pip install --upgrade pip setuptools
-- pip install -r requirements.txt
-- pip install coverage coveralls
+  - pip install -r requirements-test.txt
 script:
-- py.test --cov=pypuppetdb --pep8  -v
-- "./bandit.sh"
+  - py.test --cov=pypuppetdb --pep8  -v
+  - bandit -r pypuppetdb
+  - bandit -r tests -s B101
 after_success:
-- coveralls
+  - coveralls
 notifications:
   email: false
   irc:
