@@ -62,7 +62,7 @@ class TestBaseAPIInitOptions(object):
         assert api.protocol == 'http'
 
     def test_token(self):
-        test_token = 'tokenstring'
+        test_token = 'tokenstring'  # nosec
         api = pypuppetdb.api.BaseAPI(token=test_token)
         assert api.token == test_token
         assert api.protocol == 'https'
