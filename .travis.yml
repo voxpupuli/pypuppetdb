@@ -22,12 +22,12 @@ jobs:
     - python setup.py sdist bdist_wheel
     deploy:
       provider: pypi
-      user: mterzo
+      user: voxpupuliorg
       distributions: sdist bdist_wheel
       skip_cleanup: true
       skip_upload_docs: true
       password:
-        secure: dxjpyS3Xw1Ma1CZ/Ao+iEVGI7mloX/WvWFXIQCoghggosWwjo+Uo2WUcjc/SAe+ixn+4lvowXT0tkbc24ZpdP8QwroB5o4xy7xRm0SIajfp1xUZcZJo6nIIycJ8g5fP83KNgDnL3LeLj0kpazPaIZAugJyFyasExY2eI1NT207w=
+        secure: "A6uYtRFghLUC2NkMeuDC2HerzWimDEh307zomIRvJa9LKpcbHCbR7zP2vaLA1qes1x1+8wxbuFpvsHQMACW5rtxJvU+xpC4b/ncm/1AC5wBGTbUD6lO62ZHMRTI4hbvAak6CqNC3MMufJtggHjy3ncr/TSs9UNdQ/A+z8Aq0vs4="
       on:
         tags: true
         all_branches: true
