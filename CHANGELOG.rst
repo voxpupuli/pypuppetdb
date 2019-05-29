@@ -2,6 +2,16 @@
 Changelog
 #########
 
+1.0.0
+=====
+
+* Bump dependencies
+* QueryBuilder: Added support for FromOperator, arrays and FromOperator
+* New endpoint: status
+* POST query in request body 
+* Simplify JSON encoding for POST
+* Upload and publish is built in to setuptools
+
 0.3.3
 =====
 
