@@ -45,6 +45,7 @@ setup(
     license='Apache License 2.0',
     description='Library for working with the PuppetDB REST API.',
     long_description='\n'.join((README, CHANGELOG)),
+    long_description_content_type='text/x-rst',
     keywords='puppet puppetdb',
     tests_require=['tox'],
     cmdclass={'test': Tox},
