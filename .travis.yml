@@ -28,7 +28,7 @@ jobs:
       skip_cleanup: true
       skip_upload_docs: true
       password:
-        secure: "mijJyuxUhYnhCBvhWwhapQsR6HLSIUAJeqDx23RSI0lAB8OHu3r/+MjEpY60c3iKu4BQiVjLDrz1iYXIhUlsRNYYqhLxkY8lJ0jCckexu38zWIU7FcXEyevgzguo0x4BrnErvNi+XR/1auvHhorHEMNaiqJgHbn3O+B9d4UzWpA="
+        secure: "vRNrUY+Gpwe7GbfEI4lIaMSGosxxREmJtERIIjtOuc6bb5551GhxPsqFuuQfb61/P7DiTzLZysBvAN+bRBxN9da54/VbLHHQICvEtRN3VZZV/ETFHMUB9lXALWGzXRIoB4Bi/0fsbx9+VLpSwILxFi8+Rmd9rvZLPwHFF3IMFQM="
       on:
         tags: true
         all_branches: true
