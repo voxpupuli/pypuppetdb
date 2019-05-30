@@ -39,7 +39,7 @@ setup(
     name='pypuppetdb',
     version=version(),
     author='Vox Pupuli',
-    author_email='voxpupli@groups.io',
+    author_email='voxpupuli@groups.io',
     packages=find_packages(),
     url='https://github.com/voxpupuli/pypuppetdb',
     license='Apache License 2.0',
