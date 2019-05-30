@@ -38,8 +38,8 @@ with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
 setup(
     name='pypuppetdb',
     version=version(),
-    author='Corey Hammerton',
-    author_email='corey.hammerton@gmail.com',
+    author='Vox Pupuli',
+    author_email='voxpupli@groups.io',
     packages=find_packages(),
     url='https://github.com/voxpupuli/pypuppetdb',
     license='Apache License 2.0',
