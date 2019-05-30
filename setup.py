@@ -35,6 +35,16 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
     CHANGELOG = f.read()
 
+requirements = None
+with open('requirements.txt', 'r') as f:
+    requirements = [line.rstrip()
+                    for line in f.readlines() if not line.startswith('-')]
+
+requirements_test = None
+with open('requirements-test.txt', 'r') as f:
+    requirements_test = [line.rstrip() for line in f.readlines()
+                         if not line.startswith('-')]
+
 setup(
     name='pypuppetdb',
     version=version(),
@@ -47,11 +57,9 @@ setup(
     long_description='\n'.join((README, CHANGELOG)),
     long_description_content_type='text/x-rst',
     keywords='puppet puppetdb',
-    tests_require=['tox'],
+    tests_require=requirements_test,
     cmdclass={'test': Tox},
-    install_requires=[
-        "requests >= 2.22.0",
-        ],
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
