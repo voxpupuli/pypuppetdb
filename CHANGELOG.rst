@@ -29,7 +29,7 @@ Changelog
 0.3.1
 =====
 
-* Fixed a datetime related bug in :func:`pypuppetdb.api.nodes()` that caused
+* Fixed a datetime related bug in `pypuppetdb.api.nodes()` that caused
   all returned nodes to be an unreported status
 
 0.3.0
@@ -42,7 +42,7 @@ Changelog
 0.2.3
 =====
 
-* Removed deprecation of :func:`pypuppetdb.types.Report.events()`. Expanded
+* Removed deprecation of `pypuppetdb.types.Report.events()`. Expanded
   resource events data timestamps are not parseable.
 * Escaping additional path parameters passed to _url() with urllib.quote
 
@@ -58,7 +58,7 @@ Changelog
   warning in the test environment.
 * Updating the files under docs/ so https://pypuppetdb.readthedocs.org/en/latest/
   can be updated
-* Deprecating :func:`pypuppetdb.types.Report.events()` in favour of the new
+* Deprecating `pypuppetdb.types.Report.events()` in favour of the new
   events list variable.
 * Renaming test-requirements.txt to requirements.txt
 
