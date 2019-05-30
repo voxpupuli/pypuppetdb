@@ -8,7 +8,7 @@ Changelog
 * Bump dependencies
 * QueryBuilder: Added support for FromOperator, arrays and FromOperator
 * New endpoint: status
-* POST query in request body 
+* POST query in request body
 * Simplify JSON encoding for POST
 * Upload and publish is built in to setuptools
 
@@ -50,7 +50,7 @@ Changelog
 =====
 
 * Fixed URL Encoding found when querying the specific value of a macaddress
-  fact. 
+  fact.
 * Adding support for PuppetDB 4.0.0 information. Namely Adding a catalog_uuid
   attribute to the Catalog type object. Adding code_id, catalog_uuid and
   cached_catalog_status attributes to the Report type object.
@@ -85,7 +85,7 @@ Changelog
 * Adding support for v4 of the Query API
 * Removing v2 and v3 api functions as per changelog
 * pypuppetdb will no longer support multiple API versions, removing the
-  api_version attribute from pypuppetdb.connect() 
+  api_version attribute from pypuppetdb.connect()
 * All clients must remove the api_version attribute from the connect function,
   or the starting number, since it is no longer supported
 * Removing all NotImplemented errors in the function of BaseAPI and filled
