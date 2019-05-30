@@ -49,7 +49,7 @@ setup(
     tests_require=['tox'],
     cmdclass={'test': Tox},
     install_requires=[
-        "requests >= 1.2.3",
+        "requests >= 2.22.0",
         ],
     classifiers=[
         'Development Status :: 4 - Beta',
