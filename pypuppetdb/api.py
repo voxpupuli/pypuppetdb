@@ -387,11 +387,12 @@ class BaseAPI(object):
 
     # Method stubs
 
-    def nodes(self, unreported=2, with_status=False, **kwargs):
+    def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
+              **kwargs):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
-        also fetches the nodes status and event counts of the latest
-        report from puppetdb.
+        also (optionally) fetches the nodes status and (optionally)
+        event counts of the latest report from puppetdb.
 
         :param with_status: (optional) include the node status in the\
                            returned nodes
@@ -399,6 +400,14 @@ class BaseAPI(object):
         :param unreported: (optional) amount of hours when a node gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
+        :param with_event_numbers: (optional) include the exact number of\
+                           changed/unchanged/failed/noop events when\
+                           with_status is set to True. If set to False
+                           only "some" string is provided if there are
+                           resources with such status in the last report.
+                           This provides performance benefits as potentially
+                           slow event-counts query is omitted completely.
+        :type with_event_numbers: :bool:
         :param \*\*kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
@@ -413,7 +422,7 @@ class BaseAPI(object):
         if type(nodes) == dict:
             nodes = [nodes, ]
 
-        if with_status:
+        if with_status and with_event_numbers:
             latest_events = self.event_counts(
                 query=EqualsOperator("latest_report?", True),
                 summarize_by='certname'
@@ -424,25 +433,39 @@ class BaseAPI(object):
             node['events'] = None
 
             if with_status:
-                status = [s for s in latest_events
-                          if s['subject']['title'] == node['certname']]
+                if with_event_numbers:
+                    status = [s for s in latest_events
+                              if s['subject']['title'] == node['certname']]
 
-                try:
+                    try:
+                        node['status_report'] = node['latest_report_status']
+
+                        if status:
+                            node['events'] = status[0]
+                    except KeyError:
+                        if status:
+                            node['events'] = status = status[0]
+                            if status['successes'] > 0:
+                                node['status_report'] = 'changed'
+                            if status['noops'] > 0:
+                                node['status_report'] = 'noop'
+                            if status['failures'] > 0:
+                                node['status_report'] = 'failed'
+                        else:
+                            node['status_report'] = 'unchanged'
+                else:
                     node['status_report'] = node['latest_report_status']
-
-                    if status:
-                        node['events'] = status[0]
-                except KeyError:
-                    if status:
-                        node['events'] = status = status[0]
-                        if status['successes'] > 0:
-                            node['status_report'] = 'changed'
-                        if status['noops'] > 0:
-                            node['status_report'] = 'noop'
-                        if status['failures'] > 0:
-                            node['status_report'] = 'failed'
-                    else:
-                        node['status_report'] = 'unchanged'
+                    node['events'] = {
+                        'successes': 0,
+                        'failures': 0,
+                        'noops': 0,
+                    }
+                    if node['status_report'] == 'changed':
+                        node['events']['successes'] = 'some'
+                    elif node['status_report'] == 'noop':
+                        node['events']['noops'] = 'some'
+                    elif node['status_report'] == 'failed':
+                        node['events']['failures'] = 'some'
 
                 # node report age
                 if node['report_timestamp'] is not None:
