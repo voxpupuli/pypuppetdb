@@ -461,7 +461,7 @@ class Node(object):
     def fact(self, name):
         """Get a single fact from this node."""
         facts = self.facts(name=name)
-        return next(fact for fact in facts)
+        return next((fact for fact in facts), None)
 
     def resources(self, type_=None, title=None, **kwargs):
         """Get all resources of this node or all resources of the specified
@@ -495,7 +495,7 @@ class Node(object):
             title=title,
             query=EqualsOperator("certname", self.name),
             **kwargs)
-        return next(resource for resource in resources)
+        return next((resource for resource in resources), None)
 
     def reports(self, **kwargs):
         """Get all reports for this node. Additional arguments may also be
