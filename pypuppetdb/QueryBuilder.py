@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import datetime
+import json
 import logging
 import sys
 
@@ -39,31 +40,21 @@ class BinaryOperator(object):
     :type value: any
     """
     def __init__(self, operator, field, value):
-        if isinstance(field, (str, unicode)):
-            field = '"{0}"'.format(field)
-        else:
-            field = field
-
-        if isinstance(value, (str, unicode, datetime.datetime)):
-            value = '"{0}"'.format(value)
-        elif isinstance(value, bool):
-            value = 'true' if value else 'false'
-        else:
-            value = value
-
-        self.__string = '["{0}", {1}, {2}]'.format(
-            operator,
-            field,
-            value)
+        if isinstance(value, datetime.datetime):
+            value = str(value)
+        self.data = [operator, field, value]
 
     def __repr__(self):
-        return str('Query: {0}'.format(self.__string))
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return str('{0}'.format(self.__string))
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
-        return self.__string
+        return json.dumps(self.json_data())
+
+    def json_data(self):
+        return self.data
 
 
 class BooleanOperator(object):
@@ -91,31 +82,28 @@ class BooleanOperator(object):
         if type(query) == list:
             for i in query:
                 self.add(i)
-        elif (type(query) == str or
-                isinstance(query, (BinaryOperator, InOperator,
-                                   BooleanOperator))):
-            self.operations.append(str(query))
+        elif type(query) == str:
+            self.operations.append(json.loads(query))
+        elif isinstance(query, (BinaryOperator, InOperator,
+                                BooleanOperator)):
+            self.operations.append(query.json_data())
         else:
             raise APIError("Can only accept fixed-string queries, arrays " +
                            "or operator objects")
 
     def __repr__(self):
-        if len(self.operations) == 0:
-            raise APIError("At least one query operation is required")
-        return 'Query: ["{0}",{1}]'.format(self.operator,
-                                           ",".join(self.operations))
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        if len(self.operations) == 0:
-            raise APIError("At least one query operation is required")
-        return str('["{0}",{1}]'.format(self.operator,
-                   ",".join(self.operations)))
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
+        return json.dumps(self.json_data())
+
+    def json_data(self):
         if len(self.operations) == 0:
             raise APIError("At least one query operation is required")
-        return '["{0}",{1}]'.format(self.operator,
-                                    ",".join(self.operations))
+        return [self.operator] + self.operations
 
 
 class ExtractOperator(object):
@@ -138,9 +126,9 @@ class ExtractOperator(object):
             for i in field:
                 self.add_field(i)
         elif isinstance(field, str):
-            self.fields.append('"{0}"'.format(str(field)))
+            self.fields.append(field)
         elif isinstance(field, FunctionOperator):
-            self.fields.append(str(field))
+            self.fields.append(field.json_data())
         else:
             raise APIError("ExtractOperator.add_field only supports "
                            "lists and strings")
@@ -148,9 +136,11 @@ class ExtractOperator(object):
     def add_query(self, query):
         if self.query is not None:
             raise APIError("Only one query is supported by ExtractOperator")
-        elif isinstance(query, (str, BinaryOperator, SubqueryOperator,
+        elif isinstance(query, str):
+            self.query = json.loads(query)
+        elif isinstance(query, (BinaryOperator, SubqueryOperator,
                                 BooleanOperator)):
-            self.query = str(query)
+            self.query = query.json_data()
         else:
             raise APIError("ExtractOperator.add_query only supports "
                            "strings, BinaryOperator, BooleanOperator "
@@ -162,57 +152,37 @@ class ExtractOperator(object):
                 self.add_group_by(i)
         elif isinstance(field, str):
             if len(self.group_by) == 0:
-                self.group_by.append('"group_by"')
-            self.group_by.append('"{0}"'.format(str(field)))
+                self.group_by.append('group_by')
+            self.group_by.append(field)
         elif isinstance(field, FunctionOperator):
             if len(self.group_by) == 0:
-                self.group_by.append('"group_by"')
-            self.group_by.append(str(field))
+                self.group_by.append('group_by')
+            self.group_by.append(field.json_data())
         else:
             raise APIError("ExtractOperator.add_group_by only supports "
-                           "lists and strings")
+                           "lists, strings, and FunctionOperator objects")
 
     def __repr__(self):
-        if len(self.fields) == 0:
-            raise APIError("ExtractOperator needs at least one field")
-
-        arr = ['"extract"']
-        arr.append("[{0}]".format(",".join(self.fields)))
-
-        if self.query is not None:
-            arr.append(self.query)
-        if len(self.group_by) > 0:
-            arr.append("[{0}]".format(",".join(self.group_by)))
-
-        return str('Query: [{0}]'.format(",".join(arr)))
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        if len(self.fields) == 0:
-            raise APIError("ExtractOperator needs at least one field")
-
-        arr = ['"extract"']
-        arr.append("[{0}]".format(",".join(self.fields)))
-
-        if self.query is not None:
-            arr.append(self.query)
-        if len(self.group_by) > 0:
-            arr.append("[{0}]".format(",".join(self.group_by)))
-
-        return str('[{0}]'.format(",".join(arr)))
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
+        return json.dumps(self.json_data())
+
+    def json_data(self):
         if len(self.fields) == 0:
             raise APIError("ExtractOperator needs at least one field")
 
-        arr = ['"extract"']
-        arr.append("[{0}]".format(",".join(self.fields)))
+        arr = ['extract', self.fields]
 
         if self.query is not None:
             arr.append(self.query)
         if len(self.group_by) > 0:
-            arr.append("[{0}]".format(",".join(self.group_by)))
+            arr.append(self.group_by)
 
-        return str('[{0}]'.format(",".join(arr)))
+        return arr
 
 
 class FunctionOperator(object):
@@ -238,22 +208,25 @@ class FunctionOperator(object):
         elif (function == 'to_string' and fmt is None):
             raise APIError("Function {0} requires an extra 'fmt' parameter")
 
-        self.arr = ['"function"', '"{0}"'.format(function)]
+        self.arr = ['function', function]
 
         if field is not None:
-            self.arr.append('"{0}"'.format(field))
+            self.arr.append(field)
 
         if function == 'to_string':
-            self.arr.append('"{0}"'.format(fmt))
+            self.arr.append(fmt)
 
     def __repr__(self):
-        return str('Query: [{0}]'.format(",".join(self.arr)))
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return str('[{0}]'.format(",".join(self.arr)))
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
-        return str('[{0}]'.format(",".join(self.arr)))
+        return json.dumps(self.json_data())
+
+    def json_data(self):
+        return self.arr
 
 
 class SubqueryOperator(object):
@@ -274,23 +247,26 @@ class SubqueryOperator(object):
             raise APIError("Unsupported endpoint: {0}".format(endpoint))
 
         self.query = None
-        self.arr = ['"select_{0}"'.format(endpoint)]
+        self.arr = ['select_{0}'.format(endpoint)]
 
     def add_query(self, query):
         if self.query is not None:
             raise APIError("Only one query is supported by ExtractOperator")
         else:
             self.query = True
-            self.arr.append(str(query))
+            self.arr.append(query.json_data())
 
     def __repr__(self):
-        return str('Query: [{0}]'.format(",".join(self.arr)))
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return str('[{0}]'.format(",".join(self.arr)))
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
-        return str('[{0}]'.format(",".join(self.arr)))
+        return json.dumps(self.json_data())
+
+    def json_data(self):
+        return self.arr
 
 
 class InOperator(object):
@@ -305,14 +281,17 @@ class InOperator(object):
     """
     def __init__(self, field):
         self.query = None
-        self.arr = ['"in"', '"{0}"'.format(field)]
+        self.arr = ['in', field]
 
     def add_query(self, query):
         if self.query is not None:
             raise APIError("Only one query is supported by ExtractOperator")
-        elif isinstance(query, (str, ExtractOperator, FromOperator)):
+        elif isinstance(query, str):
             self.query = True
-            self.arr.append(str(query))
+            self.arr.append(json.loads(query))
+        elif isinstance(query, (ExtractOperator, FromOperator)):
+            self.query = True
+            self.arr.append(query.json_data())
         else:
             raise APIError("InOperator.add_query only supports "
                            "strings, ExtractOperator, and"
@@ -326,8 +305,7 @@ class InOperator(object):
                 and max(map(depth, L))+1
             if (depth(values) == 1):
                 self.query = True
-                the_arr = '["array", %s]' % values
-                self.arr.append(str(the_arr).replace("'", '"'))
+                self.arr.append(['array', values])
             else:
                 raise APIError("InOperator.add_array: cannot pass in "
                                "nested arrays (or empty arrays)")
@@ -337,13 +315,16 @@ class InOperator(object):
                            "['array', [<array values>]]")
 
     def __repr__(self):
-        return str('Query: [{0}]'.format(",".join(self.arr)))
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return str('[{0}]'.format(",".join(self.arr)))
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
-        return str('[{0}]'.format(",".join(self.arr)))
+        return json.dumps(self.json_data())
+
+    def json_data(self):
+        return self.arr
 
 
 class FromOperator(object):
@@ -384,7 +365,7 @@ class FromOperator(object):
         elif isinstance(query, (InOperator, ExtractOperator,
                                 BinaryOperator, BooleanOperator,
                                 FunctionOperator)):
-            self.query = str(query)
+            self.query = query.json_data()
         else:
             raise APIError("FromOperator.add_field only supports "
                            "Operator Objects")
@@ -395,7 +376,7 @@ class FromOperator(object):
 
         if isinstance(fields, list):
             if fields_depth == 1 or fields_depth == 2:
-                    self.order_by = str(fields)
+                    self.order_by = fields
             else:
                 raise APIError("ExtractOperator.add_order_by only "
                                "supports lists of fields of depth "
@@ -418,55 +399,28 @@ class FromOperator(object):
             raise APIError("ExtractOperator.add_offset only supports ints")
 
     def __repr__(self):
-        if self.query is None:
-            raise APIError("FromOperator needs one main query")
-
-        arr = ['"from"']
-        arr.append('"{0}"'.format(self.endpoint))
-        arr.append(self.query)
-
-        if len(self.order_by) > 0:
-            arr.append('["order_by", {0}]'.format(self.order_by))
-        if self.limit is not None:
-            arr.append('["limit", {0}]'.format(self.limit))
-        if self.offset is not None:
-            arr.append('["offset", {0}]'.format(self.offset))
-
-        return str('Query: [{0}]'.format(",".join(arr))).replace("'", '"')
+        return 'Query: {0}'.format(self)
 
     def __str__(self):
-        if self.query is None:
-            raise APIError("FromOperator needs one main query")
-
-        arr = ['"from"']
-        arr.append('"{0}"'.format(self.endpoint))
-        arr.append(self.query)
-
-        if len(self.order_by) > 0:
-            arr.append('["order_by", {0}]'.format(self.order_by))
-        if self.limit is not None:
-            arr.append('["limit", {0}]'.format(self.limit))
-        if self.offset is not None:
-            arr.append('["offset", {0}]'.format(self.offset))
-
-        return str('[{0}]'.format(",".join(arr))).replace("'", '"')
+        return json.dumps(self.json_data())
 
     def __unicode__(self):
+        return json.dumps(self.json_data())
+
+    def json_data(self):
         if self.query is None:
             raise APIError("FromOperator needs one main query")
 
-        arr = ['"from"']
-        arr.append('"{0}"'.format(self.endpoint))
-        arr.append(self.query)
+        arr = ['from', self.endpoint, self.query]
 
         if len(self.order_by) > 0:
-            arr.append('["order_by", {0}]'.format(self.order_by))
+            arr.append(['order_by', self.order_by])
         if self.limit is not None:
-            arr.append('["limit", {0}]'.format(self.limit))
+            arr.append(['limit', self.limit])
         if self.offset is not None:
-            arr.append('["offset", {0}]'.format(self.offset))
+            arr.append(['offset', self.offset])
 
-        return str('[{0}]'.format(",".join(arr))).replace("'", '"')
+        return arr
 
 
 class EqualsOperator(BinaryOperator):
