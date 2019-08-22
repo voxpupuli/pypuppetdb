@@ -396,9 +396,9 @@ class BaseAPI(object):
 
     def _cmd(self, command, payload):
         """This method posts commands to PuppetDB. Provided a command and payload
-        it will fire a request at PuppetDB. If PuppetDB can be reached and answers
-        within the timeout we'll decode the response and give it back or raise for
-        the HTTP Status Code yesPuppetDB gave back.
+        it will fire a request at PuppetDB. If PuppetDB can be reached and
+        answers within the timeout we'll decode the response and give it back
+        or raise for the HTTP Status Code yesPuppetDB gave back.
 
         :param command: The PuppetDB Command we want to execute.
         :type command: :obj:`string`
@@ -410,7 +410,8 @@ class BaseAPI(object):
         :returns: The decoded response from PuppetDB
         :rtype: :obj:`dict` or :obj:`list`
         """
-        log.debug('_cmd called with command: {0}, data: {1}'.format(command, payload))
+        log.debug('_cmd called with command: {0}, data: {1}'.format(
+            command, payload))
 
         url = self._url('cmd')
 

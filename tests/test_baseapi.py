@@ -422,11 +422,13 @@ class TestAPIQuery(object):
 
     def test_cmd_with_token_authorization(self, token_baseapi):
         httpretty.enable()
-        stub_request('https://localhost:8080/pdb/cmd/v1', method=httpretty.POST)
+        stub_request('https://localhost:8080/pdb/cmd/v1',
+                     method=httpretty.POST)
         token_baseapi._cmd('deactivate node', {'certname': ''})
         assert httpretty.last_request().path.startswith('/pdb/cmd/v1')
         assert httpretty.last_request().headers['X-Authentication'] == \
-               'tokenstring'
+            'tokenstring'
+
 
 class TestAPIMethods(object):
     def test_metric(self, baseapi):
