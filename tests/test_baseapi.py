@@ -176,18 +176,22 @@ class TestBaseAPIURL(object):
             + 'facts/macaddress/02%3A42%3Aec%3A94%3A80%3Af0'
 
 
-class TesteAPIQuery(object):
+class TestAPIQuery(object):
     @mock.patch.object(requests.Session, 'request')
     def test_timeout(self, get, baseapi):
         get.side_effect = requests.exceptions.Timeout
         with pytest.raises(requests.exceptions.Timeout):
             baseapi._query('nodes')
+        with pytest.raises(requests.exceptions.Timeout):
+            baseapi._cmd('deactivate node', {'certname': ''})
 
     @mock.patch.object(requests.Session, 'request')
     def test_connectionerror(self, get, baseapi):
         get.side_effect = requests.exceptions.ConnectionError
         with pytest.raises(requests.exceptions.ConnectionError):
             baseapi._query('nodes')
+        with pytest.raises(requests.exceptions.ConnectionError):
+            baseapi._cmd('deactivate node', {'certname': ''})
 
     @mock.patch.object(requests.Session, 'request')
     def test_httperror(self, get, baseapi):
@@ -195,6 +199,8 @@ class TesteAPIQuery(object):
             response=requests.Response())
         with pytest.raises(requests.exceptions.HTTPError):
             baseapi._query('nodes')
+        with pytest.raises(requests.exceptions.HTTPError):
+            baseapi._cmd('deactivate node', {'certname': ''})
 
     def test_setting_headers_without_token(self, baseapi):
         httpretty.enable()
@@ -386,6 +392,41 @@ class TesteAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
+    def test_cmd(self, baseapi, query):
+        httpretty.reset()
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/cmd/v1',
+                     method=httpretty.POST)
+        node_name = 'testnode'
+        baseapi._cmd('deactivate node', {'certname': node_name})
+        last_request = httpretty.last_request()
+        assert last_request.querystring == {
+            "certname": [node_name],
+            "command": ['deactivate node'],
+            "version": ['3'],
+            "checksum": ['b93d474970e54943aec050ee399dfb85d21e143a']
+        }
+        assert last_request.headers['Content-Type'] == 'application/json'
+        assert last_request.method == 'POST'
+        assert last_request.body == six.b(json.dumps({'certname': node_name}))
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_cmd_bad_command(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/cmd/v1')
+        with pytest.raises(pypuppetdb.errors.APIError):
+            baseapi._cmd('incorrect command', {})
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_cmd_with_token_authorization(self, token_baseapi):
+        httpretty.enable()
+        stub_request('https://localhost:8080/pdb/cmd/v1', method=httpretty.POST)
+        token_baseapi._cmd('deactivate node', {'certname': ''})
+        assert httpretty.last_request().path.startswith('/pdb/cmd/v1')
+        assert httpretty.last_request().headers['X-Authentication'] == \
+               'tokenstring'
 
 class TestAPIMethods(object):
     def test_metric(self, baseapi):
@@ -467,5 +508,18 @@ class TestAPIMethods(object):
         baseapi.status()
         assert httpretty.last_request().path == \
             '/status/v1/services/puppetdb-status'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_command(self, baseapi):
+        httpretty.enable()
+        stub_request(
+            'http://localhost:8080/pdb/cmd/v1',
+            method=httpretty.POST
+        )
+        baseapi.command('deactivate node', {'certname': 'testnode'})
+        assert httpretty.last_request().path.startswith(
+               '/pdb/cmd/v1'
+        )
         httpretty.disable()
         httpretty.reset()
