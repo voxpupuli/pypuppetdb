@@ -424,7 +424,7 @@ class BaseAPI(object):
             "command": command,
             "version": COMMAND_VERSION[command],
             "certname": payload['certname'],
-            "checksum": hashlib.sha1(str(payload).encode('utf-8')).hexdigest()
+            "checksum": hashlib.sha1(str(payload).encode('utf-8')).hexdigest() #nosec
         }
 
         if not self.token:
