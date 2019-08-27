@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+import hashlib
 import json
 import logging
 import requests
@@ -47,6 +48,7 @@ ENDPOINTS = {
     'pql': 'pdb/query/v4',
     'inventory': 'pdb/query/v4/inventory',
     'status': 'status/v1/services/puppetdb-status',
+    'cmd': 'pdb/cmd/v1'
 }
 
 PARAMETERS = {
@@ -56,6 +58,13 @@ PARAMETERS = {
     'counts_filter': 'counts_filter',
     'summarize_by': 'summarize_by',
     'server_time': 'server_time',
+}
+
+COMMAND_VERSION = {
+    "deactivate node": 3,
+    "replace catalog": 9,
+    "replace facts": 5,
+    "store report": 8
 }
 
 ERROR_STRINGS = {
@@ -361,6 +370,79 @@ class BaseAPI(object):
                 self.last_total = r.headers['X-Records']
             else:
                 self.last_total = None
+
+            json_body = r.json()
+            if json_body is not None:
+                return json_body
+            else:
+                del json_body
+                raise EmptyResponseError
+
+        except requests.exceptions.Timeout:
+            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['timeout'],
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
+        except requests.exceptions.ConnectionError:
+            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['refused'],
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
+        except requests.exceptions.HTTPError as err:
+            log.error("{0} {1}:{2} over {3}.".format(err.response.text,
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
+
+    def _cmd(self, command, payload):
+        """This method posts commands to PuppetDB. Provided a command and payload
+        it will fire a request at PuppetDB. If PuppetDB can be reached and
+        answers within the timeout we'll decode the response and give it back
+        or raise for the HTTP Status Code yesPuppetDB gave back.
+
+        :param command: The PuppetDB Command we want to execute.
+        :type command: :obj:`string`
+        :param command: The payload, in wire format, specific to the command.
+        :type path: :obj:`dict`
+
+        :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
+
+        :returns: The decoded response from PuppetDB
+        :rtype: :obj:`dict` or :obj:`list`
+        """
+        log.debug('_cmd called with command: {0}, data: {1}'.format(
+            command, payload))
+
+        url = self._url('cmd')
+
+        if command not in COMMAND_VERSION:
+            log.error("Only {0} supported, {1} unsupported".format(
+                list(COMMAND_VERSION.keys()), command))
+            raise APIError
+
+        params = {
+            "command": command,
+            "version": COMMAND_VERSION[command],
+            "certname": payload['certname'],
+            "checksum": hashlib.sha1(str(payload)  # nosec
+                                     .encode('utf-8')).hexdigest()
+        }
+
+        if not self.token:
+            auth = (self.username, self.password)
+        else:
+            auth = None
+
+        try:
+            r = self._session.post(url,
+                                   params=params,
+                                   data=json.dumps(payload, default=str),
+                                   verify=self.ssl_verify,
+                                   cert=(self.ssl_cert, self.ssl_key),
+                                   timeout=self.timeout,
+                                   auth=auth)
+
+            r.raise_for_status()
 
             json_body = r.json()
             if json_body is not None:
@@ -863,3 +945,6 @@ class BaseAPI(object):
         :rtype: :obj:`dict`
         """
         return self._query('status')
+
+    def command(self, command, payload):
+        return self._cmd(command, payload)
