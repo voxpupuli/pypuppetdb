@@ -2,6 +2,13 @@
 Changelog
 #########
 
+1.1.0
+=====
+
+* deduplicate dependencylist
+* QueryBuilder.py: Use native data structures for internal representation
+* Add support for the Command API, /pdb/cmd/v1. Added _cmd alongside _query to minimise changes to original code
+
 1.0.0
 =====
 
