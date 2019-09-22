@@ -58,6 +58,7 @@ setup(
     long_description_content_type='text/x-rst',
     keywords='puppet puppetdb',
     tests_require=requirements_test,
+    data_files=[('requirements_for_tests', ['requirements-test.txt'])],
     cmdclass={'test': Tox},
     install_requires=requirements,
     classifiers=[
