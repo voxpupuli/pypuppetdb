@@ -2,6 +2,13 @@
 Changelog
 #########
 
+1.2.0
+=====
+
+* Add option to get nodes without using event-counts
+* define the project status as stable
+* bundle requirements-test.txt in python package
+
 1.1.0
 =====
 
