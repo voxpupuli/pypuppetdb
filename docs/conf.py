@@ -1,60 +1,78 @@
 # -*- coding: utf-8 -*-
-import sys, os
-
-pypuppetdb_root = os.path.dirname(os.path.abspath('.'))
-sys.path.insert(0, pypuppetdb_root)
+import sys
+import os
 import pypuppetdb.package
 
-# -- General configuration -----------------------------------------------------
+pypuppetdb_root = os.path.dirname(os.path.abspath("."))
+sys.path.insert(0, pypuppetdb_root)
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+# -- General configuration ----------------------------------------------------
 
-templates_path = ['_templates']
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 
-source_suffix = '.rst'
+templates_path = ["_templates"]
 
-master_doc = 'index'
+source_suffix = ".rst"
+
+master_doc = "index"
 
 project = pypuppetdb.package.__title__
-copyright = '{0}, {1}'.format(pypuppetdb.package.__year__,
-                              pypuppetdb.package.__author__)
+copyright = "{0}, {1}".format(
+    pypuppetdb.package.__year__, pypuppetdb.package.__author__
+)
 
 version = pypuppetdb.package.__version__
 release = version
 
-language = 'en'
+language = "en"
 
-exclude_patterns = ['_build']
+exclude_patterns = ["_build"]
 
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output --------------------------------------------------
 
-html_theme = 'default'
+html_theme = "default"
 
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
-htmlhelp_basename = 'pypuppetdbdoc'
+htmlhelp_basename = "pypuppetdbdoc"
 
-# -- Options for LaTeX output --------------------------------------------------
+# -- Options for LaTeX output -------------------------------------------------
 
 latex_documents = [
-  ('index', 'pypuppetdb.tex', u'pypuppetdb Documentation',
-   u'Daniele Sluijters', 'manual'),
+    (
+        "index",
+        "pypuppetdb.tex",
+        u"pypuppetdb Documentation",
+        u"Daniele Sluijters",
+        "manual",
+    ),
 ]
 
 
-# -- Options for manual page output --------------------------------------------
+# -- Options for manual page output -------------------------------------------
 
 man_pages = [
-    ('index', 'pypuppetdb', u'pypuppetdb Documentation',
-     [u'Daniele Sluijters'], 1)
+    (
+        "index",
+        "pypuppetdb",
+        u"pypuppetdb Documentation",
+        [u"Daniele Sluijters"],
+        1,
+    )
 ]
 
-# -- Options for Texinfo output ------------------------------------------------
+# -- Options for Texinfo output -----------------------------------------------
 
 texinfo_documents = [
-  ('index', 'pypuppetdb', u'pypuppetdb Documentation',
-   u'Daniele Sluijters', 'pypuppetdb', 'Library to work with the PuppetDB REST API.',
-   'Miscellaneous'),
+    (
+        "index",
+        "pypuppetdb",
+        u"pypuppetdb Documentation",
+        u"Daniele Sluijters",
+        "pypuppetdb",
+        "Library to work with the PuppetDB REST API.",
+        "Miscellaneous",
+    ),
 ]
