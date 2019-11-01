@@ -16,17 +16,17 @@ def version():
     return os.getenv('TRAVIS_TAG', rc_value())
 
 
-class Tox(TestCommand):
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
 
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = '--cov=pypuppetdb --cov-report=term-missing'
 
     def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import tox
-        errno = tox.cmdline(self.test_args)
+        import shlex
+        import pytest
+        errno = pytest.main(shlex.split(self.pytest_args))
         sys.exit(errno)
 
 
@@ -60,7 +60,7 @@ setup(
     keywords='puppet puppetdb',
     tests_require=requirements_test,
     data_files=[('requirements_for_tests', ['requirements-test.txt'])],
-    cmdclass={'test': Tox},
+    cmdclass={'test': PyTest},
     install_requires=requirements,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
