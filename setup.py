@@ -1,8 +1,8 @@
-import sys
-import os
 import codecs
+import os
+import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 
@@ -16,18 +16,19 @@ def version():
     return os.getenv('TRAVIS_TAG', rc_value())
 
 
-class Tox(TestCommand):
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
 
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = '--cov=pypuppetdb --cov-report=term-missing'
 
     def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import tox
-        errno = tox.cmdline(self.test_args)
+        import shlex
+        import pytest
+        errno = pytest.main(shlex.split(self.pytest_args))
         sys.exit(errno)
+
 
 with codecs.open('README.rst', encoding='utf-8') as f:
     README = f.read()
@@ -59,7 +60,7 @@ setup(
     keywords='puppet puppetdb',
     tests_require=requirements_test,
     data_files=[('requirements_for_tests', ['requirements-test.txt'])],
-    cmdclass={'test': Tox},
+    cmdclass={'test': PyTest},
     install_requires=requirements,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -67,13 +68,10 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: POSIX',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries'
-        ],
-    )
+    ],
+)
