@@ -8,4 +8,6 @@ pytest==5.2.2
 pytest-cov==2.8.1
 pytest-pep8==1.0.6
 pytest-mock==1.11.2
+pytest-mypy==0.4.2
 cov-core==1.15.0
+mypy==0.740
