@@ -1,9 +1,10 @@
-from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
+
+from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.utils import json_to_datetime
-from pypuppetdb.QueryBuilder import *
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +53,7 @@ class Event(object):
     :ivar item: :obj:`dict` with information about the item/resource this\
         event was triggered for.
     """
+
     def __init__(self, node, status, timestamp, hash_, title, property_,
                  message, new_value, old_value, type_, class_, execution_path,
                  source_file, line_number):
@@ -63,17 +65,11 @@ class Event(object):
             self.failed = False
         self.timestamp = json_to_datetime(timestamp)
         self.hash_ = hash_
-        self.item = {}
-        self.item['title'] = title
-        self.item['type'] = type_
-        self.item['property'] = property_
-        self.item['message'] = message
-        self.item['old'] = old_value
-        self.item['new'] = new_value
-        self.item['class'] = class_
-        self.item['execution_path'] = execution_path
-        self.item['source_file'] = source_file
-        self.item['line_number'] = line_number
+        self.item = {'title': title, 'type': type_, 'property': property_,
+                     'message': message, 'old': old_value,
+                     'new': new_value, 'class': class_,
+                     'execution_path': execution_path, 'source_file': source_file,
+                     'line_number': line_number}
         self.__string = '{0}[{1}]/{2}'.format(self.item['type'],
                                               self.item['title'],
                                               self.hash_)
@@ -83,9 +79,6 @@ class Event(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
 
 class Report(object):
@@ -170,13 +163,13 @@ class Report(object):
     :ivar producer: :obj:`string` representing the certname of the Puppet\
         Master that sent the report to PuppetDB
     """
+
     def __init__(self, api, node, hash_, start, end, received, version,
                  format_, agent_version, transaction, status=None,
                  metrics={}, logs={}, environment=None,
                  noop=False, noop_pending=False, code_id=None,
                  catalog_uuid=None, cached_catalog_status=None,
                  producer=None):
-
         self.node = node
         self.hash_ = hash_
         self.start = json_to_datetime(start)
@@ -204,9 +197,6 @@ class Report(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be
@@ -236,6 +226,7 @@ class Fact(object):
         fact's value.
     :ivar environment: :obj:`string` holding the fact's environment
     """
+
     def __init__(self, node, name, value, environment=None):
         self.node = node
         self.name = name
@@ -248,9 +239,6 @@ class Fact(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
 
 class Resource(object):
@@ -290,6 +278,7 @@ class Resource(object):
     :ivar environment: :obj:`string` The environment of the node associated\
         with this resource.
     """
+
     def __init__(self, node, name, type_, tags, exported, sourcefile,
                  sourceline, environment=None, parameters={}):
         self.node = node
@@ -309,9 +298,6 @@ class Resource(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
 
 class Node(object):
@@ -390,6 +376,7 @@ class Node(object):
     :ivar cached_catalog_status: :obj:`string` the status of the cached\
             catalog from the last puppet run.
     """
+
     def __init__(self, api, name, deactivated=None, expired=None,
                  report_timestamp=None, catalog_timestamp=None,
                  facts_timestamp=None, status_report=None,
@@ -447,9 +434,6 @@ class Node(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
     def facts(self, **kwargs):
         """Get all facts of this node. Additional arguments may also be
@@ -554,6 +538,7 @@ class Catalog(object):
     :ivar producer: :obj:`string` of the Puppet Master that sent the catalog\
         to PuppetDB
     """
+
     def __init__(self, node, edges, resources, version, transaction_uuid,
                  environment=None, code_id=None, catalog_uuid=None,
                  producer=None):
@@ -584,10 +569,8 @@ class Catalog(object):
 
         self.edges = []
         for edge in edges:
-            identifier_source = edge['source_type'] + \
-                '[' + edge['source_title'] + ']'
-            identifier_target = edge['target_type'] + \
-                '[' + edge['target_title'] + ']'
+            identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
+            identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
             e = Edge(source=self.resources[identifier_source],
                      target=self.resources[identifier_target],
                      relationship=edge['relationship'],
@@ -604,18 +587,12 @@ class Catalog(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def __unicode__(self):
-        return self.__string
-
     def get_resources(self):
-        try:
-            return self.resources.itervalues()
-        except AttributeError:
-            return self.resources.values()
+        return self.resources.values()
 
     def get_resource(self, resource_type, resource_title):
         identifier = resource_type + \
-            '[' + resource_title + ']'
+                     '[' + resource_title + ']'
         return self.resources[identifier]
 
     def get_edges(self):
@@ -641,6 +618,7 @@ class Edge(object):
     :ivar relationship: :obj:`string` Name of the Puppet Resource relationship
     :ivar node: :obj:`string` The name of the node that owns this relationship
     """
+
     def __init__(self, source, target, relationship, node=None):
         self.source = source
         self.target = target
@@ -655,9 +633,6 @@ class Edge(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
 
 class Inventory(object):
@@ -687,6 +662,7 @@ class Inventory(object):
         assosciated facts.
     :ivar trusted: The trusted data from the node.
     """
+
     def __init__(self, node, time, environment, facts, trusted):
         self.node = node
         self.time = json_to_datetime(time)
@@ -700,6 +676,3 @@ class Inventory(object):
 
     def __str__(self):
         return str("{0}").format(self.__string)
-
-    def __unicode(self):
-        return self.__string

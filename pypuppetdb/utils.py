@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import warnings
 import datetime
 import re
 
@@ -55,6 +54,7 @@ def versioncmp(v1, v2):
     :returns: -1, 0 or 1.
     :rtype: :obj:`int`
     """
+
     def normalize(v):
         """Removes leading zeroes from right of a decimal point from v and
         returns an array of values separated by '.'
@@ -66,8 +66,6 @@ def versioncmp(v1, v2):
         :rtype: :obj:`list`
         """
         return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
-    try:
-        return cmp(normalize(v1), normalize(v2))
-    except NameError:
-        return (normalize(v1) > normalize(v2)) - (
+
+    return (normalize(v1) > normalize(v2)) - (
             normalize(v1) < normalize(v2))

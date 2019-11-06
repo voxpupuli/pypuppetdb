@@ -1,12 +1,13 @@
 import datetime
+
 import pytest
-import pypuppetdb
-import sys
 
-from pypuppetdb.QueryBuilder import *
-
-if sys.version_info >= (3, 0):
-    unicode = str
+from pypuppetdb.QueryBuilder import (AndOperator, EqualsOperator, ExtractOperator, FromOperator,
+                                     FunctionOperator, GreaterEqualOperator, GreaterOperator,
+                                     InOperator, LessEqualOperator, LessOperator, NotOperator,
+                                     NullOperator, OrOperator, RegexArrayOperator, RegexOperator,
+                                     SubqueryOperator)
+from pypuppetdb.api import APIError
 
 
 class TestBinaryOperator(object):
@@ -17,7 +18,7 @@ class TestBinaryOperator(object):
         op = EqualsOperator("certname", "test01")
         assert str(op) == '["=", "certname", "test01"]'
         assert repr(op) == 'Query: ["=", "certname", "test01"]'
-        assert unicode(op) == '["=", "certname", "test01"]'
+        assert str(op) == '["=", "certname", "test01"]'
         assert str(EqualsOperator("clientversion", 91))\
             == '["=", "clientversion", 91]'
         assert str(EqualsOperator("start_time", "2016-05-11T23:22:48.709Z"))\
@@ -120,8 +121,8 @@ class TestBooleanOperator(object):
             '["=", "operatingsystem", "CentOS"], '\
             '["=", "architecture", "x86_64"], '\
             '[">", "operatingsystemmajrelease", 6]]'
-        assert unicode(op) == '["and", ["=", "operatingsystem", "CentOS"], '\
-            '["=", "architecture", "x86_64"], '\
+        assert str(op) == '["and", ["=", "operatingsystem", "CentOS"], ' \
+                          '["=", "architecture", "x86_64"], '\
             '[">", "operatingsystemmajrelease", 6]]'
 
         with pytest.raises(APIError):
@@ -140,8 +141,8 @@ class TestBooleanOperator(object):
             '["=", "operatingsystem", "CentOS"], '\
             '["=", "architecture", "x86_64"], '\
             '[">", "operatingsystemmajrelease", 6]]'
-        assert unicode(op) == '["or", ["=", "operatingsystem", "CentOS"], '\
-            '["=", "architecture", "x86_64"], '\
+        assert str(op) == '["or", ["=", "operatingsystem", "CentOS"], ' \
+                          '["=", "architecture", "x86_64"], '\
             '[">", "operatingsystemmajrelease", 6]]'
 
         with pytest.raises(APIError):
@@ -153,7 +154,7 @@ class TestBooleanOperator(object):
 
         assert str(op) == '["not", ["=", "operatingsystem", "CentOS"]]'
         assert repr(op) == 'Query: ["not", ["=", "operatingsystem", "CentOS"]]'
-        assert unicode(op) == '["not", ["=", "operatingsystem", "CentOS"]]'
+        assert str(op) == '["not", ["=", "operatingsystem", "CentOS"]]'
 
         with pytest.raises(APIError):
             op.add(GreaterOperator("operatingsystemmajrelease", 6))
@@ -169,7 +170,7 @@ class TestBooleanOperator(object):
         with pytest.raises(APIError):
             str(op)
         with pytest.raises(APIError):
-            unicode(op)
+            str(op)
 
     def test_or_with_no_operations(self):
         op = OrOperator()
@@ -179,7 +180,7 @@ class TestBooleanOperator(object):
         with pytest.raises(APIError):
             str(op)
         with pytest.raises(APIError):
-            unicode(op)
+            str(op)
 
     def test_not_with_no_operations(self):
         op = NotOperator()
@@ -189,7 +190,7 @@ class TestBooleanOperator(object):
         with pytest.raises(APIError):
             str(op)
         with pytest.raises(APIError):
-            unicode(op)
+            str(op)
 
     def test_not_with_list(self):
         op = NotOperator()
@@ -206,12 +207,12 @@ class TestExtractOperator(object):
     def test_with_add_field(self):
         op = ExtractOperator()
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             repr(op)
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             str(op)
-        with pytest.raises(pypuppetdb.errors.APIError):
-            unicode(op)
+        with pytest.raises(APIError):
+            str(op)
 
         op.add_field("certname")
         op.add_field(['fact_environment', 'catalog_environment'])
@@ -220,10 +221,10 @@ class TestExtractOperator(object):
             '["certname", "fact_environment", "catalog_environment"]]'
         assert str(op) == '["extract", '\
             '["certname", "fact_environment", "catalog_environment"]]'
-        assert unicode(op) == '["extract", '\
-            '["certname", "fact_environment", "catalog_environment"]]'
+        assert str(op) == '["extract", ' \
+                          '["certname", "fact_environment", "catalog_environment"]]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op.add_field({'equal': 'operatingsystemrelease'})
 
     def test_with_add_query(self):
@@ -231,7 +232,7 @@ class TestExtractOperator(object):
 
         op.add_field(['certname', 'fact_environment', 'catalog_environment'])
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op.add_query({'less': 42, 'greater': 50})
 
         op.add_query(EqualsOperator('domain', 'example.com'))
@@ -242,11 +243,11 @@ class TestExtractOperator(object):
         assert str(op) == '["extract", '\
             '["certname", "fact_environment", "catalog_environment"], '\
             '["=", "domain", "example.com"]]'
-        assert unicode(op) == '["extract", '\
-            '["certname", "fact_environment", "catalog_environment"], '\
+        assert str(op) == '["extract", ' \
+                          '["certname", "fact_environment", "catalog_environment"], '\
             '["=", "domain", "example.com"]]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op.add_query(GreaterOperator("processorcount", 1))
 
     def test_with_add_group_by(self):
@@ -256,7 +257,7 @@ class TestExtractOperator(object):
         op.add_query(EqualsOperator('domain', 'example.com'))
         op.add_group_by(["fact_environment", "catalog_environment"])
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op.add_group_by({"deactivated": False})
 
         assert repr(op) == 'Query: ["extract", '\
@@ -267,8 +268,8 @@ class TestExtractOperator(object):
             '["certname", "fact_environment", "catalog_environment"], '\
             '["=", "domain", "example.com"], '\
             '["group_by", "fact_environment", "catalog_environment"]]'
-        assert unicode(op) == '["extract", '\
-            '["certname", "fact_environment", "catalog_environment"], '\
+        assert str(op) == '["extract", ' \
+                          '["certname", "fact_environment", "catalog_environment"], '\
             '["=", "domain", "example.com"], '\
             '["group_by", "fact_environment", "catalog_environment"]]'
 
@@ -293,8 +294,8 @@ class TestExtractOperator(object):
             '["function", "count"]], '\
             '["group_by", '\
             '["function", "to_string", "producer_timestamp", "FMDAY"]]]'
-        assert unicode(op) == '["extract", '\
-            '[["function", "to_string", "producer_timestamp", "FMDAY"], '\
+        assert str(op) == '["extract", ' \
+                          '[["function", "to_string", "producer_timestamp", "FMDAY"], '\
             '["function", "count"]], '\
             '["group_by", '\
             '["function", "to_string", "producer_timestamp", "FMDAY"]]]'
@@ -309,13 +310,13 @@ class TestFunctionOperator(object):
             '["function", "count"]'
         assert repr(FunctionOperator('count')) == \
             'Query: ["function", "count"]'
-        assert unicode(FunctionOperator('count')) == \
+        assert str(FunctionOperator('count')) == \
             '["function", "count"]'
         assert str(FunctionOperator('count', 'domain')) == \
             '["function", "count", "domain"]'
         assert repr(FunctionOperator('count', 'domain')) == \
             'Query: ["function", "count", "domain"]'
-        assert unicode(FunctionOperator('count', 'domain')) == \
+        assert str(FunctionOperator('count', 'domain')) == \
             '["function", "count", "domain"]'
 
     def test_avg_function(self):
@@ -323,10 +324,10 @@ class TestFunctionOperator(object):
             '["function", "avg", "uptime"]'
         assert repr(FunctionOperator('avg', 'uptime')) == \
             'Query: ["function", "avg", "uptime"]'
-        assert unicode(FunctionOperator('avg', 'uptime')) == \
+        assert str(FunctionOperator('avg', 'uptime')) == \
             '["function", "avg", "uptime"]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("avg")
 
     def test_sum_function(self):
@@ -334,10 +335,10 @@ class TestFunctionOperator(object):
             '["function", "sum", "memoryfree_mb"]'
         assert repr(FunctionOperator('sum', 'memoryfree_mb')) == \
             'Query: ["function", "sum", "memoryfree_mb"]'
-        assert unicode(FunctionOperator('sum', 'memoryfree_mb')) == \
+        assert str(FunctionOperator('sum', 'memoryfree_mb')) == \
             '["function", "sum", "memoryfree_mb"]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("sum")
 
     def test_min_function(self):
@@ -345,10 +346,10 @@ class TestFunctionOperator(object):
             '["function", "min", "kernelversion"]'
         assert repr(FunctionOperator('min', 'kernelversion')) == \
             'Query: ["function", "min", "kernelversion"]'
-        assert unicode(FunctionOperator('min', 'kernelversion')) == \
+        assert str(FunctionOperator('min', 'kernelversion')) == \
             '["function", "min", "kernelversion"]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("min")
 
     def test_max_function(self):
@@ -356,10 +357,10 @@ class TestFunctionOperator(object):
             '["function", "max", "facterversion"]'
         assert repr(FunctionOperator('max', 'facterversion')) == \
             'Query: ["function", "max", "facterversion"]'
-        assert unicode(FunctionOperator('max', 'facterversion')) == \
+        assert str(FunctionOperator('max', 'facterversion')) == \
             '["function", "max", "facterversion"]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("max")
 
     def test_to_string_function(self):
@@ -371,20 +372,18 @@ class TestFunctionOperator(object):
                                      'producer_timestamp',
                                      'FMDAY')) == \
             'Query: ["function", "to_string", "producer_timestamp", "FMDAY"]'
-        assert unicode(FunctionOperator("to_string",
-                                        'producer_timestamp',
-                                        'FMDAY')) == \
+        assert str(FunctionOperator("to_string", 'producer_timestamp', 'FMDAY')) == \
             '["function", "to_string", "producer_timestamp", "FMDAY"]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("to_string")
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("to_string", 'receive_time')
 
     def test_unknown_function(self):
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("std_dev")
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             FunctionOperator("last")
 
 
@@ -403,13 +402,13 @@ class TestSubqueryOperator(object):
             '["=", "status", "noop"]]'
 
     def test_multiple_add_query(self):
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op = SubqueryOperator('events')
             op.add_query(EqualsOperator('status', 'noop'))
             op.add_query(EqualsOperator('status', 'changed'))
 
     def test_unknown_endpoint(self):
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             SubqueryOperator('cats')
 
 
@@ -430,7 +429,7 @@ class TestInOperator(object):
             '["extract", ["certname"]]]'
 
     def test_multiple_add_query(self):
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op = InOperator('certname')
             op.add_query(ExtractOperator())
             op.add_query(ExtractOperator())
@@ -448,20 +447,20 @@ class TestInOperator(object):
         inv1 = [1, [2, 3]]
         inv2 = []
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op = InOperator('certname')
             op.add_array(inv1)
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op = InOperator('certname')
             op.add_array(inv2)
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op = InOperator('certname')
             op.add_array(arr)
             op.add_array(arr)
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             op = InOperator('certname')
 
             op.add_array(arr)
@@ -497,8 +496,8 @@ class TestInOperator(object):
         fr.add_query(ex)
         op.add_query(fr)
 
-        assert unicode(op) == '["in", "certname", ' \
-            '["from", "fact_contents", ' \
+        assert str(op) == '["in", "certname", ' \
+                          '["from", "fact_contents", ' \
             '["extract", ["certname"], ["and", ["=", "path", ' \
             '["networking", "eth0", "macaddresses", 0]], ' \
             '["=", "value", "aa:bb:cc:dd:ee:00"]]]]]'
@@ -512,10 +511,10 @@ class TestFromOperator(object):
     def test_init_from(self):
         fr = FromOperator("facts")
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             str(fr) == "unimportant_no_query"
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             fr2 = FromOperator('invalid_entity')
 
     def test_add_query(self):
@@ -527,10 +526,10 @@ class TestFromOperator(object):
 
         fr2 = FromOperator("facts")
         op2 = "test, test, test"
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             fr2.add_query(op2)
         fr2.add_query(op)
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             fr2.add_query(op)
 
         fr3 = FromOperator("facts")
@@ -557,7 +556,7 @@ class TestFromOperator(object):
             ' "test01"], ["limit", 5], ["offset", 10]]'
 
         fr.add_limit(15)
-        assert unicode(fr) == \
+        assert str(fr) == \
             '["from", "facts", ["=", "certname",' \
             ' "test01"], ["limit", 15], ["offset", 10]]'
 
@@ -565,10 +564,10 @@ class TestFromOperator(object):
             'Query: ["from", "facts", ["=", "certname",' \
             ' "test01"], ["limit", 15], ["offset", 10]]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             fr.add_offset("invalid")
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             fr.add_limit(["invalid"])
 
     def test_order_by(self):
@@ -598,11 +597,11 @@ class TestFromOperator(object):
             '["order_by", ["certname", ' \
             '["timestamp", "desc"], "facts"]]]'
 
-        assert unicode(fr) == \
+        assert str(fr) == \
             '["from", "facts", ' \
             '["=", "certname", "test01"], ' \
             '["order_by", ["certname", ' \
             '["timestamp", "desc"], "facts"]]]'
 
-        with pytest.raises(pypuppetdb.errors.APIError):
+        with pytest.raises(APIError):
             fr.add_order_by(o3inv)

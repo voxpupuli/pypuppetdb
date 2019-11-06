@@ -1,17 +1,13 @@
-from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import json
 import logging
-import sys
 
-from pypuppetdb.errors import *
+from pypuppetdb.errors import APIError
 
 log = logging.getLogger(__name__)
-
-if sys.version_info >= (3, 0):
-    unicode = str
 
 
 class BinaryOperator(object):
@@ -39,6 +35,7 @@ class BinaryOperator(object):
     :param value: The values of the field to match, or not match.
     :type value: any
     """
+
     def __init__(self, operator, field, value):
         if isinstance(value, datetime.datetime):
             value = str(value)
@@ -48,9 +45,6 @@ class BinaryOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -74,6 +68,7 @@ class BooleanOperator(object):
     :param operator: The boolean query operation to perform.
     :type operator: :obj:`string`
     """
+
     def __init__(self, operator):
         self.operator = operator
         self.operations = []
@@ -97,9 +92,6 @@ class BooleanOperator(object):
     def __str__(self):
         return json.dumps(self.json_data())
 
-    def __unicode__(self):
-        return json.dumps(self.json_data())
-
     def json_data(self):
         if len(self.operations) == 0:
             raise APIError("At least one query operation is required")
@@ -116,6 +108,7 @@ class ExtractOperator(object):
     an optional standard query and an optional group by clause including a
     list of fields.
     """
+
     def __init__(self):
         self.fields = []
         self.query = None
@@ -168,9 +161,6 @@ class ExtractOperator(object):
     def __str__(self):
         return json.dumps(self.json_data())
 
-    def __unicode__(self):
-        return json.dumps(self.json_data())
-
     def json_data(self):
         if len(self.fields) == 0:
             raise APIError("ExtractOperator needs at least one field")
@@ -199,13 +189,14 @@ class FunctionOperator(object):
         functions with the exception of count require this value.
     :type field: :obj:`str`
     """
+
     def __init__(self, function, field=None, fmt=None):
         if function not in ['count', 'avg', 'sum', 'min', 'max', 'to_string']:
             raise APIError("Unsupport function: {0}".format(function))
-        elif (function != "count" and field is None):
+        elif function != "count" and field is None:
             raise APIError("Function {0} requires a field value".format(
                 function))
-        elif (function == 'to_string' and fmt is None):
+        elif function == 'to_string' and fmt is None:
             raise APIError("Function {0} requires an extra 'fmt' parameter")
 
         self.arr = ['function', function]
@@ -220,9 +211,6 @@ class FunctionOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -240,6 +228,7 @@ class SubqueryOperator(object):
     :param endpoint: The name of the subquery object
     :type function: :obj:`str`
     """
+
     def __init__(self, endpoint):
         if endpoint not in ['catalogs', 'edges', 'environments', 'events',
                             'facts', 'fact_contents', 'fact_paths', 'nodes',
@@ -262,9 +251,6 @@ class SubqueryOperator(object):
     def __str__(self):
         return json.dumps(self.json_data())
 
-    def __unicode__(self):
-        return json.dumps(self.json_data())
-
     def json_data(self):
         return self.arr
 
@@ -279,6 +265,7 @@ class InOperator(object):
     :param field: The name of the subquery object
     :type function: :obj:`str`
     """
+
     def __init__(self, field):
         self.query = None
         self.arr = ['in', field]
@@ -301,9 +288,11 @@ class InOperator(object):
         if self.query is not None:
             raise APIError("Only one array is supported by the InOperator")
         elif isinstance(values, list):
-            def depth(L): return (isinstance(L, list) and len(L) != 0) \
-                and max(map(depth, L))+1
-            if (depth(values) == 1):
+            def depth(l):
+                return (isinstance(l, list) and len(l) != 0) \
+                       and max(map(depth, l)) + 1
+
+            if depth(values) == 1:
                 self.query = True
                 self.arr.append(['array', values])
             else:
@@ -318,9 +307,6 @@ class InOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -341,6 +327,7 @@ class FromOperator(object):
 
     note: only supports single entity From operations
     """
+
     def __init__(self, endpoint):
         valid_entities = ["aggregate_event_counts", "catalogs", "edges",
                           "environments", "event_counts", "events", "facts",
@@ -371,12 +358,14 @@ class FromOperator(object):
                            "Operator Objects")
 
     def add_order_by(self, fields):
-        def depth(L): return isinstance(L, list) and max(map(depth, L))+1
+        def depth(l):
+            return isinstance(l, list) and max(map(depth, l)) + 1
+
         fields_depth = depth(fields)
 
         if isinstance(fields, list):
             if fields_depth == 1 or fields_depth == 2:
-                    self.order_by = fields
+                self.order_by = fields
             else:
                 raise APIError("ExtractOperator.add_order_by only "
                                "supports lists of fields of depth "
@@ -402,9 +391,6 @@ class FromOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -443,6 +429,7 @@ class EqualsOperator(BinaryOperator):
     :param value: The value of the field to match, or not match.
     :type value: any
     """
+
     def __init__(self, field, value):
         super(EqualsOperator, self).__init__("=", field, value)
 
@@ -467,6 +454,7 @@ class GreaterOperator(BinaryOperator):
     :param value: Matches if the field is greater than this value.
     :type value: Number, timestamp or array
     """
+
     def __init__(self, field, value):
         super(GreaterOperator, self).__init__(">", field, value)
 
@@ -491,6 +479,7 @@ class LessOperator(BinaryOperator):
     :param value: Matches if the field is less than this value.
     :type value: Number, timestamp or array
     """
+
     def __init__(self, field, value):
         super(LessOperator, self).__init__("<", field, value)
 
@@ -516,6 +505,7 @@ class GreaterEqualOperator(BinaryOperator):
         this value.
     :type value: Number, timestamp or array
     """
+
     def __init__(self, field, value):
         super(GreaterEqualOperator, self).__init__(">=", field, value)
 
@@ -541,6 +531,7 @@ class LessEqualOperator(BinaryOperator):
         this value.
     :type value: Number, timestamp or array
     """
+
     def __init__(self, field, value):
         super(LessEqualOperator, self).__init__("<=", field, value)
 
@@ -565,6 +556,7 @@ class RegexOperator(BinaryOperator):
     :param value: Matches if the field matches this regular expression.
     :type value: :obj:`string`
     """
+
     def __init__(self, field, value):
         super(RegexOperator, self).__init__("~", field, value)
 
@@ -590,6 +582,7 @@ class RegexArrayOperator(BinaryOperator):
     :param value: Matches if the field matches this regular expression.
     :type value: :obj:`list`
     """
+
     def __init__(self, field, value):
         super(RegexArrayOperator, self).__init__("~>", field, value)
 
@@ -617,6 +610,7 @@ class NullOperator(BinaryOperator):
         not null (if False)
     :type value: :obj:`bool`
     """
+
     def __init__(self, field, value):
         if type(value) != bool:
             raise APIError("NullOperator value must be boolean")
@@ -643,6 +637,7 @@ class AndOperator(BooleanOperator):
     op.add(EqualsOperator("catalog_environment", "production"))
     op.add(EqualsOperator("facts_environment", "production"))
     """
+
     def __init__(self):
         super(AndOperator, self).__init__("and")
 
@@ -664,6 +659,7 @@ class OrOperator(BooleanOperator):
     op.add(EqualsOperator("name", "hostname"))
     op.add(EqualsOperator("name", "architecture"))
     """
+
     def __init__(self):
         super(OrOperator, self).__init__("or")
 
@@ -687,6 +683,7 @@ class NotOperator(BooleanOperator):
     op = NotOperator()
     op.add(EqualsOperator("osfamily", "RedHat"))
     """
+
     def __init__(self):
         super(NotOperator, self).__init__("not")
 

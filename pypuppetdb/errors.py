@@ -5,13 +5,13 @@ class APIError(Exception):
 
 class ImproperlyConfiguredError(APIError):
     """This exception is thrown when the API is initialised
-    and it detects incompatbile configuration such as SSL turned
+    and it detects incompatible configuration such as SSL turned
     on but no certificates provided."""
     pass
 
 
 class EmptyResponseError(APIError):
-    """Will be thrown when we did recieve a response but the
+    """Will be thrown when we did receive a response but the
     response is empty."""
     pass
 

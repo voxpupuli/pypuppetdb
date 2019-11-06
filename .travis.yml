@@ -35,7 +35,7 @@ cache: pip
 install:
   - pip install -r requirements-test.txt
 script:
-  - py.test --cov=pypuppetdb --pep8  -v
+  - py.test --pep8 --mypy --strict
   - bandit -r pypuppetdb
   - bandit -r tests -s B101
 after_success:

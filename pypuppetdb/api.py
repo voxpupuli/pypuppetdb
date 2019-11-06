@@ -1,29 +1,19 @@
-from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import hashlib
 import json
 import logging
+from datetime import datetime, timedelta
+from urllib.parse import quote
+
 import requests
 
-from datetime import datetime, timedelta
+from pypuppetdb.QueryBuilder import (EqualsOperator)
+from pypuppetdb.errors import (APIError, EmptyResponseError)
+from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
+                              Node, Report, Resource)
 from pypuppetdb.utils import json_to_datetime
-from pypuppetdb.errors import (
-    ImproperlyConfiguredError,
-    EmptyResponseError,
-    APIError,
-)
-from pypuppetdb.types import (
-    Node, Fact, Resource,
-    Report, Event, Catalog,
-    Inventory
-)
-from pypuppetdb.QueryBuilder import *
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -131,6 +121,7 @@ class BaseAPI(object):
 
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     """
+
     def __init__(self, host='localhost', port=8080, ssl_verify=True,
                  ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
                  url_path=None, username=None, password=None, token=None):
@@ -220,7 +211,8 @@ class BaseAPI(object):
         if self.last_total is not None:
             return int(self.last_total)
 
-    def _normalize_resource_type(self, type_):
+    @staticmethod
+    def _normalize_resource_type(type_):
         """Normalizes the type passed to the api by capitalizing each part
         of the type. For example:
 
@@ -336,7 +328,7 @@ class BaseAPI(object):
         if count_filter is not None:
             payload[PARAMETERS['counts_filter']] = count_filter
 
-        if not (payload):
+        if not payload:
             payload = None
 
         if not self.token:
@@ -360,7 +352,7 @@ class BaseAPI(object):
                                        auth=auth)
             else:
                 log.error("Only GET or POST supported, {0} unsupported".format(
-                          request_method))
+                    request_method))
                 raise APIError
             r.raise_for_status()
 
@@ -497,7 +489,7 @@ class BaseAPI(object):
         :rtype: :class:`pypuppetdb.types.Node`
         """
         nodes = self._query('nodes', **kwargs)
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
@@ -614,10 +606,8 @@ class BaseAPI(object):
         edges = self._query('edges', **kwargs)
 
         for edge in edges:
-            identifier_source = edge['source_type'] + \
-                '[' + edge['source_title'] + ']'
-            identifier_target = edge['target_type'] + \
-                '[' + edge['target_title'] + ']'
+            identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
+            identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
             yield Edge(source=self.resources[identifier_source],
                        target=self.resources[identifier_target],
                        relationship=edge['relationship'],
