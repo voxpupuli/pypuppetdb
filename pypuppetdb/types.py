@@ -80,9 +80,6 @@ class Event(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def __unicode__(self):
-        return self.__string
-
 
 class Report(object):
     """This object represents a report. Unless otherwise specified all
@@ -201,9 +198,6 @@ class Report(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def __unicode__(self):
-        return self.__string
-
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be
         specified that will be passed to the query function.
@@ -245,9 +239,6 @@ class Fact(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
 
 class Resource(object):
@@ -307,9 +298,6 @@ class Resource(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
 
 class Node(object):
@@ -446,9 +434,6 @@ class Node(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
-
-    def __unicode__(self):
-        return self.__string
 
     def facts(self, **kwargs):
         """Get all facts of this node. Additional arguments may also be
@@ -602,9 +587,6 @@ class Catalog(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def __unicode__(self):
-        return self.__string
-
     def get_resources(self):
         return self.resources.values()
 
@@ -652,9 +634,6 @@ class Edge(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def __unicode__(self):
-        return self.__string
-
 
 class Inventory(object):
     """This object represents a Node Inventory entry returned from
@@ -697,6 +676,3 @@ class Inventory(object):
 
     def __str__(self):
         return str("{0}").format(self.__string)
-
-    def __unicode(self):
-        return self.__string

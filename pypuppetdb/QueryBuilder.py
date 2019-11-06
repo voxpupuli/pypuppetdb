@@ -47,9 +47,6 @@ class BinaryOperator(object):
     def __str__(self):
         return json.dumps(self.json_data())
 
-    def __unicode__(self):
-        return json.dumps(self.json_data())
-
     def json_data(self):
         return self.data
 
@@ -93,9 +90,6 @@ class BooleanOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -167,9 +161,6 @@ class ExtractOperator(object):
     def __str__(self):
         return json.dumps(self.json_data())
 
-    def __unicode__(self):
-        return json.dumps(self.json_data())
-
     def json_data(self):
         if len(self.fields) == 0:
             raise APIError("ExtractOperator needs at least one field")
@@ -222,9 +213,6 @@ class FunctionOperator(object):
     def __str__(self):
         return json.dumps(self.json_data())
 
-    def __unicode__(self):
-        return json.dumps(self.json_data())
-
     def json_data(self):
         return self.arr
 
@@ -261,9 +249,6 @@ class SubqueryOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -322,9 +307,6 @@ class InOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
@@ -409,9 +391,6 @@ class FromOperator(object):
         return 'Query: {0}'.format(self)
 
     def __str__(self):
-        return json.dumps(self.json_data())
-
-    def __unicode__(self):
         return json.dumps(self.json_data())
 
     def json_data(self):
