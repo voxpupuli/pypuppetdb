@@ -1,13 +1,14 @@
 -r requirements.txt
 coveralls
 bandit
-coverage==4.5.4
-pep8==1.7.1
-mock==3.0.5
-pytest==5.2.2
-pytest-cov==2.8.1
-pytest-pep8==1.0.6
-pytest-mock==1.11.2
-pytest-mypy==0.4.2
-cov-core==1.15.0
-mypy==0.740
+coverage
+pep8
+mock
+pytest
+pytest-cov
+pytest-pep8
+pytest-mock
+pytest-mypy
+cov-core
+mypy
+httpretty
