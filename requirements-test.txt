@@ -11,3 +11,4 @@ pytest-mock==1.11.2
 pytest-mypy==0.4.2
 cov-core==1.15.0
 mypy==0.740
+httpretty==0.9.7
