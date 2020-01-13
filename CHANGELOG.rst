@@ -2,6 +2,13 @@
 Changelog
 #########
 
+2.0.0
+=====
+
+* Dropping old python 2.7/3.5 and ensuring 3 latest versions are supported
+* Adding mypy + cleanup + further removal of python2 code
+* Bugfix: Httpretty is not used outside tests and breaks install on newer python versions for some systems
+
 1.2.0
 =====
 
