@@ -5,8 +5,10 @@ import hashlib
 import json
 import logging
 from datetime import datetime, timedelta
-from urllib.parse import quote
-
+try:
+    from urllib import quote  # Python 2.X
+except ImportError:
+    from urllib.parse import quote  # Python 3+
 import requests
 
 from pypuppetdb.QueryBuilder import (EqualsOperator)
