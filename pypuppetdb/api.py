@@ -86,7 +86,7 @@ class BaseAPI(object):
     :type port: :obj:`int`
 
     :param ssl_verify: (optional) Verify PuppetDB server certificate.
-    :type ssl_verify: :obj:`bool`
+    :type ssl_verify: :obj:`bool` or :obj:`string`
 
     :param ssl_key: (optional) Path to our client secret key.
     :type ssl_key: :obj:`None` or :obj:`string` representing a filesystem\
