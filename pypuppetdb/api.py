@@ -10,7 +10,7 @@ from urllib.parse import quote
 import requests
 
 from pypuppetdb.QueryBuilder import (EqualsOperator)
-from pypuppetdb.errors import (APIError, EmptyResponseError)
+from pypuppetdb.errors import (APIError, DoesNotComputeError, EmptyResponseError)
 from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
                               Node, Report, Resource)
 from pypuppetdb.utils import json_to_datetime
@@ -23,7 +23,7 @@ ENDPOINTS = {
     'nodes': 'pdb/query/v4/nodes',
     'resources': 'pdb/query/v4/resources',
     'catalogs': 'pdb/query/v4/catalogs',
-    'mbean': 'metrics/v1/mbeans',
+    'metrics': 'metrics/v2/read',
     'reports': 'pdb/query/v4/reports',
     'events': 'pdb/query/v4/events',
     'event-counts': 'pdb/query/v4/event-counts',
@@ -892,7 +892,10 @@ class BaseAPI(object):
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        return self._query('mbean', path=metric)
+        res = self._query('metrics', path=metric)
+        if 'error' in res:
+            raise DoesNotComputeError(res['error'])
+        return res['value']
 
     def reports(self, **kwargs):
         """Get reports for our infrastructure. It is strongly recommended

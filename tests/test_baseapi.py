@@ -431,10 +431,44 @@ class TestAPIQuery(object):
 
 class TestAPIMethods(object):
     def test_metric(self, baseapi):
+        metrics_body = {
+            'request': {
+                'mbean': 'test:name=Num',
+                'type': 'read'
+            },
+            'value': {
+                'Value': 0
+            },
+            'timestamp': 0,
+            'status': 200
+        }
+
         httpretty.enable()
-        stub_request('http://localhost:8080/metrics/v1/mbeans/test')
-        baseapi.metric('test')
-        assert httpretty.last_request().path == '/metrics/v1/mbeans/test'
+        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/metrics/v2/read/test:name=Num',
+                               body=json.dumps(metrics_body))
+        metric = baseapi.metric('test:name=Num')
+        assert httpretty.last_request().path == '/metrics/v2/read/test%3Aname%3DNum'
+        assert metric['Value'] == 0
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_metric_error(self, baseapi):
+        metrics_body = {
+            'request': {
+                'mbean': 'test:name=Num',
+                'type': 'read'
+            },
+            'error_type': 'javax.management.InstanceNotFoundException',
+            'error': 'javax.management.InstanceNotFoundException : test:name=Num',
+            'status': 404
+        }
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/metrics/v2/read/test:name=Num',
+                               body=json.dumps(metrics_body))
+        with pytest.raises(pypuppetdb.errors.APIError):
+            baseapi.metric('test:name=Num')
+        assert httpretty.last_request().path == '/metrics/v2/read/test%3Aname%3DNum'
         httpretty.disable()
         httpretty.reset()
 
