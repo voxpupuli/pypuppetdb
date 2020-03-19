@@ -344,6 +344,31 @@ class TestAPIQuery(object):
         httpretty.disable()
         httpretty.reset()
 
+    def test_with_payload_get(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/nodes')
+        baseapi._query('nodes',
+                       payload={'foo': 'bar'},
+                       count_by=1)
+        assert httpretty.last_request().querystring == {
+            'foo': ['bar'],
+            'count_by': ['1']}
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_with_payload_post(self, baseapi):
+        httpretty.enable()
+        stub_request('http://localhost:8080/pdb/query/v4/nodes',
+                     method=httpretty.POST)
+        baseapi._query('nodes',
+                       payload={'foo': 'bar'},
+                       count_by=1,
+                       request_method='POST')
+        assert httpretty.last_request().body == json.dumps({'foo': 'bar',
+                                                            'count_by': 1}).encode("latin-1")
+        httpretty.disable()
+        httpretty.reset()
+
     def test_response_empty(self, baseapi):
         httpretty.enable()
         httpretty.register_uri(httpretty.GET,
@@ -469,6 +494,84 @@ class TestAPIMethods(object):
         with pytest.raises(pypuppetdb.errors.APIError):
             baseapi.metric('test:name=Num')
         assert httpretty.last_request().path == '/metrics/v2/read/test%3Aname%3DNum'
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_metric_escape_special_characters(self, baseapi):
+        metrics_body = {
+            'request': {
+                'mbean': 'test:name=Num',
+                'type': 'read'
+            },
+            'value': {
+                'Value': 0
+            },
+            'timestamp': 0,
+            'status': 200
+        }
+
+        httpretty.enable()
+        metric_name = 'test:special/chars!metric"name'
+        metric_escaped = 'test:special!/chars!!metric!"name'
+        metric_escaped_urlencoded = 'test%3Aspecial%21/chars%21%21metric%21%22name'
+        httpretty.register_uri(httpretty.GET,
+                               ('http://localhost:8080/metrics/v2/read/' + metric_escaped),
+                               body=json.dumps(metrics_body))
+        metric = baseapi.metric(metric_name)
+        assert httpretty.last_request().path == ('/metrics/v2/read/' + metric_escaped_urlencoded)
+        assert metric['Value'] == 0
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_metric_list(self, baseapi):
+        # test metric() (no arguments)
+        metrics_body = {
+            'request': {
+                'type': 'list'
+            },
+            'value': {
+                'java.util.logging': {
+                    'type=Logging': {
+                    }
+                },
+            },
+            'timestamp': 0,
+            'status': 200
+        }
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET,
+                               'http://localhost:8080/metrics/v2/list',
+                               body=json.dumps(metrics_body))
+        metric = baseapi.metric()
+        assert httpretty.last_request().path == '/metrics/v2/list'
+        assert metric == {'java.util.logging': {'type=Logging': {}}}
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_metrics(self, baseapi):
+        # test metrics()
+        metrics_body = {
+            'request': {
+                'type': 'list'
+            },
+            'value': {
+                'java.util.logging': {
+                    'type=Logging': {
+                    }
+                },
+            },
+            'timestamp': 0,
+            'status': 200
+        }
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET,
+                               'http://localhost:8080/metrics/v2/list',
+                               body=json.dumps(metrics_body))
+        metric = baseapi.metrics()
+        assert httpretty.last_request().path == '/metrics/v2/list'
+        assert metric == {'java.util.logging': {'type=Logging': {}}}
         httpretty.disable()
         httpretty.reset()
 
