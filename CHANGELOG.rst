@@ -2,6 +2,13 @@
 Changelog
 #########
 
+Development
+===========
+* Bugfix: Fixed `metric()` function to query the new v2 endpoint based on Jolokia (https://jolokia.org/reference/html/protocol.html)
+* Added new `metrics()` function that returns a metrics listing. This was needed to support the metrics v2 endpoint.
+* Added new `payload` parameter to `_query()` to allow users to send arbitrary payloads with their queries (useful for debugging).
+
+
 2.0.0
 =====
 

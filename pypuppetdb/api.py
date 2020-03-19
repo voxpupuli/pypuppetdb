@@ -23,7 +23,15 @@ ENDPOINTS = {
     'nodes': 'pdb/query/v4/nodes',
     'resources': 'pdb/query/v4/resources',
     'catalogs': 'pdb/query/v4/catalogs',
+    # metrics endpoint now is just the jolokia library
+    # https://jolokia.org/reference/html/protocol.html#jolokia-operations
     'metrics': 'metrics/v2/read',
+    'metrics-base': 'metrics/v2',
+    'metrics-exec': 'metrics/v2/exec',
+    'metrics-list': 'metrics/v2/list',
+    'metrics-search': 'metrics/v2/search',
+    'metrics-write': 'metrics/v2/write',
+    'metrics-version': 'metrics/v2/version',
     'reports': 'pdb/query/v4/reports',
     'events': 'pdb/query/v4/events',
     'event-counts': 'pdb/query/v4/event-counts',
@@ -262,7 +270,7 @@ class BaseAPI(object):
     def _query(self, endpoint, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
-               request_method='GET'):
+               payload=None, request_method='GET'):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -295,6 +303,8 @@ class BaseAPI(object):
         :type count_by: :obj:`string`
         :param count_filter: (optional) Specify a filter for the results
         :type count_filter: :obj:`string`
+        :param payload: (optional) Arbitrary payload to send as part of the request.
+        :type payload: :obj:`dict`
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
@@ -303,13 +313,14 @@ class BaseAPI(object):
         """
         log.debug('_query called with endpoint: {0}, path: {1}, query: {2}, '
                   'limit: {3}, offset: {4}, summarize_by {5}, count_by {6}, '
-                  'count_filter: {7}'.format(endpoint, path, query, limit,
-                                             offset, summarize_by, count_by,
-                                             count_filter))
+                  'count_filter: {7}, payload: {8}'
+                  .format(endpoint, path, query, limit,
+                          offset, summarize_by, count_by,
+                          count_filter, payload))
 
         url = self._url(endpoint, path=path)
-
-        payload = {}
+        if payload is None:
+            payload = {}
         if query is not None:
             payload['query'] = query
         if order_by is not None:
@@ -892,7 +903,36 @@ class BaseAPI(object):
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        res = self._query('metrics', path=metric)
+        if metric is None:
+            return self.metrics()
+        else:
+            res = self._query('metrics', path=self.escape_metric_name(metric))
+            if 'error' in res:
+                raise DoesNotComputeError(res['error'])
+            return res['value']
+
+    def escape_metric_name(self, metric):
+        """Escapes metric names so they can be used in GET requests as part of the URL.
+        The new (as of v2) metrics API is backed by the Jolokia library.
+        The escpaing rules for Jolokia GET requests can be found here:
+        https://jolokia.org/reference/html/protocol.html#escape-rules
+
+        :param metric: The name of the metric we want to escape.
+        :type metric: :obj:`string`
+
+        :returns: The escaped version of the metric name, safe for use in metric GET queries.
+        """
+        metric = metric.replace('!', r'!!')
+        metric = metric.replace('/', r'!/')
+        metric = metric.replace('"', r'!"')
+        return metric
+
+    def metrics(self):
+        """Get a list of all available metrics
+
+        :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
+        """
+        res = self._query('metrics-list')
         if 'error' in res:
             raise DoesNotComputeError(res['error'])
         return res['value']
