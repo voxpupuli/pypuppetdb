@@ -46,6 +46,7 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.url_path == ''
         assert baseapi.username is None
         assert baseapi.password is None
+        assert baseapi.metric_api_version is 'v2'
 
     def test_host(self):
         api = pypuppetdb.api.BaseAPI(host='127.0.0.1')
@@ -136,6 +137,18 @@ class TestBaseAPIInitOptions(object):
                                      password='password123')
         assert api.username == 'puppetdb'
         assert api.password == 'password123'
+
+    def test_metric_api_version_v1(self):
+        api = pypuppetdb.api.BaseAPI(metric_api_version='v1')
+        assert api.metric_api_version == 'v1'
+
+    def test_metric_api_version_v2(self):
+        api = pypuppetdb.api.BaseAPI(metric_api_version='v2')
+        assert api.metric_api_version == 'v2'
+
+    def test_metric_api_version_invalid_raises(self):
+        with pytest.raises(ValueError):
+            pypuppetdb.api.BaseAPI(metric_api_version='bad')
 
 
 class TestBaseAPIProperties(object):
@@ -455,7 +468,29 @@ class TestAPIQuery(object):
 
 
 class TestAPIMethods(object):
-    def test_metric(self, baseapi):
+    def test_metric_v1(self, baseapi):
+        httpretty.enable()
+        httpretty.enable()
+        stub_request('http://localhost:8080/metrics/v1/mbeans/test')
+        baseapi.metric('test', version='v1')
+        assert httpretty.last_request().path == '/metrics/v1/mbeans/test'
+
+    def test_metric_v1_list(self, baseapi):
+        httpretty.enable()
+        httpretty.enable()
+        stub_request('http://localhost:8080/metrics/v1/mbeans')
+        baseapi.metric(version='v1')
+        assert httpretty.last_request().path == '/metrics/v1/mbeans'
+
+    def test_metric_v1_version_constructor(self):
+        api = pypuppetdb.api.BaseAPI(metric_api_version='v1')
+        httpretty.enable()
+        httpretty.enable()
+        stub_request('http://localhost:8080/metrics/v1/mbeans/test')
+        api.metric('test')
+        assert httpretty.last_request().path == '/metrics/v1/mbeans/test'
+
+    def test_metric_v2(self, baseapi):
         metrics_body = {
             'request': {
                 'mbean': 'test:name=Num',
@@ -477,7 +512,52 @@ class TestAPIMethods(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_metric_error(self, baseapi):
+    def test_metric_v2_version_constructor(self):
+        api = pypuppetdb.api.BaseAPI(metric_api_version='v2')
+        metrics_body = {
+            'request': {
+                'mbean': 'test:name=Num',
+                'type': 'read'
+            },
+            'value': {
+                'Value': 0
+            },
+            'timestamp': 0,
+            'status': 200
+        }
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/metrics/v2/read/test:name=Num',
+                               body=json.dumps(metrics_body))
+        metric = api.metric('test:name=Num')
+        assert httpretty.last_request().path == '/metrics/v2/read/test%3Aname%3DNum'
+        assert metric['Value'] == 0
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_metric_v2_version_string(self, baseapi):
+        metrics_body = {
+            'request': {
+                'mbean': 'test:name=Num',
+                'type': 'read'
+            },
+            'value': {
+                'Value': 0
+            },
+            'timestamp': 0,
+            'status': 200
+        }
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET, 'http://localhost:8080/metrics/v2/read/test:name=Num',
+                               body=json.dumps(metrics_body))
+        metric = baseapi.metric('test:name=Num', version='v2')
+        assert httpretty.last_request().path == '/metrics/v2/read/test%3Aname%3DNum'
+        assert metric['Value'] == 0
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_metric_v2_error(self, baseapi):
         metrics_body = {
             'request': {
                 'mbean': 'test:name=Num',
@@ -497,7 +577,7 @@ class TestAPIMethods(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_metric_escape_special_characters(self, baseapi):
+    def test_metric_v2_escape_special_characters(self, baseapi):
         metrics_body = {
             'request': {
                 'mbean': 'test:name=Num',
@@ -523,7 +603,7 @@ class TestAPIMethods(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_metric_list(self, baseapi):
+    def test_metric_v2_list(self, baseapi):
         # test metric() (no arguments)
         metrics_body = {
             'request': {
@@ -549,31 +629,9 @@ class TestAPIMethods(object):
         httpretty.disable()
         httpretty.reset()
 
-    def test_metrics(self, baseapi):
-        # test metrics()
-        metrics_body = {
-            'request': {
-                'type': 'list'
-            },
-            'value': {
-                'java.util.logging': {
-                    'type=Logging': {
-                    }
-                },
-            },
-            'timestamp': 0,
-            'status': 200
-        }
-
-        httpretty.enable()
-        httpretty.register_uri(httpretty.GET,
-                               'http://localhost:8080/metrics/v2/list',
-                               body=json.dumps(metrics_body))
-        metric = baseapi.metrics()
-        assert httpretty.last_request().path == '/metrics/v2/list'
-        assert metric == {'java.util.logging': {'type=Logging': {}}}
-        httpretty.disable()
-        httpretty.reset()
+    def test_metric_bad_version(self, baseapi):
+        with pytest.raises(ValueError):
+            baseapi.metric('test', version='bad')
 
     def test_facts(self, baseapi):
         facts_body = [{

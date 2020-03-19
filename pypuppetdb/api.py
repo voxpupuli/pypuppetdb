@@ -23,7 +23,8 @@ ENDPOINTS = {
     'nodes': 'pdb/query/v4/nodes',
     'resources': 'pdb/query/v4/resources',
     'catalogs': 'pdb/query/v4/catalogs',
-    # metrics endpoint now is just the jolokia library
+    'mbean': 'metrics/v1/mbeans',
+    # metrics v2 endpoint is now the jolokia library and all of its operations
     # https://jolokia.org/reference/html/protocol.html#jolokia-operations
     'metrics': 'metrics/v2/read',
     'metrics-base': 'metrics/v2',
@@ -127,17 +128,25 @@ class BaseAPI(object):
     :param token: (optional) The X-auth token to use for X-Authentication
     :type token: :obj:`None` or :obj:`string`
 
+    :param metric_api_version: (Default 'v2') Version of the metric API we're initialising.
+    :type metric_api_version: :obj:`None` or :obj:`string`
+
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     """
 
     def __init__(self, host='localhost', port=8080, ssl_verify=True,
                  ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-                 url_path=None, username=None, password=None, token=None):
+                 url_path=None, username=None, password=None, token=None,
+                 metric_api_version=None):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
 
         self.api_version = 'v4'
+        if metric_api_version is not None and metric_api_version not in ['v1', 'v2']:
+            raise ValueError("metric_api_version specified must be None, 'v1' or 'v2',"
+                             " was given: '{}'".format(metric_api_version))
+        self.metric_api_version = metric_api_version if metric_api_version else 'v2'
         self.host = host
         self.port = port
         self.ssl_verify = ssl_verify
@@ -895,21 +904,33 @@ class BaseAPI(object):
         """Get a list of all known facts."""
         return self._query('fact-names')
 
-    def metric(self, metric=None):
+    def metric(self, metric=None, version=None):
         """Query for a specific metrc.
 
         :param metric: The name of the metric we want.
         :type metric: :obj:`string`
+        :param version: The version of the metric API to query. Valid values: 'v1', 'v2'
+                        If not specified, then the value of self.metric_api_version
+                        will be used.
+        :type version: :obj:`string`
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        if metric is None:
-            return self.metrics()
-        else:
-            res = self._query('metrics', path=self.escape_metric_name(metric))
+        version = version if version else self.metric_api_version
+        if version is None or version == 'v2':
+            if metric is None:
+                res = self._query('metrics-list')
+            else:
+                res = self._query('metrics', path=self.escape_metric_name(metric))
+
             if 'error' in res:
                 raise DoesNotComputeError(res['error'])
             return res['value']
+        elif version == 'v1':
+            return self._query('mbean', path=metric)
+        else:
+            raise ValueError("Version specified must be 'v1' or 'v2', was given: '{}'"
+                             .format(version))
 
     def escape_metric_name(self, metric):
         """Escapes metric names so they can be used in GET requests as part of the URL.
@@ -926,16 +947,6 @@ class BaseAPI(object):
         metric = metric.replace('/', r'!/')
         metric = metric.replace('"', r'!"')
         return metric
-
-    def metrics(self):
-        """Get a list of all available metrics
-
-        :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
-        """
-        res = self._query('metrics-list')
-        if 'error' in res:
-            raise DoesNotComputeError(res['error'])
-        return res['value']
 
     def reports(self, **kwargs):
         """Get reports for our infrastructure. It is strongly recommended
