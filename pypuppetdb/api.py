@@ -23,7 +23,16 @@ ENDPOINTS = {
     'nodes': 'pdb/query/v4/nodes',
     'resources': 'pdb/query/v4/resources',
     'catalogs': 'pdb/query/v4/catalogs',
+    'mbean': 'metrics/v1/mbeans',
+    # metrics v2 endpoint is now the jolokia library and all of its operations
+    # https://jolokia.org/reference/html/protocol.html#jolokia-operations
     'metrics': 'metrics/v2/read',
+    'metrics-base': 'metrics/v2',
+    'metrics-exec': 'metrics/v2/exec',
+    'metrics-list': 'metrics/v2/list',
+    'metrics-search': 'metrics/v2/search',
+    'metrics-write': 'metrics/v2/write',
+    'metrics-version': 'metrics/v2/version',
     'reports': 'pdb/query/v4/reports',
     'events': 'pdb/query/v4/events',
     'event-counts': 'pdb/query/v4/event-counts',
@@ -119,17 +128,25 @@ class BaseAPI(object):
     :param token: (optional) The X-auth token to use for X-Authentication
     :type token: :obj:`None` or :obj:`string`
 
+    :param metric_api_version: (Default 'v2') Version of the metric API we're initialising.
+    :type metric_api_version: :obj:`None` or :obj:`string`
+
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     """
 
     def __init__(self, host='localhost', port=8080, ssl_verify=True,
                  ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-                 url_path=None, username=None, password=None, token=None):
+                 url_path=None, username=None, password=None, token=None,
+                 metric_api_version=None):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
 
         self.api_version = 'v4'
+        if metric_api_version is not None and metric_api_version not in ['v1', 'v2']:
+            raise ValueError("metric_api_version specified must be None, 'v1' or 'v2',"
+                             " was given: '{}'".format(metric_api_version))
+        self.metric_api_version = metric_api_version if metric_api_version else 'v2'
         self.host = host
         self.port = port
         self.ssl_verify = ssl_verify
@@ -262,7 +279,7 @@ class BaseAPI(object):
     def _query(self, endpoint, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
-               request_method='GET'):
+               payload=None, request_method='GET'):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -295,6 +312,8 @@ class BaseAPI(object):
         :type count_by: :obj:`string`
         :param count_filter: (optional) Specify a filter for the results
         :type count_filter: :obj:`string`
+        :param payload: (optional) Arbitrary payload to send as part of the request.
+        :type payload: :obj:`dict`
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
@@ -303,13 +322,14 @@ class BaseAPI(object):
         """
         log.debug('_query called with endpoint: {0}, path: {1}, query: {2}, '
                   'limit: {3}, offset: {4}, summarize_by {5}, count_by {6}, '
-                  'count_filter: {7}'.format(endpoint, path, query, limit,
-                                             offset, summarize_by, count_by,
-                                             count_filter))
+                  'count_filter: {7}, payload: {8}'
+                  .format(endpoint, path, query, limit,
+                          offset, summarize_by, count_by,
+                          count_filter, payload))
 
         url = self._url(endpoint, path=path)
-
-        payload = {}
+        if payload is None:
+            payload = {}
         if query is not None:
             payload['query'] = query
         if order_by is not None:
@@ -884,18 +904,49 @@ class BaseAPI(object):
         """Get a list of all known facts."""
         return self._query('fact-names')
 
-    def metric(self, metric=None):
+    def metric(self, metric=None, version=None):
         """Query for a specific metrc.
 
         :param metric: The name of the metric we want.
         :type metric: :obj:`string`
+        :param version: The version of the metric API to query. Valid values: 'v1', 'v2'
+                        If not specified, then the value of self.metric_api_version
+                        will be used.
+        :type version: :obj:`string`
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        res = self._query('metrics', path=metric)
-        if 'error' in res:
-            raise DoesNotComputeError(res['error'])
-        return res['value']
+        version = version if version else self.metric_api_version
+        if version is None or version == 'v2':
+            if metric is None:
+                res = self._query('metrics-list')
+            else:
+                res = self._query('metrics', path=self.escape_metric_name(metric))
+
+            if 'error' in res:
+                raise DoesNotComputeError(res['error'])
+            return res['value']
+        elif version == 'v1':
+            return self._query('mbean', path=metric)
+        else:
+            raise ValueError("Version specified must be 'v1' or 'v2', was given: '{}'"
+                             .format(version))
+
+    def escape_metric_name(self, metric):
+        """Escapes metric names so they can be used in GET requests as part of the URL.
+        The new (as of v2) metrics API is backed by the Jolokia library.
+        The escpaing rules for Jolokia GET requests can be found here:
+        https://jolokia.org/reference/html/protocol.html#escape-rules
+
+        :param metric: The name of the metric we want to escape.
+        :type metric: :obj:`string`
+
+        :returns: The escaped version of the metric name, safe for use in metric GET queries.
+        """
+        metric = metric.replace('!', r'!!')
+        metric = metric.replace('/', r'!/')
+        metric = metric.replace('"', r'!"')
+        return metric
 
     def reports(self, **kwargs):
         """Get reports for our infrastructure. It is strongly recommended
