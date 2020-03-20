@@ -1,7 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           python-pypuppetdb
-Version:        2.0.0
+Version:        2.1.0
 Release:        2%{?dist}
 Summary:        A Python puppetdb API
 

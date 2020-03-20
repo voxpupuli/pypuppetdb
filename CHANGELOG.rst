@@ -2,8 +2,8 @@
 Changelog
 #########
 
-Development
-===========
+2.1.0
+=====
 * Bugfix: Fixed `metric()` function to query the new v2 endpoint based on Jolokia (https://jolokia.org/reference/html/protocol.html)
 * Added a new parameter `metric_api_version` to the `BaseAPI()` constructor that allows
   changing the version of the `metric` API being queried. Valid values are `'v1'` for
@@ -13,7 +13,6 @@ Development
   default to the `self.metric_api_version` of the class, else it expects a value of `'v1'` or
   `'v2'` same as the `metric_api_version` class parameter.
 * Added new `payload` parameter to `_query()` to allow users to send arbitrary payloads with their queries (useful for debugging).
-
 
 2.0.0
 =====
