@@ -5,15 +5,20 @@ import hashlib
 import json
 import logging
 from datetime import datetime, timedelta
-from urllib.parse import quote
-
 import requests
-
+import sys
 from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.errors import (APIError, DoesNotComputeError, EmptyResponseError)
 from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
                               Node, Report, Resource)
 from pypuppetdb.utils import json_to_datetime
+
+if sys.version_info.major == 2:
+    from urlparse import urlparse
+    from urllib import quote  # Python 2.X
+else:
+    from urllib.parse import urlparse
+    from urllib.parse import quote  # Python 3+
 
 log = logging.getLogger(__name__)
 
