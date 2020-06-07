@@ -2,8 +2,14 @@
 Changelog
 #########
 
+2.2.0
+=====
+
+* Loosen requirements and drop six
+
 2.1.0
 =====
+
 * Bugfix: Fixed `metric()` function to query the new v2 endpoint based on Jolokia (https://jolokia.org/reference/html/protocol.html)
 * Added a new parameter `metric_api_version` to the `BaseAPI()` constructor that allows
   changing the version of the `metric` API being queried. Valid values are `'v1'` for
