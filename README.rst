@@ -12,7 +12,7 @@ pypuppetdb
 pypuppetdtb is a library to work with PuppetDB's REST API. It is implemented
 using the `requests`_ library.
 
-.. _requests: http://docs.python-requests.org/en/latest/
+.. _requests: https://requests.readthedocs.io/
 
 **pypuppetdb >= 0.2.0 requires PuppetDB 3.0.0 or later. There is no support for
 previous versions beyond 0.1.1**
