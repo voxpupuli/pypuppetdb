@@ -38,6 +38,7 @@ Main Interface
 What you'll usually need to do is use the :func:`connect` method to set up a
 connection with PuppetDB and indicate which version of the API you want to
 talk.
+
 .. autofunction:: connect
 
 API objects
