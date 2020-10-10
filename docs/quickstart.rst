@@ -15,6 +15,15 @@ The first thing you need to do is to connect with PuppetDB:
    >>> from pypuppetdb import connect
    >>> db = connect()
 
+You can also use the `with` statement to enclose the work done on PuppetDB.
+This will ensure that all HTTP connections are closed explicitly when we're
+done:
+
+.. code-block:: python
+
+   >>> with connect() as db:
+   >>>   # ..
+
 Nodes
 -----
 
