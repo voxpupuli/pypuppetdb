@@ -194,6 +194,14 @@ class BaseAPI(object):
         else:
             self.protocol = 'http'
 
+    def disconnect(self):
+        """Close all connections that this class opened up."""
+        # If we don't explicitly close connections, we might cause other
+        # functions or libraries to hang on the open connections. This happens
+        # for example with using paramiko to tunnel PuppetDB connections
+        # through ssh.
+        self._session.close()
+
     def __enter__(self):
         """Set up environment for 'with' statement."""
         # Once this class has been instantiated, there's nothing more required
@@ -201,11 +209,7 @@ class BaseAPI(object):
 
     def __exit__(self, type, value, trace):
         """Tear down connections."""
-        # If we don't explicitly close connections, we might cause other
-        # functions or libraries to hang on the open connections. This happens
-        # for example with using paramiko to tunnel PuppetDB connections
-        # through ssh.
-        self._session.close()
+        self.disconnect()
 
     @property
     def version(self):
