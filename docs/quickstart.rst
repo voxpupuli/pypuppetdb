@@ -15,6 +15,14 @@ The first thing you need to do is to connect with PuppetDB:
    >>> from pypuppetdb import connect
    >>> db = connect()
 
+Once you're all done with requests to PuppetDB, you can explicitly close all
+HTTP connections. This can be useful if you made those connections through a
+tunnel, which might be tracking open connections:
+
+.. code-block:: python
+
+   >>> db.disconnect()
+
 You can also use the `with` statement to enclose the work done on PuppetDB.
 This will ensure that all HTTP connections are closed explicitly when we're
 done:
