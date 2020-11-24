@@ -39,6 +39,7 @@ You can install this package from source or from PyPi.
 .. code-block:: bash
 
    $ git clone https://github.com/voxpupuli/pypuppetdb
+   $ cd pypuppetdb
    $ python setup.py install
 
 If you wish to hack on it clone the repository but after that run:
