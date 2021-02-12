@@ -30,10 +30,10 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-with codecs.open('README.rst', encoding='utf-8') as f:
+with codecs.open('README.md', encoding='utf-8') as f:
     README = f.read()
 
-with codecs.open('CHANGELOG.rst', encoding='utf-8') as f:
+with codecs.open('CHANGELOG.md', encoding='utf-8') as f:
     CHANGELOG = f.read()
 
 requirements = None
@@ -56,7 +56,7 @@ setup(
     license='Apache License 2.0',
     description='Library for working with the PuppetDB REST API.',
     long_description='\n'.join((README, CHANGELOG)),
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     keywords='puppet puppetdb',
     tests_require=requirements_test,
     data_files=[('requirements_for_tests', ['requirements-test.txt'])],
