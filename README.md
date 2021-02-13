@@ -2,7 +2,7 @@
 
 [![PyPi Version](https://img.shields.io/pypi/v/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
 [![PyPi Downloads](https://img.shields.io/pypi/dm/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
-[![image](https://api.travis-ci.org/voxpupuli/pypuppetdb.png)](https://travis-ci.org/voxpupuli/pypuppetdb)
+![Tests Status](https://github.com/voxpupuli/pypuppetdb/workflows/tests%20(unit)/badge.svg)
 [![Coverage Status](https://img.shields.io/coveralls/voxpupuli/pypuppetdb.svg)](https://coveralls.io/r/voxpupuli/pypuppetdb)
 [![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](http://voxpupuli.org)
 
