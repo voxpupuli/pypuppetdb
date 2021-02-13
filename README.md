@@ -258,26 +258,27 @@ If you'd like a more elaborate guide on how to write and format your
 commit messages have a look at this post by [Tim
 Pope](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
+### Preparing local development environment
+
+```bash
+# Create a Python 3 virtualenv and activate it
+virtualenv -p python3 .venv
+. .venv/bin/activate
+# Install the module in a development mode
+python setup.py develop
+# Install test dependencies
+pip install -r requirements-test.txt
+```
 ### Tests
 
-Commits are expected to contain tests or updates to tests if they add to
+Commits are expected to contain tests or updates to the tests if they add to
 or modify the current behavior.
 
-The test suite is powered by [pytest](http://pytest.org/latest/) and
-requires [pytest](http://pytest.org/latest/),
-[pytest-pep8](https://pypi.python.org/pypi/pytest-pep8),
-[httpretty](https://pypi.python.org/pypi/httpretty/) and
-[pytest-httpretty](https://github.com/papaeye/pytest-httpretty) which
-will be installed for you if you run:
+Assuming you have prepared the development environment as explained above,
+do this to run the unit tests:
 
 ``` bash
-pip install -r requirements.txt
-```
-
-To run the unit tests (the ones that don't require a live PuppetDB):
-
-``` bash
-py.test -v -m unit
+py.test
 ```
 
 If the tests pass, you're golden. If not we'll have to figure out why
@@ -294,14 +295,9 @@ here](https://pypuppetdb.readthedocs.org/en/latest/).
 
 You can build the documentation manually by doing:
 
-``` bash
+```bash
+# Activate the virtualenv and install sphinx
+pip install sphinx
 cd docs
 make html
-```
-
-Doing so will only work if you have Sphinx installed, which you can
-achieve through:
-
-``` bash
-pip install -r requirements.txt
 ```
