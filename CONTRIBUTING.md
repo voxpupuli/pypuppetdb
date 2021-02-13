@@ -40,10 +40,13 @@ Commits are expected to contain tests or updates to the tests if they add to
 or modify the current behavior.
 
 Assuming you have prepared the development environment as explained above,
-do this to run the unit tests:
+do this to run the tests:
 
 ```bash
+# Unit tests
 py.test
+# Security linter
+bandit -r pypuppetdb
 ```
 
 If the tests pass, you're golden. If not we'll have to figure out why
