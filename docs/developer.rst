@@ -1,13 +1,18 @@
-.. _api:
+.. _developer:
 
-Developer Interface
-===================
+Developer Guide
+===============
 
 .. module:: pypuppetdb
 
 This part of the documentation covers all the interfaces of PyPuppetDB.
 It will cover how the API is set up and how to configure which version of
 the API to use.
+
+.. note::
+   This part of the documentation may be outdated. Please see
+   `this PR <https://github.com/voxpupuli/pypuppetdb/pull/190>`_
+   for more information.
 
 Lazy objects
 ------------
