@@ -61,8 +61,8 @@ here](https://pypuppetdb.readthedocs.org/en/latest/).
 You can build the documentation manually by doing:
 
 ```bash
-# Activate the virtualenv and install sphinx
-pip install sphinx
+# Activate the virtualenv and install sphinx + the theme we are using
+pip install sphinx sphinx-rtd-theme
 cd docs
 make html
 ```

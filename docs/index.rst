@@ -1,19 +1,17 @@
-Welcome to pypuppetdb's documentation!
-======================================
+.. pypuppetdb
+
+pypuppetdb
+==========
+
+**pypuppetdb** is a thin wrapper around the REST API providing some
+convenience functions and objects to request and hold data from
+PuppetDB.
 
 .. toctree::
    :maxdepth: 2
 
    user
-
-.. toctree::
-   :maxdepth: 2
-
    connecting
-
-.. toctree::
-   :maxdepth: 2
-
    developer
 
 Indices and tables
@@ -21,4 +19,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
-

@@ -5,12 +5,14 @@ import pkg_resources
 import sys
 import os
 
+import sphinx_rtd_theme
+
 pypuppetdb_root = os.path.dirname(os.path.abspath("."))
 sys.path.insert(0, pypuppetdb_root)
 
 # -- General configuration ----------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx_rtd_theme"]
 
 templates_path = ["_templates"]
 
@@ -31,7 +33,7 @@ pygments_style = "sphinx"
 
 # -- Options for HTML output --------------------------------------------------
 
-html_theme = "default"
+html_theme = "sphinx_rtd_theme"
 
 html_static_path = ["_static"]
 
@@ -44,7 +46,7 @@ latex_documents = [
         "index",
         "pypuppetdb.tex",
         u"pypuppetdb Documentation",
-        u"Daniele Sluijters",
+        u"Vox Pupuli",
         "manual",
     ),
 ]
