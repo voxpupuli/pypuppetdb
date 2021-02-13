@@ -1,37 +1,21 @@
-Welcome to pypuppetdb's documentation!
-======================================
+.. pypuppetdb
 
-.. note::
-   This is a very new project and still changing at a rapid pace. As such the
-   only documentation currently available is the API documentation and a brief
-   Getting Started guide. Once this settles down tutorials and other documentation
-   will be added over time.
+pypuppetdb
+==========
 
-Getting started
----------------
-
-The quickstart should get you up and running with pypuppetdb and familiarise
-you with how this library works.
+**pypuppetdb** is a thin wrapper around the REST API providing some
+convenience functions and objects to request and hold data from
+PuppetDB.
 
 .. toctree::
    :maxdepth: 2
 
-   quickstart
-
-API Documentation
------------------
-
-This part of the documentation focusses on the classes, methods and functions
-that make up this library.
-
-.. toctree::
-   :maxdepth: 2
-
-   api
+   user
+   connecting
+   developer
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`search`
-

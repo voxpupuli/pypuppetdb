@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
+import pkg_resources
 import sys
 import os
-import pypuppetdb.package
+
+import sphinx_rtd_theme
 
 pypuppetdb_root = os.path.dirname(os.path.abspath("."))
 sys.path.insert(0, pypuppetdb_root)
 
 # -- General configuration ----------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx_rtd_theme"]
 
 templates_path = ["_templates"]
 
@@ -16,12 +20,9 @@ source_suffix = ".rst"
 
 master_doc = "index"
 
-project = pypuppetdb.package.__title__
-copyright = "{0}, {1}".format(
-    pypuppetdb.package.__year__, pypuppetdb.package.__author__
-)
-
-version = pypuppetdb.package.__version__
+project = "pypuppetdb"
+copyright = f"2013-{datetime.now().year}, Vox Pupuli"
+version = pkg_resources.get_distribution(project).version
 release = version
 
 language = "en"
@@ -32,7 +33,7 @@ pygments_style = "sphinx"
 
 # -- Options for HTML output --------------------------------------------------
 
-html_theme = "default"
+html_theme = "sphinx_rtd_theme"
 
 html_static_path = ["_static"]
 
@@ -45,7 +46,7 @@ latex_documents = [
         "index",
         "pypuppetdb.tex",
         u"pypuppetdb Documentation",
-        u"Daniele Sluijters",
+        u"Vox Pupuli",
         "manual",
     ),
 ]
