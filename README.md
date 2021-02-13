@@ -26,7 +26,7 @@ pip install pypuppetdb
 
 ## Documentation
 
-The [user guide, API reference and a developer guide is available on ReadTheDocs.com](https://pypuppetdb.readthedocs.org/en/latest/).
+The [user guide, API reference and a developer guide is available on Read the Docs](https://pypuppetdb.readthedocs.io/en/latest/).
 
 ## Getting Help
 
