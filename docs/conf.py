@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
+import pkg_resources
 import sys
 import os
-import pypuppetdb.package
 
 pypuppetdb_root = os.path.dirname(os.path.abspath("."))
 sys.path.insert(0, pypuppetdb_root)
@@ -16,12 +18,9 @@ source_suffix = ".rst"
 
 master_doc = "index"
 
-project = pypuppetdb.package.__title__
-copyright = "{0}, {1}".format(
-    pypuppetdb.package.__year__, pypuppetdb.package.__author__
-)
-
-version = pypuppetdb.package.__version__
+project = "pypuppetdb"
+copyright = f"2013-{datetime.now().year}, Vox Pupuli"
+version = pkg_resources.get_distribution(project).version
 release = version
 
 language = "en"
