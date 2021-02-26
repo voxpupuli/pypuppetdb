@@ -1,19 +1,14 @@
 import codecs
-import os
-import sys
 
+import sys
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 
-def rc_value():
+def version():
     with open('version') as fp:
         val = fp.read().rstrip()
-    return '{}rc0'.format(val)
-
-
-def version():
-    return os.getenv('TRAVIS_TAG', rc_value())
+    return val
 
 
 class PyTest(TestCommand):
