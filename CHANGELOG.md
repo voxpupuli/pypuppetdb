@@ -4,6 +4,17 @@ Changelog
 Development
 -----------
 
+2.3.0
+-----
+
+  - Added support for `with` statement
+    ([#185](https://github.com/voxpupuli/pypuppetdb/pull/185))
+  - Added explicit `disconnect()` method
+    ([#185](https://github.com/voxpupuli/pypuppetdb/pull/185))
+  - Improved the documentation on [Read the Docs](https://pypuppetdb.readthedocs.io/en/latest/)
+    and in the project's README 
+    ([#190](https://github.com/voxpupuli/pypuppetdb/pull/190))
+
 2.2.0
 -----
 
