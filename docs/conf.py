@@ -21,7 +21,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 project = "pypuppetdb"
-copyright = f"2013-{datetime.now().year}, Vox Pupuli"
+copyright = "2013-%s, Vox Pupuli" % datetime.now().year
 version = pkg_resources.get_distribution(project).version
 release = version
 
