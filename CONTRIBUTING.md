@@ -61,11 +61,11 @@ Documentation will automatically be rebuilt on every push thanks to the
 Read The Docs webhook. You can [find it
 here](https://pypuppetdb.readthedocs.org/en/latest/).
 
-You can build the documentation manually by doing:
+You can build the documentation locally by doing:
 
 ```bash
-# Activate the virtualenv and install sphinx + the theme we are using
-pip install sphinx sphinx-rtd-theme
+# Activate the virtualenv used for the app development
+pip install -r docs/requirements.txt
 cd docs
 make html
 ```
