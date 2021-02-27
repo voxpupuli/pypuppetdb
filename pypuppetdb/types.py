@@ -528,8 +528,6 @@ class Catalog(object):
         corresponding report
     :ivar edges: :obj:`list` of :obj:`Edge` The source Resource object\
         of the relationship
-    :ivar resources: :obj:`dict` of :class:`pypuppetdb.types.Resource` The\
-        source Resource object of the relationship
     :ivar environment: :obj:`string` Environment associated with the
         catalog's certname
     :ivar code_id: :obj:`string` ties the catalog to the Puppet code that\
@@ -608,7 +606,7 @@ class Edge(object):
     :type source: :class:`pypuppetdb.Resource`
     :param target: The target Resource object of the relationship
     :type target: :class:`pypuppetdb.Resource`
-    :param relaptionship: Name of the Puppet Ressource Relationship
+    :param relationship: Name of the Puppet Resource Relationship
     :type relationship: :obj:`string`
     :param node: The certname of the node that owns this Relationship
     :type node: :obj:`string`
