@@ -4,6 +4,7 @@
 [![PyPi Downloads](https://img.shields.io/pypi/dm/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
 ![Tests Status](https://github.com/voxpupuli/pypuppetdb/workflows/tests%20(unit)/badge.svg)
 [![Coverage Status](https://img.shields.io/coveralls/voxpupuli/pypuppetdb.svg)](https://coveralls.io/r/voxpupuli/pypuppetdb)
+[![Documentation Status](https://readthedocs.org/projects/pypuppetdb/badge/?version=latest)](https://pypuppetdb.readthedocs.io/en/latest/?badge=latest)
 [![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](http://voxpupuli.org)
 
 This library is a thin wrapper around the REST API providing some
