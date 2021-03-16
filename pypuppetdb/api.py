@@ -1022,6 +1022,24 @@ class BaseAPI(object):
                 trusted=inv['trusted']
             )
 
+    def pql(self, query, **kwargs):
+        """Makes a PQL (Puppet Query Language) query.
+
+        :param query: PQL query
+        :type name: :obj:`string`
+
+        :param \*\*kwargs: The rest of the keyword arguments are passed
+            to the _query function
+
+        :returns: A generator yielding generic elements (dicts).
+        :rtype: dict
+        """
+        payload = {"query": query}
+
+        elements = self._query("pql", payload=payload, request_method="POST", **kwargs)
+        for element in elements:
+            yield element
+
     def status(self):
         """Get PuppetDB server status.
 
