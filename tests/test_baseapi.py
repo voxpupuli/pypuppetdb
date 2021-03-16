@@ -1,9 +1,11 @@
 import base64
 import json
-import mock
+
 import httpretty
+import mock
 import pytest
 import requests
+
 import pypuppetdb
 
 
@@ -692,6 +694,33 @@ class TestAPIMethods(object):
             pass
 
         assert httpretty.last_request().path == '/pdb/query/v4/inventory'
+
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_pql(self, baseapi):
+        pql_query = """
+          nodes[certname] {
+            facts {
+              name = "operatingsystem" and
+              value = "Debian"
+            }
+          }
+        """
+        pql_body = [
+            {'certname': 'foo.example.com'},
+            {'certname': 'bar.example.com'},
+        ]
+        pql_url = 'http://localhost:8080/pdb/query/v4'
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.POST, pql_url,
+                               body=json.dumps(pql_body))
+
+        elements = list(baseapi.pql(pql_query))
+
+        assert httpretty.last_request().path == '/pdb/query/v4'
+        assert elements[0]["certname"] == 'foo.example.com'
 
         httpretty.disable()
         httpretty.reset()
