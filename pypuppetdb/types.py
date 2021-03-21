@@ -435,12 +435,17 @@ class Node(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def facts(self, **kwargs):
+    def facts(self, query=None, **kwargs):
         """Get all facts of this node. Additional arguments may also be
         specified that will be passed to the query function.
         """
-        return self.__api.facts(query=EqualsOperator("certname", self.name),
-                                **kwargs)
+        q = EqualsOperator("certname", self.name)
+        if query:
+            q = AndOperator()
+            q.add(EqualsOperator("certname", self.name))
+            q.add(query)
+
+        return self.__api.facts(query=q, **kwargs)
 
     def fact(self, name):
         """Get a single fact from this node."""
