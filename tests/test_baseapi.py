@@ -46,8 +46,7 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.token is None
         assert baseapi.protocol == 'http'
         assert baseapi.url_path == ''
-        assert baseapi.username is None
-        assert baseapi.password is None
+        assert baseapi.auth is None
         assert baseapi.metric_api_version is 'v2'
 
     def test_host(self):
@@ -126,19 +125,16 @@ class TestBaseAPIInitOptions(object):
 
     def test_username(self):
         api = pypuppetdb.api.BaseAPI(username='puppetdb')
-        assert api.username is None
-        assert api.password is None
+        assert api.auth is None
 
     def test_password(self):
         api = pypuppetdb.api.BaseAPI(password='password123')  # nosec
-        assert api.username is None
-        assert api.password is None
+        assert api.auth is None
 
     def test_username_and_password(self):
         api = pypuppetdb.api.BaseAPI(username='puppetdb',  # nosec
                                      password='password123')
-        assert api.username == 'puppetdb'
-        assert api.password == 'password123'
+        assert api.auth == ('puppetdb', 'password123')
 
     def test_metric_api_version_v1(self):
         api = pypuppetdb.api.BaseAPI(metric_api_version='v1')
@@ -268,8 +264,7 @@ class TestAPIQuery(object):
     def test_with_password_authorization(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
-        baseapi.username = 'puppetdb'
-        baseapi.password = 'password123'
+        baseapi.auth = ('puppetdb', 'password123')
         baseapi._query('nodes')
         assert httpretty.last_request().path == '/pdb/query/v4/nodes'
         encoded_cred = 'puppetdb:password123'.encode('utf-8')
@@ -714,12 +709,12 @@ class TestAPIMethods(object):
         pql_url = 'http://localhost:8080/pdb/query/v4'
 
         httpretty.enable()
-        httpretty.register_uri(httpretty.POST, pql_url,
+        httpretty.register_uri(httpretty.GET, pql_url,
                                body=json.dumps(pql_body))
 
         elements = list(baseapi.pql(pql_query))
 
-        assert httpretty.last_request().path == '/pdb/query/v4'
+        assert httpretty.last_request().path.startswith('/pdb/query/v4')
         assert elements[0]["certname"] == 'foo.example.com'
 
         httpretty.disable()

@@ -291,7 +291,7 @@ class BaseAPI(object):
 
         return url
 
-    def _query(self, endpoint, path=None, query=None, pql=None,
+    def _query(self, endpoint=None, path=None, query=None, pql=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
                payload=None, request_method='GET'):
@@ -301,7 +301,8 @@ class BaseAPI(object):
         the response and give it back or raise for the HTTP Status Code
         PuppetDB gave back.
 
-        :param endpoint: The PuppetDB API endpoint we want to query.
+        :param endpoint: (optional) The PuppetDB API endpoint we want to query.
+                        Unnecessary when using PQL.
         :type endpoint: :obj:`string`
         :param path: An additional path if we don't wish to query the\
                 bare endpoint.
@@ -340,7 +341,7 @@ class BaseAPI(object):
 
         log.debug(f"_query called with ",
                   # comma-separated list of method arguments with their values
-                  ", ".join([f"{arg}: {locals()['arg']}" for arg in locals().keys() if arg != 'self'])
+                  ", ".join([f"{arg}: {locals().get(arg, 'None')}" for arg in locals().keys() if arg != 'self'])
                   )
 
         if query and pql:
@@ -348,13 +349,17 @@ class BaseAPI(object):
             raise APIError
 
         pql_unsupported_args = ['order_by', 'limit', 'include_total', 'offset', 'summarize_by', 'count_by', 'count_filter']
-        if pql and (any([locals()['arg'][param] for param in pql_unsupported_args])):
+        if pql and (any([locals().get(arg, False) for arg in pql_unsupported_args])):
             log.error(f"For PQL these arguments need to be included in the query: "
                       f"{', '.join(pql_unsupported_args)}")
             raise APIError
 
         if request_method.upper() not in ['GET', 'POST']:
             log.error(f"Only GET or POST supported, {request_method} unsupported")
+            raise APIError
+
+        if not pql and not endpoint:
+            log.error("If not using PQL, then endpoint is required!")
             raise APIError
 
         if payload is None:
