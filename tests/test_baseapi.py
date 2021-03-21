@@ -46,7 +46,7 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.token is None
         assert baseapi.protocol == 'http'
         assert baseapi.url_path == ''
-        assert baseapi.auth is None
+        assert baseapi.session.auth is None
         assert baseapi.metric_api_version is 'v2'
 
     def test_host(self):
@@ -125,16 +125,16 @@ class TestBaseAPIInitOptions(object):
 
     def test_username(self):
         api = pypuppetdb.api.BaseAPI(username='puppetdb')
-        assert api.auth is None
+        assert api.session.auth is None
 
     def test_password(self):
         api = pypuppetdb.api.BaseAPI(password='password123')  # nosec
-        assert api.auth is None
+        assert api.session.auth is None
 
     def test_username_and_password(self):
         api = pypuppetdb.api.BaseAPI(username='puppetdb',  # nosec
                                      password='password123')
-        assert api.auth == ('puppetdb', 'password123')
+        assert api.session.auth == ('puppetdb', 'password123')
 
     def test_metric_api_version_v1(self):
         api = pypuppetdb.api.BaseAPI(metric_api_version='v1')
@@ -264,7 +264,7 @@ class TestAPIQuery(object):
     def test_with_password_authorization(self, baseapi):
         httpretty.enable()
         stub_request('http://localhost:8080/pdb/query/v4/nodes')
-        baseapi.auth = ('puppetdb', 'password123')
+        baseapi.session.auth = ('puppetdb', 'password123')
         baseapi._query('nodes')
         assert httpretty.last_request().path == '/pdb/query/v4/nodes'
         encoded_cred = 'puppetdb:password123'.encode('utf-8')

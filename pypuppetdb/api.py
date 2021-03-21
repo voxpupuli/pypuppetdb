@@ -165,20 +165,20 @@ class BaseAPI(object):
             url_path = ''
 
         self.url_path = url_path
-        if username and password:
-            self.auth = (username, password)
-        else:
-            self.auth = None
 
-        self._session = requests.Session()
-        self._session.headers = {
+        self.session = requests.Session()
+
+        if username and password:
+            self.session.auth = (username, password)
+
+        self.session.headers = {
             'content-type': 'application/json',
             'accept': 'application/json',
             'accept-charset': 'utf-8'
         }
 
         if self.token:
-            self._session.headers['X-Authentication'] = self.token
+            self.session.headers['X-Authentication'] = self.token
 
         if protocol is not None:
             protocol = protocol.lower()
@@ -198,7 +198,7 @@ class BaseAPI(object):
         # functions or libraries to hang on the open connections. This happens
         # for example with using paramiko to tunnel PuppetDB connections
         # through ssh.
-        self._session.close()
+        self.session.close()
 
     def __enter__(self):
         """Set up environment for 'with' statement."""
@@ -397,18 +397,18 @@ class BaseAPI(object):
 
         try:
             if request_method.upper() == 'GET':
-                r = self._session.get(url, params=payload,
+                r = self.session.get(url, params=payload,
+                                     verify=self.ssl_verify,
+                                     cert=(self.ssl_cert, self.ssl_key),
+                                     timeout=self.timeout,
+                                     )
+            else:
+                r = self.session.post(url,
+                                      data=json.dumps(payload, default=str),
                                       verify=self.ssl_verify,
                                       cert=(self.ssl_cert, self.ssl_key),
                                       timeout=self.timeout,
-                                      auth=self.auth)
-            else:
-                r = self._session.post(url,
-                                       data=json.dumps(payload, default=str),
-                                       verify=self.ssl_verify,
-                                       cert=(self.ssl_cert, self.ssl_key),
-                                       timeout=self.timeout,
-                                       auth=self.auth)
+                                      )
 
             r.raise_for_status()
 
@@ -476,19 +476,14 @@ class BaseAPI(object):
                                      .encode('utf-8')).hexdigest()
         }
 
-        if not self.token:
-            auth = (self.username, self.password)
-        else:
-            auth = None
-
         try:
-            r = self._session.post(url,
-                                   params=params,
-                                   data=json.dumps(payload, default=str),
-                                   verify=self.ssl_verify,
-                                   cert=(self.ssl_cert, self.ssl_key),
-                                   timeout=self.timeout,
-                                   auth=auth)
+            r = self.session.post(url,
+                                  params=params,
+                                  data=json.dumps(payload, default=str),
+                                  verify=self.ssl_verify,
+                                  cert=(self.ssl_cert, self.ssl_key),
+                                  timeout=self.timeout,
+                                  )
 
             r.raise_for_status()
 
