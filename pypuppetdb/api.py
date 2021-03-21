@@ -166,11 +166,9 @@ class BaseAPI(object):
 
         self.url_path = url_path
         if username and password:
-            self.username = username
-            self.password = password
+            self.auth = (username, password)
         else:
-            self.username = None
-            self.password = None
+            self.auth = None
 
         self._session = requests.Session()
         self._session.headers = {
@@ -293,11 +291,11 @@ class BaseAPI(object):
 
         return url
 
-    def _query(self, endpoint, path=None, query=None,
+    def _query(self, endpoint, path=None, query=None, pql=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
                payload=None, request_method='GET'):
-        """This method actually querries PuppetDB. Provided an endpoint and an
+        """This method actually queries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
         the response and give it back or raise for the HTTP Status Code
@@ -308,8 +306,10 @@ class BaseAPI(object):
         :param path: An additional path if we don't wish to query the\
                 bare endpoint.
         :type path: :obj:`string`
-        :param query: (optional) A query to further narrow down the resultset.
+        :param query: (optional) An AST query to further narrow down the resultset.
         :type query: :obj:`string`
+        :param pql: (optional) A PQL query to further narrow down the resultset.
+        :type pql: :obj:`string`
         :param order_by: (optional) Set the order parameters for the resultset.
         :type order_by: :obj:`string`
         :param limit: (optional) Tell PuppetDB to limit it's response to this\
@@ -337,41 +337,58 @@ class BaseAPI(object):
         :returns: The decoded response from PuppetDB
         :rtype: :obj:`dict` or :obj:`list`
         """
-        log.debug('_query called with endpoint: {0}, path: {1}, query: {2}, '
-                  'limit: {3}, offset: {4}, summarize_by {5}, count_by {6}, '
-                  'count_filter: {7}, payload: {8}'
-                  .format(endpoint, path, query, limit,
-                          offset, summarize_by, count_by,
-                          count_filter, payload))
 
-        url = self._url(endpoint, path=path)
+        log.debug(f"_query called with ",
+                  # comma-separated list of method arguments with their values
+                  ", ".join([f"{arg}: {locals()['arg']}" for arg in locals().keys() if arg != 'self'])
+                  )
+
+        if query and pql:
+            log.error("Use only AST ('query') or PQL ('pql'), not both!")
+            raise APIError
+
+        pql_unsupported_args = ['order_by', 'limit', 'include_total', 'offset', 'summarize_by', 'count_by', 'count_filter']
+        if pql and (any([locals()['arg'][param] for param in pql_unsupported_args])):
+            log.error(f"For PQL these arguments need to be included in the query: "
+                      f"{', '.join(pql_unsupported_args)}")
+            raise APIError
+
+        if request_method.upper() not in ['GET', 'POST']:
+            log.error(f"Only GET or POST supported, {request_method} unsupported")
+            raise APIError
+
         if payload is None:
             payload = {}
-        if query is not None:
-            payload['query'] = query
-        if order_by is not None:
-            payload[PARAMETERS['order_by']] = order_by
-        if limit is not None:
-            payload['limit'] = limit
-        if include_total is True:
-            payload[PARAMETERS['include_total']] = \
-                json.dumps(include_total)
-        if offset is not None:
-            payload['offset'] = offset
-        if summarize_by is not None:
-            payload[PARAMETERS['summarize_by']] = summarize_by
-        if count_by is not None:
-            payload[PARAMETERS['count_by']] = count_by
-        if count_filter is not None:
-            payload[PARAMETERS['counts_filter']] = count_filter
 
-        if not payload:
-            payload = None
+        # if pql or query:
+        #     # it's safe to assume that if you use any query type, you may get over the limit of
+        #     # maximum URL length for HTTP GET, so just switch to POST for them
+        #     log.warning('Using AST or PQL - switching to POST to prevent hitting GET limits.')
+        #     request_method = 'POST'
 
-        if not self.token:
-            auth = (self.username, self.password)
+        if pql:
+            # PQL queries are made to the same endpoint regardless of the queried entities
+            url = self._url('pql', path=path)
+            payload['query'] = pql
         else:
-            auth = None
+            url = self._url(endpoint, path=path)
+            if query is not None:
+                payload['query'] = query
+            if order_by is not None:
+                payload[PARAMETERS['order_by']] = order_by
+            if limit is not None:
+                payload['limit'] = limit
+            if include_total is True:
+                payload[PARAMETERS['include_total']] = \
+                    json.dumps(include_total)
+            if offset is not None:
+                payload['offset'] = offset
+            if summarize_by is not None:
+                payload[PARAMETERS['summarize_by']] = summarize_by
+            if count_by is not None:
+                payload[PARAMETERS['count_by']] = count_by
+            if count_filter is not None:
+                payload[PARAMETERS['counts_filter']] = count_filter
 
         try:
             if request_method.upper() == 'GET':
@@ -379,18 +396,15 @@ class BaseAPI(object):
                                       verify=self.ssl_verify,
                                       cert=(self.ssl_cert, self.ssl_key),
                                       timeout=self.timeout,
-                                      auth=auth)
-            elif request_method.upper() == 'POST':
+                                      auth=self.auth)
+            else:
                 r = self._session.post(url,
                                        data=json.dumps(payload, default=str),
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,
-                                       auth=auth)
-            else:
-                log.error("Only GET or POST supported, {0} unsupported".format(
-                    request_method))
-                raise APIError
+                                       auth=self.auth)
+
             r.raise_for_status()
 
             # get total number of results if requested with include-total
@@ -676,6 +690,10 @@ class BaseAPI(object):
         :returns: A generator yielding Facts.
         :rtype: :class:`pypuppetdb.types.Fact`
         """
+        if 'pql' in kwargs.keys() and kwargs['pql'] and (name or value):
+            log.error("Don't use PQL together with name or value!")
+            raise APIError
+
         if name is not None and value is not None:
             path = '{0}/{1}'.format(name, value)
         elif name is not None and value is None:
@@ -748,6 +766,10 @@ class BaseAPI(object):
         :returns: A generator yielding Resources
         :rtype: :class:`pypuppetdb.types.Resource`
         """
+        if 'pql' in kwargs.keys() and kwargs['pql'] and (type_ or title):
+            log.error("Don't use PQL together with type_ or title!")
+            raise APIError
+
         path = None
 
         if type_ is not None:
@@ -796,6 +818,7 @@ class BaseAPI(object):
         :returns: A generator yielding Catalogs
         :rtype: :class:`pypuppetdb.types.Catalog`
         """
+
         catalogs = self._query('catalogs', **kwargs)
 
         if type(catalogs) == dict:
@@ -1022,11 +1045,12 @@ class BaseAPI(object):
                 trusted=inv['trusted']
             )
 
-    def pql(self, query, **kwargs):
-        """Makes a PQL (Puppet Query Language) query.
+    def pql(self, pql, **kwargs):
+        """Makes a raw PQL (Puppet Query Language) getting plain dicts
+         as a result - without casting the results into any rich type.
 
-        :param query: PQL query
-        :type name: :obj:`string`
+        :param pql: PQL query
+        :type pql: :obj:`string`
 
         :param \*\*kwargs: The rest of the keyword arguments are passed
             to the _query function
@@ -1034,9 +1058,8 @@ class BaseAPI(object):
         :returns: A generator yielding generic elements (dicts).
         :rtype: dict
         """
-        payload = {"query": query}
 
-        elements = self._query("pql", payload=payload, request_method="POST", **kwargs)
+        elements = self._query(pql=pql, **kwargs)
         for element in elements:
             yield element
 
