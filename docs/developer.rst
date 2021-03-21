@@ -1,13 +1,18 @@
-.. _api:
+.. _developer:
 
-Developer Interface
-===================
+Developer Guide
+===============
 
 .. module:: pypuppetdb
 
 This part of the documentation covers all the interfaces of PyPuppetDB.
 It will cover how the API is set up and how to configure which version of
 the API to use.
+
+.. note::
+   This part of the documentation may be outdated. Please see
+   `this PR <https://github.com/voxpupuli/pypuppetdb/pull/190>`_
+   for more information.
 
 Lazy objects
 ------------
@@ -38,6 +43,7 @@ Main Interface
 What you'll usually need to do is use the :func:`connect` method to set up a
 connection with PuppetDB and indicate which version of the API you want to
 talk.
+
 .. autofunction:: connect
 
 API objects
@@ -146,6 +152,12 @@ PuppetDB call.
 .. autoclass:: pypuppetdb.QueryBuilder.ExtractOperator
    :members:
 .. autoclass:: pypuppetdb.QueryBuilder.FunctionOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.SubqueryOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.InOperator
+   :members:
+.. autoclass:: pypuppetdb.QueryBuilder.FromOperator
    :members:
 
 Utilities

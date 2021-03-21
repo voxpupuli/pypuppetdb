@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
 
-import sys
-
-import pytest
-import pypuppetdb
 import datetime
 
-if sys.version_info >= (3, 0):
-    unicode = str
+import pytest
+
+import pypuppetdb
 
 
 class TestUTC(object):
@@ -26,7 +23,7 @@ class TestUTC(object):
         assert str('UTC') == str(utc)
 
     def test_magic_unicode(self, utc):
-        assert 'UTC' == unicode(utc)
+        assert 'UTC' == str(utc)
 
     def test_magic_repr(self, utc):
         assert str('<UTC>') == repr(utc)

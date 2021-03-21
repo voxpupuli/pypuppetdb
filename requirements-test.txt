@@ -1,0 +1,14 @@
+-r requirements.txt
+coveralls
+bandit
+coverage
+pep8
+mock
+pytest<6
+pytest-cov
+pytest-pep8
+pytest-mock
+pytest-mypy
+cov-core
+mypy
+httpretty

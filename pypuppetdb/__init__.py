@@ -1,5 +1,5 @@
-from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 """
 pypuppetdb PuppetDB API library
@@ -47,7 +47,7 @@ We can also query for facts:
    osfamily/host1
    osfamily/host2
 
-That querries PuppetDB for the 'osfamily' fact and will yield Fact objects,
+That queries PuppetDB for the 'osfamily' fact and will yield Fact objects,
 one per node this fact is found on.
 
    >>> resources = db.resources('file')
@@ -60,14 +60,7 @@ import logging
 
 from pypuppetdb.api import BaseAPI
 
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:  # pragma: notest
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 def connect(host='localhost', port=8080, ssl_verify=False, ssl_key=None,

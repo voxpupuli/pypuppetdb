@@ -1,28 +1,19 @@
-from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import hashlib
 import json
 import logging
+from datetime import datetime, timedelta
+from urllib.parse import quote
+
 import requests
 
-from datetime import datetime, timedelta
+from pypuppetdb.QueryBuilder import (EqualsOperator)
+from pypuppetdb.errors import (APIError, DoesNotComputeError, EmptyResponseError)
+from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
+                              Node, Report, Resource)
 from pypuppetdb.utils import json_to_datetime
-from pypuppetdb.errors import (
-    ImproperlyConfiguredError,
-    EmptyResponseError,
-    APIError,
-)
-from pypuppetdb.types import (
-    Node, Fact, Resource,
-    Report, Event, Catalog,
-    Inventory
-)
-from pypuppetdb.QueryBuilder import *
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +24,15 @@ ENDPOINTS = {
     'resources': 'pdb/query/v4/resources',
     'catalogs': 'pdb/query/v4/catalogs',
     'mbean': 'metrics/v1/mbeans',
+    # metrics v2 endpoint is now the jolokia library and all of its operations
+    # https://jolokia.org/reference/html/protocol.html#jolokia-operations
+    'metrics': 'metrics/v2/read',
+    'metrics-base': 'metrics/v2',
+    'metrics-exec': 'metrics/v2/exec',
+    'metrics-list': 'metrics/v2/list',
+    'metrics-search': 'metrics/v2/search',
+    'metrics-write': 'metrics/v2/write',
+    'metrics-version': 'metrics/v2/version',
     'reports': 'pdb/query/v4/reports',
     'events': 'pdb/query/v4/events',
     'event-counts': 'pdb/query/v4/event-counts',
@@ -46,6 +46,8 @@ ENDPOINTS = {
     'edges': 'pdb/query/v4/edges',
     'pql': 'pdb/query/v4',
     'inventory': 'pdb/query/v4/inventory',
+    'status': 'status/v1/services/puppetdb-status',
+    'cmd': 'pdb/cmd/v1'
 }
 
 PARAMETERS = {
@@ -55,6 +57,13 @@ PARAMETERS = {
     'counts_filter': 'counts_filter',
     'summarize_by': 'summarize_by',
     'server_time': 'server_time',
+}
+
+COMMAND_VERSION = {
+    "deactivate node": 3,
+    "replace catalog": 9,
+    "replace facts": 5,
+    "store report": 8
 }
 
 ERROR_STRINGS = {
@@ -86,7 +95,7 @@ class BaseAPI(object):
     :type port: :obj:`int`
 
     :param ssl_verify: (optional) Verify PuppetDB server certificate.
-    :type ssl_verify: :obj:`bool`
+    :type ssl_verify: :obj:`bool` or :obj:`string`
 
     :param ssl_key: (optional) Path to our client secret key.
     :type ssl_key: :obj:`None` or :obj:`string` representing a filesystem\
@@ -119,16 +128,25 @@ class BaseAPI(object):
     :param token: (optional) The X-auth token to use for X-Authentication
     :type token: :obj:`None` or :obj:`string`
 
+    :param metric_api_version: (Default 'v2') Version of the metric API we're initialising.
+    :type metric_api_version: :obj:`None` or :obj:`string`
+
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     """
+
     def __init__(self, host='localhost', port=8080, ssl_verify=True,
                  ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-                 url_path=None, username=None, password=None, token=None):
+                 url_path=None, username=None, password=None, token=None,
+                 metric_api_version=None):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
 
         self.api_version = 'v4'
+        if metric_api_version is not None and metric_api_version not in ['v1', 'v2']:
+            raise ValueError("metric_api_version specified must be None, 'v1' or 'v2',"
+                             " was given: '{}'".format(metric_api_version))
+        self.metric_api_version = metric_api_version if metric_api_version else 'v2'
         self.host = host
         self.port = port
         self.ssl_verify = ssl_verify
@@ -176,6 +194,23 @@ class BaseAPI(object):
         else:
             self.protocol = 'http'
 
+    def disconnect(self):
+        """Close all connections that this class opened up."""
+        # If we don't explicitly close connections, we might cause other
+        # functions or libraries to hang on the open connections. This happens
+        # for example with using paramiko to tunnel PuppetDB connections
+        # through ssh.
+        self._session.close()
+
+    def __enter__(self):
+        """Set up environment for 'with' statement."""
+        # Once this class has been instantiated, there's nothing more required
+        return self
+
+    def __exit__(self, type, value, trace):
+        """Tear down connections."""
+        self.disconnect()
+
     @property
     def version(self):
         """The version of the API we're querying against.
@@ -210,7 +245,8 @@ class BaseAPI(object):
         if self.last_total is not None:
             return int(self.last_total)
 
-    def _normalize_resource_type(self, type_):
+    @staticmethod
+    def _normalize_resource_type(type_):
         """Normalizes the type passed to the api by capitalizing each part
         of the type. For example:
 
@@ -260,7 +296,7 @@ class BaseAPI(object):
     def _query(self, endpoint, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
-               request_method='GET'):
+               payload=None, request_method='GET'):
         """This method actually querries PuppetDB. Provided an endpoint and an
         optional path and/or query it will fire a request at PuppetDB. If
         PuppetDB can be reached and answers within the timeout we'll decode
@@ -293,6 +329,8 @@ class BaseAPI(object):
         :type count_by: :obj:`string`
         :param count_filter: (optional) Specify a filter for the results
         :type count_filter: :obj:`string`
+        :param payload: (optional) Arbitrary payload to send as part of the request.
+        :type payload: :obj:`dict`
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
@@ -301,13 +339,14 @@ class BaseAPI(object):
         """
         log.debug('_query called with endpoint: {0}, path: {1}, query: {2}, '
                   'limit: {3}, offset: {4}, summarize_by {5}, count_by {6}, '
-                  'count_filter: {7}'.format(endpoint, path, query, limit,
-                                             offset, summarize_by, count_by,
-                                             count_filter))
+                  'count_filter: {7}, payload: {8}'
+                  .format(endpoint, path, query, limit,
+                          offset, summarize_by, count_by,
+                          count_filter, payload))
 
         url = self._url(endpoint, path=path)
-
-        payload = {}
+        if payload is None:
+            payload = {}
         if query is not None:
             payload['query'] = query
         if order_by is not None:
@@ -326,7 +365,7 @@ class BaseAPI(object):
         if count_filter is not None:
             payload[PARAMETERS['counts_filter']] = count_filter
 
-        if not (payload):
+        if not payload:
             payload = None
 
         if not self.token:
@@ -342,14 +381,15 @@ class BaseAPI(object):
                                       timeout=self.timeout,
                                       auth=auth)
             elif request_method.upper() == 'POST':
-                r = self._session.post(url, params=payload,
+                r = self._session.post(url,
+                                       data=json.dumps(payload, default=str),
                                        verify=self.ssl_verify,
                                        cert=(self.ssl_cert, self.ssl_key),
                                        timeout=self.timeout,
                                        auth=auth)
             else:
                 log.error("Only GET or POST supported, {0} unsupported".format(
-                          request_method))
+                    request_method))
                 raise APIError
             r.raise_for_status()
 
@@ -383,13 +423,87 @@ class BaseAPI(object):
                                                      self.protocol.upper()))
             raise
 
+    def _cmd(self, command, payload):
+        """This method posts commands to PuppetDB. Provided a command and payload
+        it will fire a request at PuppetDB. If PuppetDB can be reached and
+        answers within the timeout we'll decode the response and give it back
+        or raise for the HTTP Status Code yesPuppetDB gave back.
+
+        :param command: The PuppetDB Command we want to execute.
+        :type command: :obj:`string`
+        :param command: The payload, in wire format, specific to the command.
+        :type path: :obj:`dict`
+
+        :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
+
+        :returns: The decoded response from PuppetDB
+        :rtype: :obj:`dict` or :obj:`list`
+        """
+        log.debug('_cmd called with command: {0}, data: {1}'.format(
+            command, payload))
+
+        url = self._url('cmd')
+
+        if command not in COMMAND_VERSION:
+            log.error("Only {0} supported, {1} unsupported".format(
+                list(COMMAND_VERSION.keys()), command))
+            raise APIError
+
+        params = {
+            "command": command,
+            "version": COMMAND_VERSION[command],
+            "certname": payload['certname'],
+            "checksum": hashlib.sha1(str(payload)  # nosec
+                                     .encode('utf-8')).hexdigest()
+        }
+
+        if not self.token:
+            auth = (self.username, self.password)
+        else:
+            auth = None
+
+        try:
+            r = self._session.post(url,
+                                   params=params,
+                                   data=json.dumps(payload, default=str),
+                                   verify=self.ssl_verify,
+                                   cert=(self.ssl_cert, self.ssl_key),
+                                   timeout=self.timeout,
+                                   auth=auth)
+
+            r.raise_for_status()
+
+            json_body = r.json()
+            if json_body is not None:
+                return json_body
+            else:
+                del json_body
+                raise EmptyResponseError
+
+        except requests.exceptions.Timeout:
+            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['timeout'],
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
+        except requests.exceptions.ConnectionError:
+            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['refused'],
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
+        except requests.exceptions.HTTPError as err:
+            log.error("{0} {1}:{2} over {3}.".format(err.response.text,
+                                                     self.host, self.port,
+                                                     self.protocol.upper()))
+            raise
+
     # Method stubs
 
-    def nodes(self, unreported=2, with_status=False, **kwargs):
+    def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
+              **kwargs):
         """Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
-        also fetches the nodes status and event counts of the latest
-        report from puppetdb.
+        also (optionally) fetches the nodes status and (optionally)
+        event counts of the latest report from puppetdb.
 
         :param with_status: (optional) include the node status in the\
                            returned nodes
@@ -397,6 +511,14 @@ class BaseAPI(object):
         :param unreported: (optional) amount of hours when a node gets
                            marked as unreported
         :type unreported: :obj:`None` or integer
+        :param with_event_numbers: (optional) include the exact number of\
+                           changed/unchanged/failed/noop events when\
+                           with_status is set to True. If set to False
+                           only "some" string is provided if there are
+                           resources with such status in the last report.
+                           This provides performance benefits as potentially
+                           slow event-counts query is omitted completely.
+        :type with_event_numbers: :bool:
         :param \*\*kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
@@ -404,14 +526,14 @@ class BaseAPI(object):
         :rtype: :class:`pypuppetdb.types.Node`
         """
         nodes = self._query('nodes', **kwargs)
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
         if type(nodes) == dict:
             nodes = [nodes, ]
 
-        if with_status:
+        if with_status and with_event_numbers:
             latest_events = self.event_counts(
                 query=EqualsOperator("latest_report?", True),
                 summarize_by='certname'
@@ -422,25 +544,39 @@ class BaseAPI(object):
             node['events'] = None
 
             if with_status:
-                status = [s for s in latest_events
-                          if s['subject']['title'] == node['certname']]
+                if with_event_numbers:
+                    status = [s for s in latest_events
+                              if s['subject']['title'] == node['certname']]
 
-                try:
+                    try:
+                        node['status_report'] = node['latest_report_status']
+
+                        if status:
+                            node['events'] = status[0]
+                    except KeyError:
+                        if status:
+                            node['events'] = status = status[0]
+                            if status['successes'] > 0:
+                                node['status_report'] = 'changed'
+                            if status['noops'] > 0:
+                                node['status_report'] = 'noop'
+                            if status['failures'] > 0:
+                                node['status_report'] = 'failed'
+                        else:
+                            node['status_report'] = 'unchanged'
+                else:
                     node['status_report'] = node['latest_report_status']
-
-                    if status:
-                        node['events'] = status[0]
-                except KeyError:
-                    if status:
-                        node['events'] = status = status[0]
-                        if status['successes'] > 0:
-                            node['status_report'] = 'changed'
-                        if status['noops'] > 0:
-                            node['status_report'] = 'noop'
-                        if status['failures'] > 0:
-                            node['status_report'] = 'failed'
-                    else:
-                        node['status_report'] = 'unchanged'
+                    node['events'] = {
+                        'successes': 0,
+                        'failures': 0,
+                        'noops': 0,
+                    }
+                    if node['status_report'] == 'changed':
+                        node['events']['successes'] = 'some'
+                    elif node['status_report'] == 'noop':
+                        node['events']['noops'] = 'some'
+                    elif node['status_report'] == 'failed':
+                        node['events']['failures'] = 'some'
 
                 # node report age
                 if node['report_timestamp'] is not None:
@@ -507,10 +643,8 @@ class BaseAPI(object):
         edges = self._query('edges', **kwargs)
 
         for edge in edges:
-            identifier_source = edge['source_type'] + \
-                '[' + edge['source_title'] + ']'
-            identifier_target = edge['target_type'] + \
-                '[' + edge['target_title'] + ']'
+            identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
+            identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
             yield Edge(source=self.resources[identifier_source],
                        target=self.resources[identifier_target],
                        relationship=edge['relationship'],
@@ -787,15 +921,49 @@ class BaseAPI(object):
         """Get a list of all known facts."""
         return self._query('fact-names')
 
-    def metric(self, metric=None):
+    def metric(self, metric=None, version=None):
         """Query for a specific metrc.
 
         :param metric: The name of the metric we want.
         :type metric: :obj:`string`
+        :param version: The version of the metric API to query. Valid values: 'v1', 'v2'
+                        If not specified, then the value of self.metric_api_version
+                        will be used.
+        :type version: :obj:`string`
 
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
-        return self._query('mbean', path=metric)
+        version = version if version else self.metric_api_version
+        if version is None or version == 'v2':
+            if metric is None:
+                res = self._query('metrics-list')
+            else:
+                res = self._query('metrics', path=self.escape_metric_name(metric))
+
+            if 'error' in res:
+                raise DoesNotComputeError(res['error'])
+            return res['value']
+        elif version == 'v1':
+            return self._query('mbean', path=metric)
+        else:
+            raise ValueError("Version specified must be 'v1' or 'v2', was given: '{}'"
+                             .format(version))
+
+    def escape_metric_name(self, metric):
+        """Escapes metric names so they can be used in GET requests as part of the URL.
+        The new (as of v2) metrics API is backed by the Jolokia library.
+        The escpaing rules for Jolokia GET requests can be found here:
+        https://jolokia.org/reference/html/protocol.html#escape-rules
+
+        :param metric: The name of the metric we want to escape.
+        :type metric: :obj:`string`
+
+        :returns: The escaped version of the metric name, safe for use in metric GET queries.
+        """
+        metric = metric.replace('!', r'!!')
+        metric = metric.replace('/', r'!/')
+        metric = metric.replace('"', r'!"')
+        return metric
 
     def reports(self, **kwargs):
         """Get reports for our infrastructure. It is strongly recommended
@@ -853,3 +1021,14 @@ class BaseAPI(object):
                 facts=inv['facts'],
                 trusted=inv['trusted']
             )
+
+    def status(self):
+        """Get PuppetDB server status.
+
+        :returns: A dict with the PuppetDB status information
+        :rtype: :obj:`dict`
+        """
+        return self._query('status')
+
+    def command(self, command, payload):
+        return self._cmd(command, payload)
