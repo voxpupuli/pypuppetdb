@@ -341,14 +341,16 @@ class BaseAPI(object):
 
         log.debug(f"_query called with ",
                   # comma-separated list of method arguments with their values
-                  ", ".join([f"{arg}: {locals().get(arg, 'None')}" for arg in locals().keys() if arg != 'self'])
+                  ", ".join([f"{arg}: {locals().get(arg, 'None')}"
+                             for arg in locals().keys() if arg != 'self'])
                   )
 
         if query and pql:
             log.error("Use only AST ('query') or PQL ('pql'), not both!")
             raise APIError
 
-        pql_unsupported_args = ['order_by', 'limit', 'include_total', 'offset', 'summarize_by', 'count_by', 'count_filter']
+        pql_unsupported_args = ['order_by', 'limit', 'include_total', 'offset', 'summarize_by',
+                                'count_by', 'count_filter']
         if pql and (any([locals().get(arg, False) for arg in pql_unsupported_args])):
             log.error(f"For PQL these arguments need to be included in the query: "
                       f"{', '.join(pql_unsupported_args)}")
