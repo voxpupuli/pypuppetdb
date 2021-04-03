@@ -79,9 +79,6 @@ class BaseAPI(object):
     If :attr:`ssl` is set to `True` but either :attr:`ssl_key` or\
             :attr:`ssl_cert` are `None` this will raise an error.
 
-    :param api_version: (Default 4) Version of the API we're initialising.
-    :type api_version: :obj:`int`
-
     :param host: (optional) Hostname or IP of PuppetDB.
     :type host: :obj:`string`
 

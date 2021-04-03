@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 class MetricsAPI(BaseAPI):
 
     def metric(self, metric=None, version=None):
-        """Query for a specific metrc.
+        """Query for a specific metric.
 
         :param metric: The name of the metric we want.
         :type metric: :obj:`string`
@@ -28,7 +28,7 @@ class MetricsAPI(BaseAPI):
             if metric is None:
                 res = self._query('metrics-list')
             else:
-                res = self._query('metrics', path=self.escape_metric_name(metric))
+                res = self._query('metrics', path=self._escape_metric_name(metric))
 
             if 'error' in res:
                 raise DoesNotComputeError(res['error'])
@@ -39,7 +39,8 @@ class MetricsAPI(BaseAPI):
             raise ValueError("Version specified must be 'v1' or 'v2', was given: '{}'"
                              .format(version))
 
-    def escape_metric_name(self, metric):
+    @staticmethod
+    def _escape_metric_name(metric):
         """Escapes metric names so they can be used in GET requests as part of the URL.
         The new (as of v2) metrics API is backed by the Jolokia library.
         The escpaing rules for Jolokia GET requests can be found here:

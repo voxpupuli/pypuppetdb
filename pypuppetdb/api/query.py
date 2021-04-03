@@ -308,7 +308,7 @@ class QueryAPI(BaseAPI):
         :rtype: :class:`pypuppetdb.types.Catalog`
         """
         catalogs = self.catalogs(path=node)
-        return next(x for x in catalogs)
+        return next(catalog for catalog in catalogs)
 
     def catalogs(self, **kwargs):
         """Get the catalog information from the infrastructure based on path

@@ -35,7 +35,8 @@ class PqlAPI(BaseAPI):
             #     yield element
             yield element
 
-    def _get_type_from_query(self, pql):
+    @staticmethod
+    def _get_type_from_query(pql):
         """Gets a rich type of the entities returned by the given
         PQL query.
 

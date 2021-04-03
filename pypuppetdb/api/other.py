@@ -26,8 +26,9 @@ class CmdAPI(BaseAPI):
 
         :param command: The PuppetDB Command we want to execute.
         :type command: :obj:`string`
+
         :param command: The payload, in wire format, specific to the command.
-        :type path: :obj:`dict`
+        :type command: :obj:`dict`
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
