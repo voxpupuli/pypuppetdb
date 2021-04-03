@@ -31,7 +31,7 @@ def query(request):
 
 class TestBaseAPIVersion(object):
     def test_init_defaults(self):
-        v4 = pypuppetdb.api.BaseAPI()
+        v4 = pypuppetdb.api.API()
         assert v4.api_version == 'v4'
 
 
@@ -50,103 +50,103 @@ class TestBaseAPIInitOptions(object):
         assert baseapi.metric_api_version is 'v2'
 
     def test_host(self):
-        api = pypuppetdb.api.BaseAPI(host='127.0.0.1')
+        api = pypuppetdb.api.API(host='127.0.0.1')
         assert api.host == '127.0.0.1'
 
     def test_port(self):
-        api = pypuppetdb.api.BaseAPI(port=8081)
+        api = pypuppetdb.api.API(port=8081)
         assert api.port == 8081
 
     def test_ssl_verify(self):
-        api = pypuppetdb.api.BaseAPI(ssl_verify=False)
+        api = pypuppetdb.api.API(ssl_verify=False)
         assert api.ssl_verify is False
         assert api.protocol == 'http'
 
     def test_token(self):
         test_token = 'tokenstring'  # nosec
-        api = pypuppetdb.api.BaseAPI(token=test_token)
+        api = pypuppetdb.api.API(token=test_token)
         assert api.token == test_token
         assert api.protocol == 'https'
 
     def test_ssl_key(self):
-        api = pypuppetdb.api.BaseAPI(ssl_key='/a/b/c.pem')
+        api = pypuppetdb.api.API(ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.protocol == 'http'
 
     def test_ssl_cert(self):
-        api = pypuppetdb.api.BaseAPI(ssl_cert='/d/e/f.pem')
+        api = pypuppetdb.api.API(ssl_cert='/d/e/f.pem')
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'http'
 
     def test_ssl_key_and_cert(self):
-        api = pypuppetdb.api.BaseAPI(ssl_cert='/d/e/f.pem',
+        api = pypuppetdb.api.API(ssl_cert='/d/e/f.pem',
                                      ssl_key='/a/b/c.pem')
         assert api.ssl_key == '/a/b/c.pem'
         assert api.ssl_cert == '/d/e/f.pem'
         assert api.protocol == 'https'
 
     def test_timeout(self):
-        api = pypuppetdb.api.BaseAPI(timeout=20)
+        api = pypuppetdb.api.API(timeout=20)
         assert api.timeout == 20
 
     def test_protocol(self):
-        api = pypuppetdb.api.BaseAPI(protocol='https')
+        api = pypuppetdb.api.API(protocol='https')
         assert api.protocol == 'https'
 
     def test_uppercase_protocol(self):
-        api = pypuppetdb.api.BaseAPI(protocol='HTTP')
+        api = pypuppetdb.api.API(protocol='HTTP')
         assert api.protocol == 'http'
 
     def test_override_protocol(self):
-        api = pypuppetdb.api.BaseAPI(protocol='http',
+        api = pypuppetdb.api.API(protocol='http',
                                      ssl_cert='/d/e/f.pem',
                                      ssl_key='/a/b/c.pem')
         assert api.protocol == 'http'
 
     def test_invalid_protocol(self):
         with pytest.raises(ValueError):
-            api = pypuppetdb.api.BaseAPI(protocol='ftp')
+            api = pypuppetdb.api.API(protocol='ftp')
 
     def test_url_path(self):
-        api = pypuppetdb.api.BaseAPI(url_path='puppetdb')
+        api = pypuppetdb.api.API(url_path='puppetdb')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_leading_slash(self):
-        api = pypuppetdb.api.BaseAPI(url_path='/puppetdb')
+        api = pypuppetdb.api.API(url_path='/puppetdb')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_trailing_slash(self):
-        api = pypuppetdb.api.BaseAPI(url_path='puppetdb/')
+        api = pypuppetdb.api.API(url_path='puppetdb/')
         assert api.url_path == '/puppetdb'
 
     def test_url_path_longer_with_both_slashes(self):
-        api = pypuppetdb.api.BaseAPI(url_path='/puppet/db/')
+        api = pypuppetdb.api.API(url_path='/puppet/db/')
         assert api.url_path == '/puppet/db'
 
     def test_username(self):
-        api = pypuppetdb.api.BaseAPI(username='puppetdb')
+        api = pypuppetdb.api.API(username='puppetdb')
         assert api.session.auth is None
 
     def test_password(self):
-        api = pypuppetdb.api.BaseAPI(password='password123')  # nosec
+        api = pypuppetdb.api.API(password='password123')  # nosec
         assert api.session.auth is None
 
     def test_username_and_password(self):
-        api = pypuppetdb.api.BaseAPI(username='puppetdb',  # nosec
+        api = pypuppetdb.api.API(username='puppetdb',  # nosec
                                      password='password123')
         assert api.session.auth == ('puppetdb', 'password123')
 
     def test_metric_api_version_v1(self):
-        api = pypuppetdb.api.BaseAPI(metric_api_version='v1')
+        api = pypuppetdb.api.API(metric_api_version='v1')
         assert api.metric_api_version == 'v1'
 
     def test_metric_api_version_v2(self):
-        api = pypuppetdb.api.BaseAPI(metric_api_version='v2')
+        api = pypuppetdb.api.API(metric_api_version='v2')
         assert api.metric_api_version == 'v2'
 
     def test_metric_api_version_invalid_raises(self):
         with pytest.raises(ValueError):
-            pypuppetdb.api.BaseAPI(metric_api_version='bad')
+            pypuppetdb.api.API(metric_api_version='bad')
 
 
 class TestBaseAPIProperties(object):
@@ -480,7 +480,7 @@ class TestAPIMethods(object):
         assert httpretty.last_request().path == '/metrics/v1/mbeans'
 
     def test_metric_v1_version_constructor(self):
-        api = pypuppetdb.api.BaseAPI(metric_api_version='v1')
+        api = pypuppetdb.api.API(metric_api_version='v1')
         httpretty.enable()
         httpretty.enable()
         stub_request('http://localhost:8080/metrics/v1/mbeans/test')
@@ -510,7 +510,7 @@ class TestAPIMethods(object):
         httpretty.reset()
 
     def test_metric_v2_version_constructor(self):
-        api = pypuppetdb.api.BaseAPI(metric_api_version='v2')
+        api = pypuppetdb.api.API(metric_api_version='v2')
         metrics_body = {
             'request': {
                 'mbean': 'test:name=Num',

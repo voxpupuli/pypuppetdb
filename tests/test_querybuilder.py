@@ -7,7 +7,7 @@ from pypuppetdb.QueryBuilder import (AndOperator, EqualsOperator, ExtractOperato
                                      InOperator, LessEqualOperator, LessOperator, NotOperator,
                                      NullOperator, OrOperator, RegexArrayOperator, RegexOperator,
                                      SubqueryOperator)
-from pypuppetdb.api import APIError
+from pypuppetdb.errors import APIError
 
 
 class TestBinaryOperator(object):
