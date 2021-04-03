@@ -16,24 +16,6 @@ log = logging.getLogger(__name__)
 
 class QueryAPI(BaseAPI):
 
-    def pql(self, pql, **kwargs):
-        """Makes a raw PQL (Puppet Query Language) getting plain dicts
-         as a result - without casting the results into any rich type.
-
-        :param pql: PQL query
-        :type pql: :obj:`string`
-
-        :param \*\*kwargs: The rest of the keyword arguments are passed
-            to the _query function
-
-        :returns: A generator yielding generic elements (dicts).
-        :rtype: dict
-        """
-
-        elements = self._query(pql=pql, **kwargs)
-        for element in elements:
-            yield element
-
     def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
               **kwargs):
         """Query for nodes by either name or query. If both aren't

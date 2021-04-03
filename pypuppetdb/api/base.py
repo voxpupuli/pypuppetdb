@@ -11,7 +11,6 @@ from pypuppetdb.errors import (APIError, EmptyResponseError)
 
 log = logging.getLogger(__name__)
 
-
 ENDPOINTS = {
     'facts': 'pdb/query/v4/facts',
     'fact-names': 'pdb/query/v4/fact-names',
@@ -286,7 +285,7 @@ class BaseAPI(object):
 
         return url
 
-    def _query(self, endpoint=None, path=None, query=None, pql=None,
+    def _query(self, endpoint=None, path=None, query=None,
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
                payload=None, request_method='GET'):
@@ -304,8 +303,6 @@ class BaseAPI(object):
         :type path: :obj:`string`
         :param query: (optional) An AST query to further narrow down the resultset.
         :type query: :obj:`string`
-        :param pql: (optional) A PQL query to further narrow down the resultset.
-        :type pql: :obj:`string`
         :param order_by: (optional) Set the order parameters for the resultset.
         :type order_by: :obj:`string`
         :param limit: (optional) Tell PuppetDB to limit it's response to this\
@@ -340,57 +337,73 @@ class BaseAPI(object):
                              for arg in locals().keys() if arg != 'self'])
                   )
 
-        if query and pql:
-            log.error("Use only AST ('query') or PQL ('pql'), not both!")
-            raise APIError
-
-        pql_unsupported_args = ['order_by', 'limit', 'include_total', 'offset', 'summarize_by',
-                                'count_by', 'count_filter']
-        if pql and (any([locals().get(arg, False) for arg in pql_unsupported_args])):
-            log.error(f"For PQL these arguments need to be included in the query: "
-                      f"{', '.join(pql_unsupported_args)}")
-            raise APIError
-
-        if request_method.upper() not in ['GET', 'POST']:
-            log.error(f"Only GET or POST supported, {request_method} unsupported")
-            raise APIError
-
-        if not pql and not endpoint:
-            log.error("If not using PQL, then endpoint is required!")
+        if not endpoint:
+            log.error("Endpoint is required!")
             raise APIError
 
         if payload is None:
             payload = {}
 
-        # if pql or query:
-        #     # it's safe to assume that if you use any query type, you may get over the limit of
-        #     # maximum URL length for HTTP GET, so just switch to POST for them
-        #     log.warning('Using AST or PQL - switching to POST to prevent hitting GET limits.')
-        #     request_method = 'POST'
+        url = self._url(endpoint, path=path)
+        if query is not None:
+            payload['query'] = query
+        if order_by is not None:
+            payload[PARAMETERS['order_by']] = order_by
+        if limit is not None:
+            payload['limit'] = limit
+        if include_total is True:
+            payload[PARAMETERS['include_total']] = \
+                json.dumps(include_total)
+        if offset is not None:
+            payload['offset'] = offset
+        if summarize_by is not None:
+            payload[PARAMETERS['summarize_by']] = summarize_by
+        if count_by is not None:
+            payload[PARAMETERS['count_by']] = count_by
+        if count_filter is not None:
+            payload[PARAMETERS['counts_filter']] = count_filter
 
-        if pql:
-            # PQL queries are made to the same endpoint regardless of the queried entities
-            url = self._url('pql', path=path)
-            payload['query'] = pql
-        else:
-            url = self._url(endpoint, path=path)
-            if query is not None:
-                payload['query'] = query
-            if order_by is not None:
-                payload[PARAMETERS['order_by']] = order_by
-            if limit is not None:
-                payload['limit'] = limit
-            if include_total is True:
-                payload[PARAMETERS['include_total']] = \
-                    json.dumps(include_total)
-            if offset is not None:
-                payload['offset'] = offset
-            if summarize_by is not None:
-                payload[PARAMETERS['summarize_by']] = summarize_by
-            if count_by is not None:
-                payload[PARAMETERS['count_by']] = count_by
-            if count_filter is not None:
-                payload[PARAMETERS['counts_filter']] = count_filter
+        return self._make_request(url, request_method, payload)
+
+    def _pql(self, pql=None, request_method='GET'):
+        """This method actually queries PuppetDB. Provided an endpoint and an
+        optional path and/or query it will fire a request at PuppetDB. If
+        PuppetDB can be reached and answers within the timeout we'll decode
+        the response and give it back or raise for the HTTP Status Code
+        PuppetDB gave back.
+
+        :param pql: (optional) A PQL query to further narrow down the resultset.
+        :type pql: :obj:`string`
+
+        :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
+
+        :returns: The decoded response from PuppetDB
+        :rtype: :obj:`dict` or :obj:`list`
+        """
+
+        log.debug(f"_pql called with ",
+                  # comma-separated list of method arguments with their values
+                  ", ".join([f"{arg}: {locals().get(arg, 'None')}"
+                             for arg in locals().keys() if arg != 'self'])
+                  )
+
+        if not pql:
+            log.error("PQL query is required!")
+            raise APIError
+
+        payload = {}
+
+        # PQL queries are made to the same endpoint regardless of the queried entities
+        url = self._url('pql')
+        payload['query'] = pql
+
+        return self._make_request(url, request_method, payload)
+
+    def _make_request(self, url, request_method, payload):
+
+        if request_method.upper() not in ['GET', 'POST']:
+            log.error(f"Only GET or POST supported, {request_method} unsupported")
+            raise APIError
 
         try:
             if request_method.upper() == 'GET':
@@ -428,11 +441,13 @@ class BaseAPI(object):
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
+
         except requests.exceptions.ConnectionError:
             log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['refused'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
+
         except requests.exceptions.HTTPError as err:
             log.error("{0} {1}:{2} over {3}.".format(err.response.text,
                                                      self.host, self.port,

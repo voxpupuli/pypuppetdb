@@ -4,12 +4,12 @@ import pypuppetdb
 
 # Set up our API objects
 @pytest.fixture
-def baseapi():
+def api():
     return pypuppetdb.api.API()
 
 
 @pytest.fixture
-def token_baseapi():
+def token_api():
     return pypuppetdb.api.API(token='tokenstring')
 
 
