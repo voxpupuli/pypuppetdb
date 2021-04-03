@@ -45,12 +45,14 @@ class QueryAPI(BaseAPI):
         """
         nodes = self._query('nodes', **kwargs)
         now = datetime.utcnow()
+
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
         if type(nodes) == dict:
             nodes = [nodes, ]
 
+        latest_events = None
         if with_status and with_event_numbers:
             latest_events = self.event_counts(
                 query=EqualsOperator("latest_report?", True),
@@ -58,84 +60,89 @@ class QueryAPI(BaseAPI):
             )
 
         for node in nodes:
-            node['status_report'] = None
-            node['events'] = None
+            yield self._to_node(node, with_status, with_event_numbers, latest_events, now,
+                                unreported)
 
-            if with_status:
-                if with_event_numbers:
-                    status = [s for s in latest_events
-                              if s['subject']['title'] == node['certname']]
+    def _to_node(self, node, with_status, with_event_numbers, latest_events, now, unreported):
 
-                    try:
-                        node['status_report'] = node['latest_report_status']
+        node['status_report'] = None
+        node['events'] = None
 
-                        if status:
-                            node['events'] = status[0]
-                    except KeyError:
-                        if status:
-                            node['events'] = status = status[0]
-                            if status['successes'] > 0:
-                                node['status_report'] = 'changed'
-                            if status['noops'] > 0:
-                                node['status_report'] = 'noop'
-                            if status['failures'] > 0:
-                                node['status_report'] = 'failed'
-                        else:
-                            node['status_report'] = 'unchanged'
-                else:
+        if with_status:
+            if with_event_numbers:
+                status = [s for s in latest_events
+                          if s['subject']['title'] == node['certname']]
+
+                try:
                     node['status_report'] = node['latest_report_status']
-                    node['events'] = {
-                        'successes': 0,
-                        'failures': 0,
-                        'noops': 0,
-                    }
-                    if node['status_report'] == 'changed':
-                        node['events']['successes'] = 'some'
-                    elif node['status_report'] == 'noop':
-                        node['events']['noops'] = 'some'
-                    elif node['status_report'] == 'failed':
-                        node['events']['failures'] = 'some'
 
-                # node report age
-                if node['report_timestamp'] is not None:
-                    try:
-                        last_report = json_to_datetime(
-                            node['report_timestamp'])
-                        last_report = last_report.replace(tzinfo=None)
-                        unreported_border = now - timedelta(hours=unreported)
-                        if last_report < unreported_border:
-                            delta = (now - last_report)
-                            node['unreported'] = True
-                            node['unreported_time'] = '{0}d {1}h {2}m'.format(
-                                delta.days,
-                                int(delta.seconds / 3600),
-                                int((delta.seconds % 3600) / 60)
-                            )
-                    except AttributeError:
+                    if status:
+                        node['events'] = status[0]
+                except KeyError:
+                    if status:
+                        node['events'] = status = status[0]
+                        if status['successes'] > 0:
+                            node['status_report'] = 'changed'
+                        if status['noops'] > 0:
+                            node['status_report'] = 'noop'
+                        if status['failures'] > 0:
+                            node['status_report'] = 'failed'
+                    else:
+                        node['status_report'] = 'unchanged'
+            else:
+                node['status_report'] = node['latest_report_status']
+                node['events'] = {
+                    'successes': 0,
+                    'failures': 0,
+                    'noops': 0,
+                }
+                if node['status_report'] == 'changed':
+                    node['events']['successes'] = 'some'
+                elif node['status_report'] == 'noop':
+                    node['events']['noops'] = 'some'
+                elif node['status_report'] == 'failed':
+                    node['events']['failures'] = 'some'
+
+            # node report age
+            if node['report_timestamp'] is not None:
+                try:
+                    last_report = json_to_datetime(
+                        node['report_timestamp'])
+                    last_report = last_report.replace(tzinfo=None)
+                    unreported_border = now - timedelta(hours=unreported)
+                    if last_report < unreported_border:
+                        delta = (now - last_report)
                         node['unreported'] = True
-
-                if not node['report_timestamp']:
+                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                            delta.days,
+                            int(delta.seconds / 3600),
+                            int((delta.seconds % 3600) / 60)
+                        )
+                except AttributeError:
                     node['unreported'] = True
 
-            yield Node(self,
-                       name=node['certname'],
-                       deactivated=node['deactivated'],
-                       expired=node['expired'],
-                       report_timestamp=node['report_timestamp'],
-                       catalog_timestamp=node['catalog_timestamp'],
-                       facts_timestamp=node['facts_timestamp'],
-                       status_report=node['status_report'],
-                       noop=node.get('latest_report_noop'),
-                       noop_pending=node.get('latest_report_noop_pending'),
-                       events=node['events'],
-                       unreported=node.get('unreported'),
-                       unreported_time=node.get('unreported_time'),
-                       report_environment=node['report_environment'],
-                       catalog_environment=node['catalog_environment'],
-                       facts_environment=node['facts_environment'],
-                       latest_report_hash=node.get('latest_report_hash'),
-                       cached_catalog_status=node.get('cached_catalog_status')
-                       )
+            if not node['report_timestamp']:
+                node['unreported'] = True
+
+        return Node(self,
+                    name=node['certname'],
+                    deactivated=node['deactivated'],
+                    expired=node['expired'],
+                    report_timestamp=node['report_timestamp'],
+                    catalog_timestamp=node['catalog_timestamp'],
+                    facts_timestamp=node['facts_timestamp'],
+                    status_report=node['status_report'],
+                    noop=node.get('latest_report_noop'),
+                    noop_pending=node.get('latest_report_noop_pending'),
+                    events=node['events'],
+                    unreported=node.get('unreported'),
+                    unreported_time=node.get('unreported_time'),
+                    report_environment=node['report_environment'],
+                    catalog_environment=node['catalog_environment'],
+                    facts_environment=node['facts_environment'],
+                    latest_report_hash=node.get('latest_report_hash'),
+                    cached_catalog_status=node.get('cached_catalog_status')
+                    )
 
     def node(self, name):
         """Gets a single node from PuppetDB.
@@ -161,12 +168,15 @@ class QueryAPI(BaseAPI):
         edges = self._query('edges', **kwargs)
 
         for edge in edges:
-            identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
-            identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
-            yield Edge(source=self.resources[identifier_source],
-                       target=self.resources[identifier_target],
-                       relationship=edge['relationship'],
-                       node=edge['certname'])
+            yield self._to_edge(edge)
+
+    def _to_edge(self, edge):
+        identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
+        identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
+        return Edge(source=self.resources[identifier_source],
+                    target=self.resources[identifier_target],
+                    relationship=edge['relationship'],
+                    node=edge['certname'])
 
     def environments(self, **kwargs):
         """Get all known environments from Puppetdb.
@@ -207,12 +217,15 @@ class QueryAPI(BaseAPI):
 
         facts = self._query('facts', path=path, **kwargs)
         for fact in facts:
-            yield Fact(
-                node=fact['certname'],
-                name=fact['name'],
-                value=fact['value'],
-                environment=fact['environment']
-            )
+            yield self._to_fact(fact)
+
+    def _to_fact(self, fact):
+        return Fact(
+            node=fact['certname'],
+            name=fact['name'],
+            value=fact['value'],
+            environment=fact['environment']
+        )
 
     def factsets(self, **kwargs):
         """Returns a set of all facts or for a single certname.
@@ -286,17 +299,20 @@ class QueryAPI(BaseAPI):
 
         resources = self._query('resources', path=path, **kwargs)
         for resource in resources:
-            yield Resource(
-                node=resource['certname'],
-                name=resource['title'],
-                type_=resource['type'],
-                tags=resource['tags'],
-                exported=resource['exported'],
-                sourcefile=resource['file'],
-                sourceline=resource['line'],
-                parameters=resource['parameters'],
-                environment=resource['environment'],
-            )
+            yield self._to_resource(resource)
+
+    def _to_resource(self, resource):
+        return Resource(
+            node=resource['certname'],
+            name=resource['title'],
+            type_=resource['type'],
+            tags=resource['tags'],
+            exported=resource['exported'],
+            sourcefile=resource['file'],
+            sourceline=resource['line'],
+            parameters=resource['parameters'],
+            environment=resource['environment'],
+        )
 
     def catalog(self, node):
         """Get the available catalog for a given node.
@@ -329,14 +345,17 @@ class QueryAPI(BaseAPI):
             catalogs = [catalogs, ]
 
         for catalog in catalogs:
-            yield Catalog(node=catalog['certname'],
-                          edges=catalog['edges']['data'],
-                          resources=catalog['resources']['data'],
-                          version=catalog['version'],
-                          transaction_uuid=catalog['transaction_uuid'],
-                          environment=catalog['environment'],
-                          code_id=catalog.get('code_id'),
-                          catalog_uuid=catalog.get('catalog_uuid'))
+            yield self._to_catalog(catalog)
+
+    def _to_catalog(self, catalog):
+        return Catalog(node=catalog['certname'],
+                       edges=catalog['edges']['data'],
+                       resources=catalog['resources']['data'],
+                       version=catalog['version'],
+                       transaction_uuid=catalog['transaction_uuid'],
+                       environment=catalog['environment'],
+                       code_id=catalog.get('code_id'),
+                       catalog_uuid=catalog.get('catalog_uuid'))
 
     def events(self, **kwargs):
         """A report is made up of events which can be queried either
@@ -353,22 +372,25 @@ class QueryAPI(BaseAPI):
         """
         events = self._query('events', **kwargs)
         for event in events:
-            yield Event(
-                node=event['certname'],
-                status=event['status'],
-                timestamp=event['timestamp'],
-                hash_=event['report'],
-                title=event['resource_title'],
-                property_=event['property'],
-                message=event['message'],
-                new_value=event['new_value'],
-                old_value=event['old_value'],
-                type_=event['resource_type'],
-                class_=event['containing_class'],
-                execution_path=event['containment_path'],
-                source_file=event['file'],
-                line_number=event['line'],
-            )
+            yield self._to_event(event)
+
+    def _to_event(self, event):
+        return Event(
+            node=event['certname'],
+            status=event['status'],
+            timestamp=event['timestamp'],
+            hash_=event['report'],
+            title=event['resource_title'],
+            property_=event['property'],
+            message=event['message'],
+            new_value=event['new_value'],
+            old_value=event['old_value'],
+            type_=event['resource_type'],
+            class_=event['containing_class'],
+            execution_path=event['containment_path'],
+            source_file=event['file'],
+            line_number=event['line'],
+        )
 
     def event_counts(self, summarize_by, **kwargs):
         """Get event counts from puppetdb.
@@ -447,27 +469,30 @@ class QueryAPI(BaseAPI):
         """
         reports = self._query('reports', **kwargs)
         for report in reports:
-            yield Report(
-                api=self,
-                node=report['certname'],
-                hash_=report['hash'],
-                start=report['start_time'],
-                end=report['end_time'],
-                received=report['receive_time'],
-                version=report['configuration_version'],
-                format_=report['report_format'],
-                agent_version=report['puppet_version'],
-                transaction=report['transaction_uuid'],
-                environment=report['environment'],
-                status=report['status'],
-                noop=report.get('noop'),
-                noop_pending=report.get('noop_pending'),
-                metrics=report['metrics']['data'],
-                logs=report['logs']['data'],
-                code_id=report.get('code_id'),
-                catalog_uuid=report.get('catalog_uuid'),
-                cached_catalog_status=report.get('cached_catalog_status')
-            )
+            yield self._to_report(report)
+
+    def _to_report(self, report):
+        return Report(
+            api=self,
+            node=report['certname'],
+            hash_=report['hash'],
+            start=report['start_time'],
+            end=report['end_time'],
+            received=report['receive_time'],
+            version=report['configuration_version'],
+            format_=report['report_format'],
+            agent_version=report['puppet_version'],
+            transaction=report['transaction_uuid'],
+            environment=report['environment'],
+            status=report['status'],
+            noop=report.get('noop'),
+            noop_pending=report.get('noop_pending'),
+            metrics=report['metrics']['data'],
+            logs=report['logs']['data'],
+            code_id=report.get('code_id'),
+            catalog_uuid=report.get('catalog_uuid'),
+            cached_catalog_status=report.get('cached_catalog_status')
+        )
 
     def inventory(self, **kwargs):
         """Get Node and Fact information with an alternative query syntax
@@ -482,10 +507,13 @@ class QueryAPI(BaseAPI):
         """
         inventory = self._query('inventory', **kwargs)
         for inv in inventory:
-            yield Inventory(
-                node=inv['certname'],
-                time=inv['timestamp'],
-                environment=inv['environment'],
-                facts=inv['facts'],
-                trusted=inv['trusted']
-            )
+            yield self._to_inventory(inv)
+
+    def _to_inventory(self, inv):
+        return Inventory(
+            node=inv['certname'],
+            time=inv['timestamp'],
+            environment=inv['environment'],
+            facts=inv['facts'],
+            trusted=inv['trusted']
+        )
