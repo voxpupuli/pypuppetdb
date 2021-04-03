@@ -25,6 +25,8 @@ class PqlAPI(BaseAPI):
         :returns: A generator yielding elements of a rich type or plain dicts
         """
 
+        pql = pql.strip()
+
         type_class = self._get_type_from_query(pql)
 
         for element in self._pql(pql=pql, **kwargs):
@@ -44,20 +46,33 @@ class PqlAPI(BaseAPI):
         :return: a rich type, if there
         """
 
+        pql = pql.strip()
+
         # in PQL the beginning of the query is the type of returned entities
         # but only if the projection is empty ([]) or there is no projection
-        pattern = re.compile(r'(.*?)\s*(\[])?\s*{')
+        pattern = re.compile(r'([a-z]*?)\s*(\[])?\s*{')
         match = pattern.match(pql)
 
         if match:
-            type_str = match.group()
-            type_str = type_str.capitalize()
-            type_class = getattr(pypuppetdb.types, type_str)
-            if type_class:
-                return type_class
+            type_name_lowercase = match.group(1)
+
+            # class name is capitalized
+            type_name = type_name_lowercase.capitalize()
+
+            # depluralize - remove trailing "s"
+            if type_name.endswith("s"):
+                type_name_singular = type_name[:-1]
             else:
-                log.debug(f"PQL returns entities of a type {type_str}, but it is not supported"
-                          " by this library yet.")
+                type_name_singular = type_name
+
+            log.debug(f"Type name: {type_name_singular}")
+            try:
+                type_class = getattr(pypuppetdb.types, type_name_singular)
+                return type_class
+            except AttributeError:
+                log.debug(f"PQL returns entities of a type {type_name_singular},"
+                          f" but it is not supported by this library yet.")
                 return None
         else:
+            log.debug(f"No match!")
             return None

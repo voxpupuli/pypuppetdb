@@ -1,6 +1,9 @@
 import json
 
 import httpretty
+import logging
+
+from pypuppetdb.types import Node, Inventory, Fact
 
 
 class TestApiPQL(object):
@@ -31,3 +34,48 @@ class TestApiPQL(object):
 
         httpretty.disable()
         httpretty.reset()
+
+    def test_get_type_from_query_matching(self, api):
+        pql = """
+              nodes {
+                facts {
+                  name = "operatingsystem" and
+                  value = "Debian"
+                }
+              }
+            """
+        type = api._get_type_from_query(pql)
+
+        assert type == Node
+
+    def test_get_type_from_query_matching_empty_projection(self, api):
+        pql = """
+              inventory[] {}
+            """
+        type = api._get_type_from_query(pql)
+
+        assert type == Inventory
+
+    def test_get_type_from_query_matching_no_whitespace(self, api):
+        pql = """
+              facts{}
+            """
+        type = api._get_type_from_query(pql)
+
+        assert type == Fact
+
+    def test_get_type_from_query_matching_but_unsupported(self, api):
+        pql = """
+              producers {}
+            """
+        type = api._get_type_from_query(pql)
+
+        assert type == None
+
+    def test_get_type_from_query_not_matching_projection(self, api):
+        pql = """
+              nodes[certname, count()] {}
+            """
+        type = api._get_type_from_query(pql)
+
+        assert type == None
