@@ -15,10 +15,10 @@ class TestAPIURL(object):
     def test_with_path(self, api):
         url = api._url('nodes', path='node1.example.com')
         assert url == \
-               'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
+            'http://localhost:8080/pdb/query/v4/nodes/node1.example.com'
 
     def test_quote(self, api):
         url = api._url("facts", path="macaddress/02:42:ec:94:80:f0")
         assert url == \
-               'http://localhost:8080/pdb/query/v4/' \
-               + 'facts/macaddress/02%3A42%3Aec%3A94%3A80%3Af0'
+            'http://localhost:8080/pdb/query/v4/' \
+            'facts/macaddress/02%3A42%3Aec%3A94%3A80%3Af0'

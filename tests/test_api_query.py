@@ -113,7 +113,7 @@ class TestAPIQuery(object):
         encoded_cred = 'puppetdb:password123'.encode('utf-8')
         bs_authheader = base64.b64encode(encoded_cred).decode('utf-8')
         assert httpretty.last_request().headers['Authorization'] == \
-               'Basic {0}'.format(bs_authheader)
+            'Basic {0}'.format(bs_authheader)
         httpretty.disable()
         httpretty.reset()
 
@@ -123,7 +123,7 @@ class TestAPIQuery(object):
         token_api._query('nodes')
         assert httpretty.last_request().path == '/pdb/query/v4/nodes'
         assert httpretty.last_request().headers['X-Authentication'] == \
-               'tokenstring'
+            'tokenstring'
 
     def test_with_query(self, api):
         httpretty.enable()

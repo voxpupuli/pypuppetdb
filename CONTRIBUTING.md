@@ -44,7 +44,7 @@ do this to run the tests:
 
 ```bash
 # Unit tests
-py.test
+py.test --pep8 --strict
 # Security linter
 bandit -r pypuppetdb
 ```

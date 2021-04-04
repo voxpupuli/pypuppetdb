@@ -70,7 +70,7 @@ class TestApiPQL(object):
             """
         type = api._get_type_from_query(pql)
 
-        assert type == None
+        assert type is None
 
     def test_get_type_from_query_not_matching_projection(self, api):
         pql = """
@@ -78,4 +78,4 @@ class TestApiPQL(object):
             """
         type = api._get_type_from_query(pql)
 
-        assert type == None
+        assert type is None

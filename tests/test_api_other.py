@@ -76,7 +76,7 @@ class TestAPIOther(object):
         token_api._cmd('deactivate node', {'certname': ''})
         assert httpretty.last_request().path.startswith('/pdb/cmd/v1')
         assert httpretty.last_request().headers['X-Authentication'] == \
-               'tokenstring'
+            'tokenstring'
 
     def test_status(self, api):
         httpretty.enable()
@@ -85,6 +85,6 @@ class TestAPIOther(object):
         )
         api.status()
         assert httpretty.last_request().path == \
-               '/status/v1/services/puppetdb-status'
+            '/status/v1/services/puppetdb-status'
         httpretty.disable()
         httpretty.reset()
