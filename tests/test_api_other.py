@@ -26,7 +26,7 @@ def query(request):
         return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
 
 
-class TestCmdAPI(object):
+class TestCommandAPI(object):
 
     def test_command(self, api):
         httpretty.enable()

@@ -13,7 +13,7 @@ from pypuppetdb.errors import (APIError, EmptyResponseError)
 log = logging.getLogger(__name__)
 
 
-class CmdAPI(BaseAPI):
+class CommandAPI(BaseAPI):
 
     def command(self, command, payload):
         return self._cmd(command, payload)
@@ -88,7 +88,7 @@ class CmdAPI(BaseAPI):
             raise
 
 
-class MetaAPI(BaseAPI):
+class MetadataAPI(BaseAPI):
 
     def server_time(self):
         """Get the current time of the clock on the PuppetDB server.
