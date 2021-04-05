@@ -50,15 +50,29 @@ class PqlAPI(BaseAPI):
 
         return self._make_request(url, request_method, payload)
 
-    def pql(self, pql, **kwargs):
+    # TODO: deduplicate this - see QueryAPI.nodes()
+    def pql(self, pql, with_status=False, unreported=2, with_event_numbers=True):
         """Makes a PQL (Puppet Query Language) and tries to cast results
          to a rich type. If it won't work, returns plain dicts.
 
         :param pql: PQL query
         :type pql: :obj:`string`
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
-        to the _pql function
+        :param with_status: (optional, only for queries for nodes) include
+                           the node status in the returned nodes
+        :type with_status: :bool:
+        :param unreported: (optional, only for queries for nodes) amount
+                           of hours when a node gets marked as unreported
+        :type unreported: :obj:`None` or integer
+        :param with_event_numbers: (optional, only for queries for nodes)
+                           include the exact number of
+                           changed/unchanged/failed/noop events when
+                           with_status is set to True. If set to False
+                           only "some" string is provided if there are
+                           resources with such status in the last report.
+                           This provides performance benefits as potentially
+                           slow event-counts query is omitted completely.
+        :type with_event_numbers: :bool:
 
         :returns: A generator yielding elements of a rich type or plain dicts
         """
@@ -67,13 +81,15 @@ class PqlAPI(BaseAPI):
 
         type_class = self._get_type_from_query(pql)
 
-        for element in self._pql(pql=pql, **kwargs):
+        if type_class == Node and (with_status or unreported != 2 or not with_event_numbers):
+            log.error("with_status, unreported and with_event_numbers are used only"
+                      " for queries for nodes!")
+            raise APIError
+
+        for element in self._pql(pql=pql):
             if type_class == Node:
 
                 # TODO: deduplicate this - see QueryAPI.nodes()
-                with_status = kwargs.get('with_status', False)
-                unreported = kwargs.get('unreported', 2)
-                with_event_numbers = kwargs.get('with_event_numbers', True)
 
                 now = datetime.utcnow()
 
@@ -101,7 +117,10 @@ class PqlAPI(BaseAPI):
         PQL query.
 
         :param pql: PQL query
-        :return: a rich type, if there
+        :type pql: :obj:`string`
+
+        :return: a rich type, if this library supports it
+                 otherwise - None
         """
 
         pql = pql.strip()
