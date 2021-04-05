@@ -4,6 +4,9 @@ Changelog
 Development
 -----------
 
+  - Python 3.9 added as a supported version
+    ([#203](https://github.com/voxpupuli/pypuppetdb/pull/203))
+
 2.3.0
 -----
 
