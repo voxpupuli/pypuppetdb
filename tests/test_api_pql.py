@@ -1,12 +1,11 @@
 import json
 
 import httpretty
-import logging
 
 from pypuppetdb.types import Node, Inventory, Fact
 
 
-class TestApiPQL(object):
+class TestPqlAPI(object):
 
     def test_pql(self, api):
         pql_query = """

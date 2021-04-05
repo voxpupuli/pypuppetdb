@@ -2,17 +2,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-from datetime import datetime, timedelta
-
-import re
+from datetime import datetime
 
 import pypuppetdb
 from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.api.base import BaseAPI
-from pypuppetdb.errors import (APIError)
 from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
                               Node, Report, Resource)
-from pypuppetdb.utils import json_to_datetime
 
 log = logging.getLogger(__name__)
 
@@ -57,9 +53,10 @@ class QueryAPI(BaseAPI):
 
         latest_events = None
         if with_status and with_event_numbers:
-            latest_events = self.event_counts(
+            latest_events = self._query(
+                'event-counts',
                 query=EqualsOperator("latest_report?", True),
-                summarize_by='certname'
+                summarize_by='certname',
             )
 
         for node in nodes:
@@ -343,87 +340,3 @@ class QueryAPI(BaseAPI):
         inventory = self._query('inventory', **kwargs)
         for inv in inventory:
             yield Inventory.create_from_dict(inv)
-
-    def pql(self, pql, **kwargs):
-        """Makes a PQL (Puppet Query Language) and tries to cast results
-         to a rich type. If it won't work, returns plain dicts.
-
-        :param pql: PQL query
-        :type pql: :obj:`string`
-
-        :param \*\*kwargs: The rest of the keyword arguments are passed
-        to the _pql function
-
-        :returns: A generator yielding elements of a rich type or plain dicts
-        """
-
-        pql = pql.strip()
-
-        type_class = self._get_type_from_query(pql)
-
-        for element in self._pql(pql=pql, **kwargs):
-            if type_class == Node:
-
-                # TODO: deduplicate this - see nodes()
-                with_status = kwargs.get('with_status', False)
-                unreported = kwargs.get('unreported', 2)
-                with_event_numbers = kwargs.get('with_event_numbers', True)
-
-                now = datetime.utcnow()
-
-                latest_events = None
-                if with_status and with_event_numbers:
-                    latest_events = self.event_counts(
-                        query=EqualsOperator("latest_report?", True),
-                        summarize_by='certname'
-                    )
-
-                yield Node.create_from_dict(self, element, with_status, with_event_numbers,
-                                            latest_events, now, unreported)
-
-            elif type_class == Report:
-                yield Report.create_from_dict(self, element)
-            elif type_class:
-                yield type_class.create_from_dict(element)
-            else:
-                yield element
-
-    @staticmethod
-    def _get_type_from_query(pql):
-        """Gets a rich type of the entities returned by the given
-        PQL query.
-
-        :param pql: PQL query
-        :return: a rich type, if there
-        """
-
-        pql = pql.strip()
-
-        # in PQL the beginning of the query is the type of returned entities
-        # but only if the projection is empty ([]) or there is no projection
-        pattern = re.compile(r'([a-z]*?)\s*(\[])?\s*{')
-        match = pattern.match(pql)
-
-        if match:
-            type_name_lowercase = match.group(1)
-
-            # class name is capitalized
-            type_name = type_name_lowercase.capitalize()
-
-            # depluralize - remove trailing "s"
-            if type_name.endswith("s"):
-                type_name_singular = type_name[:-1]
-            else:
-                type_name_singular = type_name
-
-            log.debug(f"Type name: {type_name_singular}")
-            try:
-                type_class = getattr(pypuppetdb.types, type_name_singular)
-                return type_class
-            except AttributeError:
-                log.debug(f"PQL returns entities of a type {type_name_singular},"
-                          f" but it is not supported by this library yet.")
-                return None
-        else:
-            log.debug(f"No match!")
-            return None

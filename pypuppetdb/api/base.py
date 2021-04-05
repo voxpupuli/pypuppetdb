@@ -286,11 +286,8 @@ class BaseAPI(object):
                order_by=None, limit=None, offset=None, include_total=False,
                summarize_by=None, count_by=None, count_filter=None,
                payload=None, request_method='GET'):
-        """This method actually queries PuppetDB. Provided an endpoint and an
-        optional path and/or query it will fire a request at PuppetDB. If
-        PuppetDB can be reached and answers within the timeout we'll decode
-        the response and give it back or raise for the HTTP Status Code
-        PuppetDB gave back.
+        """This method prepares a non-PQL query to PuppetDB. Actual making
+        the HTTP request is done by _make_request().
 
         :param endpoint: (optional) The PuppetDB API endpoint we want to query.
                         Unnecessary when using PQL.
@@ -362,41 +359,18 @@ class BaseAPI(object):
 
         return self._make_request(url, request_method, payload)
 
-    def _pql(self, pql=None, request_method='GET'):
-        """This method actually queries PuppetDB. Provided an endpoint and an
-        optional path and/or query it will fire a request at PuppetDB. If
-        PuppetDB can be reached and answers within the timeout we'll decode
-        the response and give it back or raise for the HTTP Status Code
-        PuppetDB gave back.
-
-        :param pql: (optional) A PQL query to further narrow down the resultset.
-        :type pql: :obj:`string`
-
-        :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
-
-        :returns: The decoded response from PuppetDB
-        :rtype: :obj:`dict` or :obj:`list`
-        """
-
-        log.debug(f"_pql called with ",
-                  # comma-separated list of method arguments with their values
-                  ", ".join([f"{arg}: {locals().get(arg, 'None')}"
-                             for arg in locals().keys() if arg != 'self'])
-                  )
-
-        if not pql:
-            log.error("PQL query is required!")
-            raise APIError
-
-        payload = {}
-
-        # PQL queries are made to the same endpoint regardless of the queried entities
-        url = self._url('pql')
-        payload['query'] = pql
-
-        return self._make_request(url, request_method, payload)
-
     def _make_request(self, url, request_method, payload):
+        """
+        Makes a GET or POST HTTP request to PuppetDB. If PuppetDB can be
+        reached and answers within the timeout we'll decode the response
+        and give it back or raise for the HTTP Status Code PuppetDB gave back.
+
+        :param url: Complete URL to call
+        :param request_method: GET or POST
+        :param payload: data to send as parameters (GET) or in the body (POST)
+        :return: response body as JSON
+                 or raises an EmptyResponseError exception if it's empty
+        """
 
         if request_method.upper() not in ['GET', 'POST']:
             log.error(f"Only GET or POST supported, {request_method} unsupported")

@@ -26,13 +26,13 @@ def query(request):
         return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
 
 
-class TestAPIVersion(object):
+class TestBaseAPIVersion(object):
     def test_init_defaults(self):
         v4 = pypuppetdb.api.API()
         assert v4.api_version == 'v4'
 
 
-class TestAPIInitOptions(object):
+class TestBaseAPIInitOptions(object):
     def test_defaults(self, api):
         assert api.host == 'localhost'
         assert api.port == 8080
@@ -146,7 +146,7 @@ class TestAPIInitOptions(object):
             pypuppetdb.api.API(metric_api_version='bad')
 
 
-class TestAPIProperties(object):
+class TestBaseAPIProperties(object):
     def test_version(self, api):
         assert api.version == 'v4'
 
@@ -160,69 +160,3 @@ class TestAPIProperties(object):
     def test_total(self, api):
         api.last_total = 10  # slightly evil
         assert api.total == 10
-
-
-class TestAPIMethods(object):
-
-    def test_facts(self, api):
-        facts_body = [{
-            'certname': 'test_certname',
-            'name': 'test_name',
-            'value': 'test_value',
-            'environment': 'test_environment',
-        }]
-        facts_url = 'http://localhost:8080/pdb/query/v4/facts'
-
-        httpretty.enable()
-        httpretty.register_uri(httpretty.GET, facts_url,
-                               body=json.dumps(facts_body))
-
-        for fact in api.facts():
-            pass
-
-        assert httpretty.last_request().path == '/pdb/query/v4/facts'
-
-        httpretty.disable()
-        httpretty.reset()
-
-    def test_fact_names(self, api):
-        httpretty.enable()
-        stub_request('http://localhost:8080/pdb/query/v4/fact-names')
-        api.fact_names()
-        assert httpretty.last_request().path == '/pdb/query/v4/fact-names'
-        httpretty.disable()
-        httpretty.reset()
-
-    def test_normalize_resource_type(self, api):
-        assert api._normalize_resource_type('sysctl::value') == \
-               'Sysctl::Value'
-        assert api._normalize_resource_type('user') == 'User'
-
-    def test_environments(self, api):
-        httpretty.enable()
-        stub_request('http://localhost:8080/pdb/query/v4/environments')
-        api.environments()
-        assert httpretty.last_request().path == '/pdb/query/v4/environments'
-        httpretty.disable()
-        httpretty.reset()
-
-    def test_inventory(self, api):
-        inventory_body = [{
-            'certname': 'test_certname',
-            'timestamp': '2017-06-05T20:18:23.374Z',
-            'environment': 'test_environment',
-            'facts': 'test_facts',
-            'trusted': 'test_trusted'
-        }]
-        inventory_url = 'http://localhost:8080/pdb/query/v4/inventory'
-
-        httpretty.enable()
-        httpretty.register_uri(httpretty.GET, inventory_url,
-                               body=json.dumps(inventory_body))
-        for inv in api.inventory():
-            pass
-
-        assert httpretty.last_request().path == '/pdb/query/v4/inventory'
-
-        httpretty.disable()
-        httpretty.reset()

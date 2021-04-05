@@ -3,7 +3,8 @@ import pytest
 import pypuppetdb
 
 
-class TestAPIURL(object):
+class TestBaseAPIURL(object):
+
     def test_without_path(self, api):
         assert api._url('nodes') == \
                'http://localhost:8080/pdb/query/v4/nodes'

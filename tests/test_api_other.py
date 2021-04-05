@@ -26,7 +26,7 @@ def query(request):
         return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
 
 
-class TestAPIOther(object):
+class TestCmdAPI(object):
 
     def test_command(self, api):
         httpretty.enable()
@@ -77,6 +77,9 @@ class TestAPIOther(object):
         assert httpretty.last_request().path.startswith('/pdb/cmd/v1')
         assert httpretty.last_request().headers['X-Authentication'] == \
             'tokenstring'
+
+
+class TestServicesAPI(object):
 
     def test_status(self, api):
         httpretty.enable()

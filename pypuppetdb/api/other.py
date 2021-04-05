@@ -22,7 +22,7 @@ class CmdAPI(BaseAPI):
         """This method posts commands to PuppetDB. Provided a command and payload
         it will fire a request at PuppetDB. If PuppetDB can be reached and
         answers within the timeout we'll decode the response and give it back
-        or raise for the HTTP Status Code yesPuppetDB gave back.
+        or raise for the HTTP Status Code PuppetDB gave back.
 
         :param command: The PuppetDB Command we want to execute.
         :type command: :obj:`string`

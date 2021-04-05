@@ -16,7 +16,7 @@ def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
                                   **kwargs)
 
 
-class TestAPIMetrics(object):
+class TestMetricsAPI(object):
     def test_metric_v1(self, api):
         httpretty.enable()
         httpretty.enable()
