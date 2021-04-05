@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 import logging
 from datetime import datetime, timedelta
 
+import re
+
+import pypuppetdb
 from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.api.base import BaseAPI
 from pypuppetdb.errors import (APIError)
@@ -60,89 +63,8 @@ class QueryAPI(BaseAPI):
             )
 
         for node in nodes:
-            yield self._to_node(node, with_status, with_event_numbers, latest_events, now,
-                                unreported)
-
-    def _to_node(self, node, with_status, with_event_numbers, latest_events, now, unreported):
-
-        node['status_report'] = None
-        node['events'] = None
-
-        if with_status:
-            if with_event_numbers:
-                status = [s for s in latest_events
-                          if s['subject']['title'] == node['certname']]
-
-                try:
-                    node['status_report'] = node['latest_report_status']
-
-                    if status:
-                        node['events'] = status[0]
-                except KeyError:
-                    if status:
-                        node['events'] = status = status[0]
-                        if status['successes'] > 0:
-                            node['status_report'] = 'changed'
-                        if status['noops'] > 0:
-                            node['status_report'] = 'noop'
-                        if status['failures'] > 0:
-                            node['status_report'] = 'failed'
-                    else:
-                        node['status_report'] = 'unchanged'
-            else:
-                node['status_report'] = node['latest_report_status']
-                node['events'] = {
-                    'successes': 0,
-                    'failures': 0,
-                    'noops': 0,
-                }
-                if node['status_report'] == 'changed':
-                    node['events']['successes'] = 'some'
-                elif node['status_report'] == 'noop':
-                    node['events']['noops'] = 'some'
-                elif node['status_report'] == 'failed':
-                    node['events']['failures'] = 'some'
-
-            # node report age
-            if node['report_timestamp'] is not None:
-                try:
-                    last_report = json_to_datetime(
-                        node['report_timestamp'])
-                    last_report = last_report.replace(tzinfo=None)
-                    unreported_border = now - timedelta(hours=unreported)
-                    if last_report < unreported_border:
-                        delta = (now - last_report)
-                        node['unreported'] = True
-                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
-                            delta.days,
-                            int(delta.seconds / 3600),
-                            int((delta.seconds % 3600) / 60)
-                        )
-                except AttributeError:
-                    node['unreported'] = True
-
-            if not node['report_timestamp']:
-                node['unreported'] = True
-
-        return Node(self,
-                    name=node['certname'],
-                    deactivated=node['deactivated'],
-                    expired=node['expired'],
-                    report_timestamp=node['report_timestamp'],
-                    catalog_timestamp=node['catalog_timestamp'],
-                    facts_timestamp=node['facts_timestamp'],
-                    status_report=node['status_report'],
-                    noop=node.get('latest_report_noop'),
-                    noop_pending=node.get('latest_report_noop_pending'),
-                    events=node['events'],
-                    unreported=node.get('unreported'),
-                    unreported_time=node.get('unreported_time'),
-                    report_environment=node['report_environment'],
-                    catalog_environment=node['catalog_environment'],
-                    facts_environment=node['facts_environment'],
-                    latest_report_hash=node.get('latest_report_hash'),
-                    cached_catalog_status=node.get('cached_catalog_status')
-                    )
+            yield Node.create_from_dict(self, node, with_status, with_event_numbers, latest_events,
+                                        now, unreported)
 
     def node(self, name):
         """Gets a single node from PuppetDB.
@@ -168,15 +90,7 @@ class QueryAPI(BaseAPI):
         edges = self._query('edges', **kwargs)
 
         for edge in edges:
-            yield self._to_edge(edge)
-
-    def _to_edge(self, edge):
-        identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
-        identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
-        return Edge(source=self.resources[identifier_source],
-                    target=self.resources[identifier_target],
-                    relationship=edge['relationship'],
-                    node=edge['certname'])
+            yield Edge.create_from_dict(edge)
 
     def environments(self, **kwargs):
         """Get all known environments from Puppetdb.
@@ -204,10 +118,6 @@ class QueryAPI(BaseAPI):
         :returns: A generator yielding Facts.
         :rtype: :class:`pypuppetdb.types.Fact`
         """
-        if 'pql' in kwargs.keys() and kwargs['pql'] and (name or value):
-            log.error("Don't use PQL together with name or value!")
-            raise APIError
-
         if name is not None and value is not None:
             path = '{0}/{1}'.format(name, value)
         elif name is not None and value is None:
@@ -217,15 +127,7 @@ class QueryAPI(BaseAPI):
 
         facts = self._query('facts', path=path, **kwargs)
         for fact in facts:
-            yield self._to_fact(fact)
-
-    def _to_fact(self, fact):
-        return Fact(
-            node=fact['certname'],
-            name=fact['name'],
-            value=fact['value'],
-            environment=fact['environment']
-        )
+            yield Fact.create_from_dict(fact)
 
     def factsets(self, **kwargs):
         """Returns a set of all facts or for a single certname.
@@ -283,9 +185,6 @@ class QueryAPI(BaseAPI):
         :returns: A generator yielding Resources
         :rtype: :class:`pypuppetdb.types.Resource`
         """
-        if 'pql' in kwargs.keys() and kwargs['pql'] and (type_ or title):
-            log.error("Don't use PQL together with type_ or title!")
-            raise APIError
 
         path = None
 
@@ -299,20 +198,7 @@ class QueryAPI(BaseAPI):
 
         resources = self._query('resources', path=path, **kwargs)
         for resource in resources:
-            yield self._to_resource(resource)
-
-    def _to_resource(self, resource):
-        return Resource(
-            node=resource['certname'],
-            name=resource['title'],
-            type_=resource['type'],
-            tags=resource['tags'],
-            exported=resource['exported'],
-            sourcefile=resource['file'],
-            sourceline=resource['line'],
-            parameters=resource['parameters'],
-            environment=resource['environment'],
-        )
+            yield Resource.create_from_dict(resource)
 
     def catalog(self, node):
         """Get the available catalog for a given node.
@@ -345,17 +231,7 @@ class QueryAPI(BaseAPI):
             catalogs = [catalogs, ]
 
         for catalog in catalogs:
-            yield self._to_catalog(catalog)
-
-    def _to_catalog(self, catalog):
-        return Catalog(node=catalog['certname'],
-                       edges=catalog['edges']['data'],
-                       resources=catalog['resources']['data'],
-                       version=catalog['version'],
-                       transaction_uuid=catalog['transaction_uuid'],
-                       environment=catalog['environment'],
-                       code_id=catalog.get('code_id'),
-                       catalog_uuid=catalog.get('catalog_uuid'))
+            yield Catalog.create_from_dict(catalog)
 
     def events(self, **kwargs):
         """A report is made up of events which can be queried either
@@ -372,25 +248,7 @@ class QueryAPI(BaseAPI):
         """
         events = self._query('events', **kwargs)
         for event in events:
-            yield self._to_event(event)
-
-    def _to_event(self, event):
-        return Event(
-            node=event['certname'],
-            status=event['status'],
-            timestamp=event['timestamp'],
-            hash_=event['report'],
-            title=event['resource_title'],
-            property_=event['property'],
-            message=event['message'],
-            new_value=event['new_value'],
-            old_value=event['old_value'],
-            type_=event['resource_type'],
-            class_=event['containing_class'],
-            execution_path=event['containment_path'],
-            source_file=event['file'],
-            line_number=event['line'],
-        )
+            yield Event.create_from_dict(event)
 
     def event_counts(self, summarize_by, **kwargs):
         """Get event counts from puppetdb.
@@ -469,30 +327,7 @@ class QueryAPI(BaseAPI):
         """
         reports = self._query('reports', **kwargs)
         for report in reports:
-            yield self._to_report(report)
-
-    def _to_report(self, report):
-        return Report(
-            api=self,
-            node=report['certname'],
-            hash_=report['hash'],
-            start=report['start_time'],
-            end=report['end_time'],
-            received=report['receive_time'],
-            version=report['configuration_version'],
-            format_=report['report_format'],
-            agent_version=report['puppet_version'],
-            transaction=report['transaction_uuid'],
-            environment=report['environment'],
-            status=report['status'],
-            noop=report.get('noop'),
-            noop_pending=report.get('noop_pending'),
-            metrics=report['metrics']['data'],
-            logs=report['logs']['data'],
-            code_id=report.get('code_id'),
-            catalog_uuid=report.get('catalog_uuid'),
-            cached_catalog_status=report.get('cached_catalog_status')
-        )
+            yield Report.create_from_dict(self, report)
 
     def inventory(self, **kwargs):
         """Get Node and Fact information with an alternative query syntax
@@ -507,13 +342,88 @@ class QueryAPI(BaseAPI):
         """
         inventory = self._query('inventory', **kwargs)
         for inv in inventory:
-            yield self._to_inventory(inv)
+            yield Inventory.create_from_dict(inv)
 
-    def _to_inventory(self, inv):
-        return Inventory(
-            node=inv['certname'],
-            time=inv['timestamp'],
-            environment=inv['environment'],
-            facts=inv['facts'],
-            trusted=inv['trusted']
-        )
+    def pql(self, pql, **kwargs):
+        """Makes a PQL (Puppet Query Language) and tries to cast results
+         to a rich type. If it won't work, returns plain dicts.
+
+        :param pql: PQL query
+        :type pql: :obj:`string`
+
+        :param \*\*kwargs: The rest of the keyword arguments are passed
+        to the _pql function
+
+        :returns: A generator yielding elements of a rich type or plain dicts
+        """
+
+        pql = pql.strip()
+
+        type_class = self._get_type_from_query(pql)
+
+        for element in self._pql(pql=pql, **kwargs):
+            if type_class == Node:
+
+                # TODO: deduplicate this - see nodes()
+                with_status = kwargs.get('with_status', False)
+                unreported = kwargs.get('unreported', 2)
+                with_event_numbers = kwargs.get('with_event_numbers', True)
+
+                now = datetime.utcnow()
+
+                latest_events = None
+                if with_status and with_event_numbers:
+                    latest_events = self.event_counts(
+                        query=EqualsOperator("latest_report?", True),
+                        summarize_by='certname'
+                    )
+
+                yield Node.create_from_dict(self, element, with_status, with_event_numbers,
+                                            latest_events, now, unreported)
+
+            elif type_class == Report:
+                yield Report.create_from_dict(self, element)
+            elif type_class:
+                yield type_class.create_from_dict(element)
+            else:
+                yield element
+
+    @staticmethod
+    def _get_type_from_query(pql):
+        """Gets a rich type of the entities returned by the given
+        PQL query.
+
+        :param pql: PQL query
+        :return: a rich type, if there
+        """
+
+        pql = pql.strip()
+
+        # in PQL the beginning of the query is the type of returned entities
+        # but only if the projection is empty ([]) or there is no projection
+        pattern = re.compile(r'([a-z]*?)\s*(\[])?\s*{')
+        match = pattern.match(pql)
+
+        if match:
+            type_name_lowercase = match.group(1)
+
+            # class name is capitalized
+            type_name = type_name_lowercase.capitalize()
+
+            # depluralize - remove trailing "s"
+            if type_name.endswith("s"):
+                type_name_singular = type_name[:-1]
+            else:
+                type_name_singular = type_name
+
+            log.debug(f"Type name: {type_name_singular}")
+            try:
+                type_class = getattr(pypuppetdb.types, type_name_singular)
+                return type_class
+            except AttributeError:
+                log.debug(f"PQL returns entities of a type {type_name_singular},"
+                          f" but it is not supported by this library yet.")
+                return None
+        else:
+            log.debug(f"No match!")
+            return None
