@@ -16,15 +16,14 @@ log = logging.getLogger(__name__)
 
 class PqlAPI(BaseAPI):
 
-    def _pql(self, pql=None, request_method='GET'):
-        """This method actually queries PuppetDB. Provided an endpoint and an
-        optional path and/or query it will fire a request at PuppetDB. If
-        PuppetDB can be reached and answers within the timeout we'll decode
-        the response and give it back or raise for the HTTP Status Code
-        PuppetDB gave back.
+    def _pql(self, pql, request_method='GET'):
+        """This method prepares a PQL query to PuppetDB. Actual making
+        the HTTP request is done by _make_request().
 
-        :param pql: (optional) A PQL query to further narrow down the resultset.
+        :param pql: PQL query
         :type pql: :obj:`string`
+
+        :param request_method: (optional) GET or POST, the default is GET
 
         :raises: :class:`~pypuppetdb.errors.EmptyResponseError`
 
@@ -32,14 +31,11 @@ class PqlAPI(BaseAPI):
         :rtype: :obj:`dict` or :obj:`list`
         """
 
-        log.debug(f"_pql called with ",
-                  # comma-separated list of method arguments with their values
-                  ", ".join([f"{arg}: {locals().get(arg, 'None')}"
-                             for arg in locals().keys() if arg != 'self'])
-                  )
+        log.debug(f"_pql called with pql={pql}, request_method={request_method}")
 
+        pql = pql.strip()
         if not pql:
-            log.error("PQL query is required!")
+            log.error("Non-empty PQL query is required!")
             raise APIError
 
         payload = {}
@@ -76,8 +72,6 @@ class PqlAPI(BaseAPI):
 
         :returns: A generator yielding elements of a rich type or plain dicts
         """
-
-        pql = pql.strip()
 
         type_class = self._get_type_from_query(pql)
 
@@ -124,6 +118,9 @@ class PqlAPI(BaseAPI):
         """
 
         pql = pql.strip()
+        if not pql:
+            log.error("Non-empty PQL query is required!")
+            raise APIError
 
         # in PQL the beginning of the query is the type of returned entities
         # but only if the projection is empty ([]) or there is no projection
