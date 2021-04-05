@@ -90,3 +90,36 @@ class TestQueryAPI(object):
 
         httpretty.disable()
         httpretty.reset()
+
+    def test_nodes_single(self, api):
+        body = {
+            "cached_catalog_status": "not_used",
+            "catalog_environment": "production",
+            "catalog_timestamp": "2016-08-15T11:06:26.275Z",
+            "certname": "greenserver.vm",
+            "deactivated": None,
+            "expired": None,
+            "facts_environment": "production",
+            "facts_timestamp": "2016-08-15T11:06:26.140Z",
+            "latest_report_hash": "4a956674b016d95a7b77c99513ba26e4a744f8d1",
+            "latest_report_noop": False,
+            "latest_report_noop_pending": None,
+            "latest_report_status": "changed",
+            "report_environment": "production",
+            "report_timestamp": "2016-08-15T11:06:18.393Z"
+        }
+        url = 'http://localhost:8080/pdb/query/v4/nodes'
+
+        httpretty.enable()
+        httpretty.register_uri(httpretty.GET, url,
+                               body=json.dumps(body))
+
+        nodes = list(api.nodes(query='["=","certname","greenserver.vm"'))
+
+        assert len(nodes) == 1
+        assert nodes[0].name == "greenserver.vm"
+
+        assert httpretty.last_request().path.startswith('/pdb/query/v4/nodes')
+
+        httpretty.disable()
+        httpretty.reset()
