@@ -79,7 +79,7 @@ class TestCmdAPI(object):
             'tokenstring'
 
 
-class TestServicesAPI(object):
+class TestStatusAPI(object):
 
     def test_status(self, api):
         httpretty.enable()

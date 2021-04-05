@@ -1,5 +1,5 @@
 from pypuppetdb.api.metrics import MetricsAPI
-from pypuppetdb.api.other import CmdAPI, MetaAPI, ServicesAPI
+from pypuppetdb.api.other import CmdAPI, MetaAPI, StatusAPI
 from pypuppetdb.api.pql import PqlAPI
 from pypuppetdb.api.query import QueryAPI
 
@@ -9,7 +9,7 @@ class API(
     MetricsAPI,
     CmdAPI,
     MetaAPI,
-    ServicesAPI,
+    StatusAPI,
     PqlAPI,
 ):
     pass

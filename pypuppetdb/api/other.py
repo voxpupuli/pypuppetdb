@@ -106,7 +106,7 @@ class MetaAPI(BaseAPI):
         return self._query('version')['version']
 
 
-class ServicesAPI(BaseAPI):
+class StatusAPI(BaseAPI):
 
     def status(self):
         """Get PuppetDB server status.
