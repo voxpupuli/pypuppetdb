@@ -1,15 +1,17 @@
+from pypuppetdb.api.command import CommandAPI
+from pypuppetdb.api.metadata import MetadataAPI
 from pypuppetdb.api.metrics import MetricsAPI
-from pypuppetdb.api.other import CommandAPI, MetadataAPI, StatusAPI
 from pypuppetdb.api.pql import PqlAPI
 from pypuppetdb.api.query import QueryAPI
+from pypuppetdb.api.status import StatusAPI
 
 
 class API(
-    QueryAPI,
-    MetricsAPI,
     CommandAPI,
     MetadataAPI,
-    StatusAPI,
+    MetricsAPI,
     PqlAPI,
+    QueryAPI,
+    StatusAPI,
 ):
     pass

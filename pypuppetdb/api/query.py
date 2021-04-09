@@ -14,6 +14,10 @@ log = logging.getLogger(__name__)
 
 
 class QueryAPI(BaseAPI):
+    """
+    This class provides methods that interact with the "pdb/query/v4/*"
+    PuppetDB API endpoints.
+    """
 
     def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
               **kwargs):

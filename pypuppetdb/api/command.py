@@ -14,6 +14,10 @@ log = logging.getLogger(__name__)
 
 
 class CommandAPI(BaseAPI):
+    """
+    This class provides methods that interact with the "pdb/cmd/*"
+    PuppetDB API endpoints.
+    """
 
     def command(self, command, payload):
         return self._cmd(command, payload)
@@ -86,32 +90,3 @@ class CommandAPI(BaseAPI):
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
-
-
-class MetadataAPI(BaseAPI):
-
-    def server_time(self):
-        """Get the current time of the clock on the PuppetDB server.
-        :returns: An ISO-8091 formatting timestamp.
-        :rtype: :obj:`string`
-        """
-        return self._query('server-time')[self.parameters['server_time']]
-
-    def current_version(self):
-        """Get version information about the running PuppetDB server.
-
-        :returns: A string representation of the PuppetDB version.
-        :rtype: :obj:`string`
-        """
-        return self._query('version')['version']
-
-
-class StatusAPI(BaseAPI):
-
-    def status(self):
-        """Get PuppetDB server status.
-
-        :returns: A dict with the PuppetDB status information
-        :rtype: :obj:`dict`
-        """
-        return self._query('status')
