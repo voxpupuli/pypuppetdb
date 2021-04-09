@@ -82,7 +82,7 @@ class Event(object):
         return str('{0}').format(self.__string)
 
     @staticmethod
-    def get_from_dict(event):
+    def create_from_dict(event):
         return Event(
             node=event['certname'],
             status=event['status'],
