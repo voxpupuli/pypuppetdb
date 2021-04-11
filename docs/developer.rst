@@ -9,11 +9,6 @@ This part of the documentation covers all the interfaces of PyPuppetDB.
 It will cover how the API is set up and how to configure which version of
 the API to use.
 
-.. note::
-   This part of the documentation may be outdated. Please see
-   `this PR <https://github.com/voxpupuli/pypuppetdb/pull/190>`_
-   for more information.
-
 Lazy objects
 ------------
 
@@ -28,7 +23,7 @@ that are expected to return more than a single item are implemented as
 generators.
 
 This is usually the case for functions with a plural name like
-:func:`~pypuppetdb.api.BaseAPI.nodes` or :func:`~pypuppetdb.api.BaseAPI.facts`.
+:func:`~pypuppetdb.api.QueryAPI.nodes` or :func:`~pypuppetdb.api.QueryAPI.facts`.
 
 Because of this we'll only query PuppetDB once you start iterating over the
 generator object. Until that time not a single request is fired at PuppetDB.
@@ -41,40 +36,72 @@ Main Interface
 --------------
 
 What you'll usually need to do is use the :func:`connect` method to set up a
-connection with PuppetDB and indicate which version of the API you want to
-talk.
+connection with PuppetDB.
 
 .. autofunction:: connect
 
-API objects
------------
+Endpoint classes
+----------------
 
-The PuppetDB API is no longer versioned. This was changed in v0.2.0 because
-it started to become too difficult to maintain multiple API versions.
+The supported PuppetDB endpoint types are implemented in classes with
+corresponding names:
 
-All the functions of the v1, v2, and v3 APIs have been moved to :class:`BaseAPI
-<BaseAPI>` which now only supports API version 4 of PuppetDB.
+* pdb/query/v4 - ``PqlAPI``
+* pdb/query/v4/* - ``QueryAPI``
+* pdb/cmd/v1 - ``CommandAPI``
+* status/v1/** - ``StatusAPI``
+* pdb/meta/v1* - ``MetadataAPI``
+* metrics/* - ``MetricsAPI``
 
-.. data:: API_VERSIONS
 
-   :obj:`dict` of :obj:`int`::obj:`string` pairs representing the API version
-   and it's URL prefix.
+PqlAPI
+^^^^^^
 
-   We currently only handle API version 2 though it should be fairly easy to
-   support version 1 should we want to.
-
-BaseAPI
-^^^^^^^
-
-.. autoclass:: pypuppetdb.api.BaseAPI
+.. autoclass:: pypuppetdb.api.PqlAPI
    :members:
    :private-members:
+
+QueryAPI
+^^^^^^^^
+
+.. autoclass:: pypuppetdb.api.QueryAPI
+   :members:
+   :private-members:
+
+CommandAPI
+^^^^^^^^^^
+
+.. autoclass:: pypuppetdb.api.CommandAPI
+   :members:
+   :private-members:
+
+StatusAPI
+^^^^^^^^^
+
+.. autoclass:: pypuppetdb.api.StatusAPI
+   :members:
+   :private-members:
+
+MetadataAPI
+^^^^^^^^^^^
+
+.. autoclass:: pypuppetdb.api.MetadataAPI
+   :members:
+   :private-members:
+
+MetricsAPI
+^^^^^^^^^^
+
+.. autoclass:: pypuppetdb.api.MetricsAPI
+   :members:
+   :private-members:
+
 
 Types
 -----
 
 In order to facilitate working with the API most methods like
-:meth:`~pypuppetdb.api.BaseAPI.nodes` don't return the decoded
+:meth:`~pypuppetdb.api.QueryAPI.nodes` don't return the decoded
 JSON response but return an object representation of the querried
 endpoints data.
 
@@ -94,7 +121,7 @@ Errors
 
 Unfortunately things can go haywire. PuppetDB might not be reachable
 or complain about our query, requests might have to wait too long to
-recieve a response or the body is just too big to handle.
+receive a response or the body is just too big to handle.
 
 In that case, we'll throw an exception at you.
 

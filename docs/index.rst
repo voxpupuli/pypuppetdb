@@ -3,15 +3,15 @@
 pypuppetdb
 ==========
 
-**pypuppetdb** is a thin wrapper around the REST API providing some
-convenience functions and objects to request and hold data from
-PuppetDB.
+**pypuppetdb** is a wrapper around the PuppetDB REST API
+providing some convenience functions and objects.
 
 .. toctree::
    :maxdepth: 2
 
-   user
    connecting
+   basics
+   advanced_queries
    developer
 
 Indices and tables
