@@ -9,8 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class StatusAPI(BaseAPI):
-    """
-    This class provides methods that interact with the "status/*"
+    """This class provides methods that interact with the `status/*`
     PuppetDB API endpoints.
     """
 

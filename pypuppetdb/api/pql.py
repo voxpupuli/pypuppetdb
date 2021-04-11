@@ -15,8 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class PqlAPI(BaseAPI):
-    """
-    This class provides methods that interact with the "pdb/query/v4"
+    """This class provides methods that interact with the `pdb/query/v4`
     PuppetDB API endpoint.
     """
 

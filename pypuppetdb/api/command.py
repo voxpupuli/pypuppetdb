@@ -14,8 +14,7 @@ log = logging.getLogger(__name__)
 
 
 class CommandAPI(BaseAPI):
-    """
-    This class provides methods that interact with the "pdb/cmd/*"
+    """This class provides methods that interact with the `pdb/cmd/*`
     PuppetDB API endpoints.
     """
 
