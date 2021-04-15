@@ -15,8 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class PqlAPI(BaseAPI):
-    """
-    This class provides methods that interact with the "pdb/query/v4"
+    """This class provides methods that interact with the `pdb/query/v4`
     PuppetDB API endpoint.
     """
 
@@ -53,7 +52,7 @@ class PqlAPI(BaseAPI):
     # TODO: deduplicate this - see QueryAPI.nodes()
     def pql(self, pql, with_status=False, unreported=2, with_event_numbers=True):
         """Makes a PQL (Puppet Query Language) and tries to cast results
-         to a rich type. If it won't work, returns plain dicts.
+        to a rich type. If it won't work, returns plain dicts.
 
         :param pql: PQL query
         :type pql: :obj:`string`

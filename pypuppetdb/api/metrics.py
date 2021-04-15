@@ -10,8 +10,7 @@ log = logging.getLogger(__name__)
 
 
 class MetricsAPI(BaseAPI):
-    """
-    This class provides methods that interact with the "metrics/*"
+    """This class provides methods that interact with the `metrics/*`
     PuppetDB API endpoints.
     """
 

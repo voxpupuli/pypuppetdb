@@ -9,8 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class MetadataAPI(BaseAPI):
-    """
-    This class provides methods that interact with the "pdb/meta/*"
+    """This class provides methods that interact with the `pdb/meta/*`
     PuppetDB API endpoints.
     """
 
