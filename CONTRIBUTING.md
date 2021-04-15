@@ -43,8 +43,8 @@ Assuming you have prepared the development environment as explained above,
 do this to run the tests:
 
 ```bash
-# Unit tests
-py.test --pep8 --strict
+# Unit tests, with PEP8 and mypy (static typing) checks
+pytest --pep8 --strict-markers --mypy pypuppetdb tests
 # Security linter
 bandit -r pypuppetdb
 ```

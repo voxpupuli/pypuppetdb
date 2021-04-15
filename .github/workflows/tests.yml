@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements-test.txt
       - name: Test
         run: |
-          pytest --pep8 --strict
+          pytest --pep8 --strict-markers --mypy pypuppetdb tests
       - name: Run coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
