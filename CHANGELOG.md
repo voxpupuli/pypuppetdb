@@ -4,6 +4,20 @@ Changelog
 Development
 -----------
 
+2.4.0
+-----
+
+  - Added PQL support with `pql()` method
+    (PR [#201](https://github.com/voxpupuli/pypuppetdb/pull/201),
+     fixes [#167](https://github.com/voxpupuli/pypuppetdb/issues/167))
+  - Added ability to specify additional queries when using `Node.facts()`
+    ([#127](https://github.com/voxpupuli/pypuppetdb/pull/127))
+  - Improve the documentation (even more ;))
+    (PR [#206](https://github.com/voxpupuli/pypuppetdb/issues/206),
+     fixes [#143](https://github.com/voxpupuli/pypuppetdb/issues/143)
+     and [#129](https://github.com/voxpupuli/pypuppetdb/issues/129))
+  - Fixed creating `Edge` objects
+    ([#202](https://github.com/voxpupuli/pypuppetdb/issues/202))
   - Python 3.9 added as a supported version
     ([#203](https://github.com/voxpupuli/pypuppetdb/pull/203))
 
