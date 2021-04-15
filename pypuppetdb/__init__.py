@@ -58,7 +58,7 @@ number of nodes as the response will be huge.
 """
 import logging
 
-from pypuppetdb.api import BaseAPI
+from pypuppetdb.api import API
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -109,7 +109,7 @@ def connect(host='localhost', port=8080, ssl_verify=False, ssl_key=None,
     :param token: (optional) The x-auth token to use for X-Authentication
     :type token: :obj:`None` or :obj:`string`
     """
-    return BaseAPI(host=host, port=port,
-                   timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-                   ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
-                   username=username, password=password, token=token)
+    return API(host=host, port=port,
+               timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
+               ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
+               username=username, password=password, token=token)
