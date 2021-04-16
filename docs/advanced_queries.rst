@@ -16,8 +16,8 @@ PQL query with rich types
 -------------------------
 
 Making a PQL query using ``pql()`` method without using projection for one of the supported types
-(``nodes``, ``edges``, ``facts``, ``resources``, ``catalogs``, ``events``, ``reports``, ``inventory``) will return
-the rich types.
+(``nodes``, ``edges``, ``facts``, ``resources``, ``catalogs``, ``events``, ``reports``, ``inventory``)
+will return the rich types.
 
 For example the below code returns objects of the type ``Node``:
 
@@ -26,8 +26,8 @@ For example the below code returns objects of the type ``Node``:
    >>> nodes = db.pql("""
    >>>     nodes {
    >>>       facts {
-   >>>         name = "operatingsystem" and
-   >>>         value = "Debian"
+   >>>         name = "operatingsystem"
+   >>>         and value = "Debian"
    >>>       }
    >>>     }
    >>> """
@@ -52,8 +52,8 @@ set to "Debian":
    >>> nodes = db.pql("""
    >>>     nodes[certname] {
    >>>       facts {
-   >>>         name = "operatingsystem" and
-   >>>         value = "Debian"
+   >>>         name = "operatingsystem"
+   >>>         and value = "Debian"
    >>>       }
    >>>     }
    >>> """
@@ -69,12 +69,12 @@ for more examples.
 AST query
 ---------
 
-Alternatively to use the AST query language, use of of these methods:
+Alternatively to use the AST query language, use one of these methods:
 
 ``nodes()``, ``edges()``,  ``facts()``, ``resources()``, ``catalogs()``, ``events()``,
 ``reports()``, ``inventory()``,
 ``event_counts()``, ``aggregate_event_counts()``,
-``environments()``, ``factsets()``, ``fact_contents()``, ``fact_paths()``.
+``environments()``, ``factsets()``, ``fact_contents()``, ``fact_paths()``
 
 ...and pass the AST query in the ``query`` parameter.
 
@@ -145,9 +145,9 @@ nodes belonging to the production environment.
 
 Subqueries are implemented using corresponding operators (like documented).
 
-  - SubqueryOperator
-  - InOperator
-  - ExtractOperator
+* SubqueryOperator
+* InOperator
+* ExtractOperator
 
 .. code-block:: python
 
