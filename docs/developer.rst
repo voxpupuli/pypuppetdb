@@ -32,13 +32,28 @@ Most singular functions are implemented by calling their plural counterpart
 and then iterating over the generator, immediately exhausting the generator
 and returning a single/the first object.
 
-Main Interface
---------------
 
-What you'll usually need to do is use the :func:`connect` method to set up a
+API and BaseAPI classes
+-----------------------
+
+The starting point for the library is the :func:`connect` method used to set up a
 connection with PuppetDB.
 
 .. autofunction:: connect
+
+This method returns the ``API`` class instance.
+
+That class is built using mixins from the endpoint-specific classes, such as
+``PqlAPI`` (see the next section for more info about them).
+
+All the endpoint-specific classes inherit from the abstract ``BaseAPI`` class
+which contains the logic shared by all the endpoints, such as:
+
+* connecting to the PuppetDB (in the constructor),
+* disconnecting from the PuppetDB (``disconnect()``),
+* ``_query()`` and ``_make_request()`` that prepare and make HTTP(S) requests
+  to PuppetDB,
+
 
 Endpoint classes
 ----------------
@@ -115,6 +130,7 @@ endpoints data.
 .. autoclass:: pypuppetdb.types.Catalog
    :members:
 .. autoclass:: pypuppetdb.types.Edge
+.. autoclass:: pypuppetdb.types.Inventory
 
 Errors
 ------
