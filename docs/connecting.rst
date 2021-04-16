@@ -47,8 +47,9 @@ according to PuppetDB's default configuration.
 of just the local machine but **you should not do that**.)
 
 Pypuppetdb can handle this easily for you. It requires two things:
-  * Generate with your Puppet CA a key pair that you want to use
-  * Tell pypuppetdb to use this keypair.
+
+* Generate with your Puppet CA a key pair that you want to use
+* Tell pypuppetdb to use this keypair.
 
 Generate keypair
 """"""""""""""""
@@ -63,9 +64,9 @@ Once that's done you'll need to get the public and private keyfile
 and your Puppet CA root certificate. You can find those in Puppet's
 ``$ssldir``, usually ``/var/lib/puppet/ssl``:
 
-  * private key: ``$ssldir/private_keys/<service_name>.pem``
-  * public key: ``$ssldir/ca/signed/<service_name>.pem``
-  * CA root certificate: ``$ssldir/ca/ca_crt.pem``
+* private key: ``$ssldir/private_keys/<service_name>.pem``
+* public key: ``$ssldir/ca/signed/<service_name>.pem``
+* CA root certificate: ``$ssldir/ca/ca_crt.pem``
 
 Configure pypuppetdb for SSL
 """"""""""""""""""""""""""""
@@ -79,7 +80,7 @@ Once you have those you can pass them to pypuppetdb's ``connect()``:
    >>>              port=8081)
 
 This will make pypuppedb use HTTPS with a mutual TLS (client will verify
-if the server is using a certificate issues by our Puppet CA, server will
+if the server is using a certificate issued by our Puppet CA, server will
 verify the same for the client's certificate).
 
 If for whatever reason want to disable the verification of PuppetDB's
@@ -87,9 +88,9 @@ certificate you can pass in ``ssl_verify=False``.
 
 
 RBAC Token Authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you are using Puppet Enterprise Puppetdb >=4.0.2 - an RBAC token can be passed
+If you are using Puppet Enterprise Puppetdb >= 4.0.2 - an RBAC token can be passed
 to pypuppetdb's ``connect()``:
 
 .. code-block:: python
@@ -98,10 +99,10 @@ to pypuppetdb's ``connect()``:
    >>>              port=8081)
 
 If this argument is passed, pypuppetdb will automatically switch over to using HTTPS.
-This is handled via the addition of ``X-Authentication`` to the session headers
+This is handled via the addition of ``X-Authentication`` to the session headers.
 
 If you need to disable validation of the certificate PuppetDB is serving, please follow the
-steps documented in the ``Configure pypuppetdb for SSL`` section
+steps documented in the ``Configure pypuppetdb for SSL`` section.
 
 It should also be noted that when using RBAC token authentication,
 the ``ssl_key`` and ``ssl_cert`` options should not be used and are not required.
