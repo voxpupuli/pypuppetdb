@@ -831,7 +831,7 @@ class Inventory(object):
     :ivar environment: The environment associated with the inventory's
         certname.
     :ivar facts: The dictionary of key-value pairs for the nodes
-        assosciated facts.
+        associated facts.
     :ivar trusted: The trusted data from the node.
     """
 
