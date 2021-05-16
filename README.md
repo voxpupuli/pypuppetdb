@@ -1,11 +1,12 @@
 # pypuppetdb
 
 [![PyPi Version](https://img.shields.io/pypi/v/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
 [![PyPi Downloads](https://img.shields.io/pypi/dm/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
 ![Tests Status](https://github.com/voxpupuli/pypuppetdb/workflows/tests%20(unit)/badge.svg)
 [![Coverage Status](https://img.shields.io/coveralls/voxpupuli/pypuppetdb.svg)](https://coveralls.io/r/voxpupuli/pypuppetdb)
 [![Documentation Status](https://readthedocs.org/projects/pypuppetdb/badge/?version=latest)](https://pypuppetdb.readthedocs.io/en/latest/?badge=latest)
-[![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](http://voxpupuli.org)
+[![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](https://voxpupuli.org)
 
 This library is a thin wrapper around the REST API providing some
 convenience functions and objects to request and hold data from
@@ -34,7 +35,7 @@ The [user guide, API reference and a developer guide is available on Read the Do
 For bug reports you can file an
 [issue](https://github.com/voxpupuli/pypuppetdb/issues). If you need
 help with something feel free to pop by \#voxpupuli or the \#puppetboard on
-[Freenode](http://freenode.net) or [Vox Pupuli on Slack](https://puppetcommunity.slack.com/messages/voxpupuli/).
+[Freenode](https://freenode.net) or [Vox Pupuli on Slack](https://puppetcommunity.slack.com/messages/voxpupuli/).
 
 ## Contributing
 
