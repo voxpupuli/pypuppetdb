@@ -10,4 +10,5 @@ pytest-mock
 pytest-mypy
 cov-core
 mypy
+types-requests
 httpretty
