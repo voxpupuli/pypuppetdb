@@ -25,7 +25,7 @@ jobs:
           mypy --install-types --non-interactive pypuppetdb/ tests/
       - name: Test
         run: |
-          pytest --cov=. --cov-report=xml --pep8 --strict-markers --mypy pypuppetdb tests
+          pytest --cov=. --cov-report=xml --flake8 --strict-markers --mypy pypuppetdb tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
