@@ -25,9 +25,8 @@ jobs:
           mypy --install-types --non-interactive pypuppetdb/ tests/
       - name: Test
         run: |
-          pytest --pep8 --strict-markers --mypy pypuppetdb tests
-      - name: Run coveralls
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          coveralls --service=github
+          pytest --cov=. --cov-report=xml --pep8 --strict-markers --mypy pypuppetdb tests
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true

@@ -1,5 +1,4 @@
 -r requirements.txt
-coveralls
 bandit
 coverage
 pep8

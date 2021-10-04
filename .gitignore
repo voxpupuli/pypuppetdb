@@ -27,6 +27,7 @@ pip-log.txt
 
 # Unit test / coverage reports
 .coverage
+coverage.xml
 .tox
 nosetests.xml
 htmlcov
@@ -48,3 +49,6 @@ docs/_build
 
 # OS X
 .DS_*
+
+# private test data
+private/
