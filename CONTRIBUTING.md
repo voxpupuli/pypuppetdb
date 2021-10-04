@@ -28,6 +28,8 @@ Pope](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 # Create a Python 3 virtualenv and activate it
 virtualenv -p python3 .venv
 . .venv/bin/activate
+# Get the up to date base packages
+pip install --upgrade wheel setuptools
 # Install the module in a development mode
 python setup.py develop
 # Install test dependencies
@@ -44,7 +46,8 @@ do this to run the tests:
 
 ```bash
 # Unit tests, with PEP8 and mypy (static typing) checks
-pytest --pep8 --strict-markers --mypy pypuppetdb tests
+mypy --install-types --non-interactive pypuppetdb/ tests/
+pytest --flake8 --strict-markers --mypy pypuppetdb tests
 # Security linter
 bandit -r pypuppetdb
 ```

@@ -44,7 +44,7 @@ class TestBaseAPIInitOptions(object):
         assert api.protocol == 'http'
         assert api.url_path == ''
         assert api.session.auth is None
-        assert api.metric_api_version is 'v2'
+        assert api.metric_api_version == 'v2'
 
     def test_host(self):
         api = pypuppetdb.api.API(host='127.0.0.1')
@@ -102,7 +102,7 @@ class TestBaseAPIInitOptions(object):
 
     def test_invalid_protocol(self):
         with pytest.raises(ValueError):
-            api = pypuppetdb.api.API(protocol='ftp')
+            pypuppetdb.api.API(protocol='ftp')
 
     def test_url_path(self):
         api = pypuppetdb.api.API(url_path='puppetdb')

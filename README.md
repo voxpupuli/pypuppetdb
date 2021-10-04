@@ -4,7 +4,7 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
 [![PyPi Downloads](https://img.shields.io/pypi/dm/pypuppetdb)](https://pypi.org/project/pypuppetdb/)
 ![Tests Status](https://github.com/voxpupuli/pypuppetdb/workflows/tests%20(unit)/badge.svg)
-[![Coverage Status](https://img.shields.io/coveralls/voxpupuli/pypuppetdb.svg)](https://coveralls.io/r/voxpupuli/pypuppetdb)
+[![codecov](https://codecov.io/gh/voxpupuli/pypuppetdb/branch/master/graph/badge.svg?token=mOOj805A15)](https://codecov.io/gh/voxpupuli/pypuppetdb)
 [![Documentation Status](https://readthedocs.org/projects/pypuppetdb/badge/?version=latest)](https://pypuppetdb.readthedocs.io/en/latest/?badge=latest)
 [![By Voxpupuli](https://img.shields.io/badge/by-Vox%20Pupuli%20%F0%9F%A6%8A-ef902f.svg)](https://voxpupuli.org)
 
@@ -16,7 +16,7 @@ PuppetDB.
 
 * PuppetDB 3.0 or newer
   * (For support of older PuppetDB versions please check versions < 0.2.0)
-* Python 3.6 / 3.7 / 3.8 / 3.9
+* Python 3.6 / 3.7 / 3.8 / 3.9 / 3.10
 
 ## Installation
 

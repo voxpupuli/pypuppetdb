@@ -1,12 +1,11 @@
 -r requirements.txt
-coveralls
 bandit
 coverage
 pep8
 mock
-pytest<6
+pytest<7
 pytest-cov
-pytest-pep8
+pytest-flake8
 pytest-mock
 pytest-mypy
 cov-core

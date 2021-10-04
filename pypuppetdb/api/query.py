@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import logging
 from datetime import datetime
 
-import pypuppetdb
 from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.api.base import BaseAPI
 from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
@@ -39,7 +38,7 @@ class QueryAPI(BaseAPI):
                            This provides performance benefits as potentially
                            slow event-counts query is omitted completely.
         :type with_event_numbers: :bool:
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
         :returns: A generator yieling Nodes.
@@ -81,7 +80,7 @@ class QueryAPI(BaseAPI):
     def edges(self, **kwargs):
         """Get the known catalog edges, formed between two resources.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A generating yielding Edges.
@@ -95,7 +94,7 @@ class QueryAPI(BaseAPI):
     def environments(self, **kwargs):
         """Get all known environments from Puppetdb.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containing the results.
@@ -112,7 +111,7 @@ class QueryAPI(BaseAPI):
             match this value. Use of this parameter requires the `name`\
             parameter be set.
         :type value: :obj:`string`
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
             to the _query function
 
         :returns: A generator yielding Facts.
@@ -132,7 +131,7 @@ class QueryAPI(BaseAPI):
     def factsets(self, **kwargs):
         """Returns a set of all facts or for a single certname.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containg the results.
@@ -145,7 +144,7 @@ class QueryAPI(BaseAPI):
         to descend into structured facts and retreive the values associated
         with fact paths.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containg the results.
@@ -159,7 +158,7 @@ class QueryAPI(BaseAPI):
         facts and may be used for building GUI autocompletions or other
         applications that require a basic top-level view of fact paths.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containg the results.
@@ -179,7 +178,7 @@ class QueryAPI(BaseAPI):
             'namevar' in the Puppet Manifests. This parameter requires the\
             `type_` parameter be set.
         :type title: :obj:`string`
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
             to the _query function
 
         :returns: A generator yielding Resources
@@ -218,7 +217,7 @@ class QueryAPI(BaseAPI):
         and/or paging parameters for this endpoint to prevent large result
         sets or PuppetDB performance bottlenecks.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A generator yielding Catalogs
@@ -240,7 +239,7 @@ class QueryAPI(BaseAPI):
         endpoint to prevent large result sets or PuppetDB performance
         bottlenecks.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
         :returns: A generator yielding Events
@@ -268,7 +267,7 @@ class QueryAPI(BaseAPI):
                              `<`, `>=`, and `<=`. Supported fields are
                              `failures`, `successes`, `noops`, and `skips`.
         :type count_filter: :obj:`string`
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containing the results.
@@ -319,7 +318,7 @@ class QueryAPI(BaseAPI):
         prevent large result sets and potential PuppetDB performance
         bottlenecks.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
         :returns: A generating yielding Reports
@@ -334,7 +333,7 @@ class QueryAPI(BaseAPI):
         for structured facts instead of using the facts, fact-contents and
         factsets endpoints for many fact-related queries.
 
-        :param \*\*kwargs: The rest of the keyword arguments are passed
+        :param **kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A generator yielding Inventory

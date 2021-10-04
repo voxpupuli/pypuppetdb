@@ -288,9 +288,9 @@ class InOperator(object):
         if self.query is not None:
             raise APIError("Only one array is supported by the InOperator")
         elif isinstance(values, list):
-            def depth(l):
-                return (isinstance(l, list) and len(l) != 0) \
-                       and max(map(depth, l)) + 1
+            def depth(a_list):
+                return (isinstance(a_list, list) and len(a_list) != 0) \
+                       and max(map(depth, a_list)) + 1
 
             if depth(values) == 1:
                 self.query = True
@@ -358,8 +358,8 @@ class FromOperator(object):
                            "Operator Objects")
 
     def add_order_by(self, fields):
-        def depth(l):
-            return isinstance(l, list) and max(map(depth, l)) + 1
+        def depth(a_list):
+            return isinstance(a_list, list) and max(map(depth, a_list)) + 1
 
         fields_depth = depth(fields)
 

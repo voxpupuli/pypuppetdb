@@ -515,7 +515,7 @@ class TestFromOperator(object):
             str(fr) == "unimportant_no_query"
 
         with pytest.raises(APIError):
-            fr2 = FromOperator('invalid_entity')
+            FromOperator('invalid_entity')
 
     def test_add_query(self):
         fr = FromOperator("facts")
