@@ -325,7 +325,7 @@ class BaseAPI(object):
         :rtype: :obj:`dict` or :obj:`list`
         """
 
-        log.debug(f"_query called with ",
+        log.debug("_query called with ",
                   # comma-separated list of method arguments with their values
                   ", ".join([f"{arg}: {locals().get(arg, 'None')}"
                              for arg in locals().keys() if arg != 'self'])

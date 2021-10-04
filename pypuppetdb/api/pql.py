@@ -9,7 +9,7 @@ import pypuppetdb
 from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.api.base import BaseAPI
 from pypuppetdb.errors import (APIError)
-from pypuppetdb.types import (Catalog, Node, Report)
+from pypuppetdb.types import (Node, Report)
 
 log = logging.getLogger(__name__)
 
@@ -151,5 +151,5 @@ class PqlAPI(BaseAPI):
                           f" but it is not supported by this library yet.")
                 return None
         else:
-            log.debug(f"No match!")
+            log.debug("No match!")
             return None

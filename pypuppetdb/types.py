@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import logging
 from datetime import timedelta
 
-from pypuppetdb.QueryBuilder import (EqualsOperator)
+from pypuppetdb.QueryBuilder import (EqualsOperator, AndOperator)
 from pypuppetdb.utils import json_to_datetime
 
 log = logging.getLogger(__name__)
@@ -20,22 +20,22 @@ class Event(object):
     :type status: :obj:`string`
     :param timestamp: A timestamp of when this event occured.
     :type timestamp: :obj:`string` formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
-    :param hash\_: The hash of the report that contains this event.
-    :type hash\_: :obj:`string`
+    :param hash_: The hash of the report that contains this event.
+    :type hash_: :obj:`string`
     :param title: The resource title this event was fired for.
     :type title: :obj:`string`
-    :param property\_: The property of the resource this event was fired for.
-    :type property\_: :obj:`string`
+    :param property_: The property of the resource this event was fired for.
+    :type property_: :obj:`string`
     :param message: A message associated with this event.
     :type message: :obj:`string`
     :param new_value: The new value/state of the resource.
     :type new_value: :obj:`string`
     :param old_value: The old value/state of the resource.
     :type old_value: :obj:`string`
-    :param type\_: The type of the resource this event fired for.
-    :type type\_: :obj:`string`
-    :param class\_: The class responsible for running this event.
-    :type class\_: :obj:`string`
+    :param type_: The type of the resource this event fired for.
+    :type type_: :obj:`string`
+    :param class_: The class responsible for running this event.
+    :type class_: :obj:`string`
     :param execution_path: The path used to reach this particular resource.
     :type execution_path: :obj:`string`
     :param source_file: The puppet source code file containing the class.
@@ -50,7 +50,7 @@ class Event(object):
     :ivar timestamp: A :obj:`datetime.datetime` of when this event happend.
     :ivar node: The hostname of the machine this event\
         occured on.
-    :ivar hash\_: The hash of this event.
+    :ivar hash_: The hash of this event.
     :ivar item: :obj:`dict` with information about the item/resource this\
         event was triggered for.
     """
@@ -109,8 +109,8 @@ class Report(object):
     :type api: :class:`pypuppetdb.api.BaseAPI`
     :param node: The hostname of the node this report originated on.
     :type node: :obj:`string`
-    :param hash\_: A string uniquely identifying this report.
-    :type hash\_: :obj:`string`
+    :param hash_: A string uniquely identifying this report.
+    :type hash_: :obj:`string`
     :param start: The start time of the agent run.
     :type start: :obj:`string` formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
     :param end: The time the agent finished its run.
@@ -119,8 +119,8 @@ class Report(object):
     :type received: :obj:`string` formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
     :param version: The catalog / configuration version.
     :type version: :obj:`string`
-    :param format\_: The catalog format version.
-    :type format\_: :obj:`int`
+    :param format_: The catalog format version.
+    :type format_: :obj:`int`
     :param agent_version: The Puppet agent version.
     :type agent_version: :obj:`string`
     :param transaction: The UUID of this transaction.
@@ -156,13 +156,12 @@ class Report(object):
     :type producer: :obj:`string`
 
     :ivar node: The hostname this report originated from.
-    :ivar hash\_: Unique identifier of this report.
+    :ivar hash_: Unique identifier of this report.
     :ivar start: :obj:`datetime.datetime` when the Puppet agent run started.
     :ivar end: :obj:`datetime.datetime` when the Puppet agent run ended.
-    :ivar received: :obj:`datetime.datetime` when the report finished\
-        uploading.
+    :ivar received: :obj:`datetime.datetime` when the report finished uploading.
     :ivar version: :obj:`string` catalog configuration version.
-    :ivar format\_: :obj:`int` catalog format version.
+    :ivar format_: :obj:`int` catalog format version.
     :ivar agent_version: :obj:`string` Puppet Agent version.
     :ivar run_time: :obj:`datetime.timedelta` of **end** - **start**.
     :ivar transaction: UUID identifying this transaction.
@@ -299,11 +298,11 @@ class Resource(object):
     parameters are required.
 
     :param node: The hostname this resource is located on.
-    :type noode: :obj:`string`
+    :type node: :obj:`string`
     :param name: The name of the resource in the Puppet manifest.
     :type name: :obj:`string`
-    :param type\_: Type of the Puppet resource.
-    :type type\_: :obj:`string`
+    :param type_: Type of the Puppet resource.
+    :type type_: :obj:`string`
     :param tags: Tags associated with this resource.
     :type tags: :obj:`list`
     :param exported: If it's an exported resource.
@@ -321,7 +320,7 @@ class Resource(object):
 
     :ivar node: The hostname this resources is located on.
     :ivar name: The name of the resource in the Puppet manifest.
-    :ivar type\_: The type of Puppet resource.
+    :ivar type_: The type of Puppet resource.
     :ivar exported: :obj:`bool` if the resource is exported.
     :ivar sourcefile: The Puppet manifest this resource is declared in.
     :ivar sourceline: The line this resource is declared at.
@@ -420,7 +419,7 @@ class Node(object):
     :param cached_catalog_status: Cached catalog status of the last puppet run\
             on this node, possible values are 'explicitly_requested',\
             'on_failure', 'not_used' or None.
-    :type cache_catalog_status: :obj:`string`
+    :type cached_catalog_status: :obj:`string`
 
     :ivar name: Hostname of this node.
     :ivar deactivated: :obj:`datetime.datetime` when this host was\

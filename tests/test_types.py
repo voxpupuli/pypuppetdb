@@ -42,7 +42,7 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unreported'
-        assert node.unreported_time is '0d 5h 20m'
+        assert node.unreported_time == '0d 5h 20m'
         assert str(node) == str('node')
         assert str(node) == str('node')
         assert repr(node) == str('<Node: node>')
@@ -66,7 +66,7 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unreported'
-        assert node.unreported_time is '0d 5h 20m'
+        assert node.unreported_time == '0d 5h 20m'
         assert str(node) == str('node')
         assert str(node) == str('node')
         assert repr(node) == str('<Node: node>')
@@ -90,7 +90,7 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unreported'
-        assert node.unreported_time is '0d 5h 20m'
+        assert node.unreported_time == '0d 5h 20m'
         assert str(node) == str('node')
         assert str(node) == str('node')
         assert repr(node) == str('<Node: node>')
