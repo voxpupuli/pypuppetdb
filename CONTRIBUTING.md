@@ -32,8 +32,8 @@ virtualenv -p python3 .venv
 pip install --upgrade wheel setuptools
 # Install the module in a development mode
 python setup.py develop
-# Install test dependencies
-pip install -r requirements-test.txt
+# Install/update test dependencies
+pip install --upgrade -r requirements-test.txt
 ```
 
 ## Tests
@@ -68,7 +68,7 @@ You can build the documentation locally by doing:
 
 ```bash
 # Activate the virtualenv used for the app development
-pip install -r docs/requirements.txt
+pip install --upgrade -r docs/requirements.txt
 cd docs
 make html
 ```

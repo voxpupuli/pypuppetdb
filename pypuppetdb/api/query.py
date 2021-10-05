@@ -19,7 +19,7 @@ class QueryAPI(BaseAPI):
 
     def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
               **kwargs):
-        """Query for nodes by either name or query. If both aren't
+        r"""Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also (optionally) fetches the nodes status and (optionally)
         event counts of the latest report from puppetdb.
@@ -38,7 +38,7 @@ class QueryAPI(BaseAPI):
                            This provides performance benefits as potentially
                            slow event-counts query is omitted completely.
         :type with_event_numbers: :bool:
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
         :returns: A generator yieling Nodes.
@@ -78,9 +78,9 @@ class QueryAPI(BaseAPI):
         return next(node for node in nodes)
 
     def edges(self, **kwargs):
-        """Get the known catalog edges, formed between two resources.
+        r"""Get the known catalog edges, formed between two resources.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A generating yielding Edges.
@@ -92,9 +92,9 @@ class QueryAPI(BaseAPI):
             yield Edge.create_from_dict(edge)
 
     def environments(self, **kwargs):
-        """Get all known environments from Puppetdb.
+        r"""Get all known environments from Puppetdb.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containing the results.
@@ -103,7 +103,7 @@ class QueryAPI(BaseAPI):
         return self._query('environments', **kwargs)
 
     def facts(self, name=None, value=None, **kwargs):
-        """Query for facts limited by either name, value and/or query.
+        r"""Query for facts limited by either name, value and/or query.
 
         :param name: (Optional) Only return facts that match this name.
         :type name: :obj:`string`
@@ -111,7 +111,7 @@ class QueryAPI(BaseAPI):
             match this value. Use of this parameter requires the `name`\
             parameter be set.
         :type value: :obj:`string`
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
             to the _query function
 
         :returns: A generator yielding Facts.
@@ -129,9 +129,9 @@ class QueryAPI(BaseAPI):
             yield Fact.create_from_dict(fact)
 
     def factsets(self, **kwargs):
-        """Returns a set of all facts or for a single certname.
+        r"""Returns a set of all facts or for a single certname.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containg the results.
@@ -140,11 +140,11 @@ class QueryAPI(BaseAPI):
         return self._query('factsets', **kwargs)
 
     def fact_contents(self, **kwargs):
-        """To complement fact_paths(), this endpoint provides the capability
+        r"""To complement fact_paths(), this endpoint provides the capability
         to descend into structured facts and retreive the values associated
         with fact paths.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containg the results.
@@ -153,12 +153,12 @@ class QueryAPI(BaseAPI):
         return self._query('fact-contents', **kwargs)
 
     def fact_paths(self, **kwargs):
-        """Fact Paths are intended to be a counter-part of the fact-names
+        r"""Fact Paths are intended to be a counter-part of the fact-names
         endpoint. It provides increased granularity around structured
         facts and may be used for building GUI autocompletions or other
         applications that require a basic top-level view of fact paths.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containg the results.
@@ -167,7 +167,7 @@ class QueryAPI(BaseAPI):
         return self._query('fact-paths', **kwargs)
 
     def resources(self, type_=None, title=None, **kwargs):
-        """Query for resources limited by either type and/or title or query.
+        r"""Query for resources limited by either type and/or title or query.
         This will yield a Resources object for every returned resource.
 
         :param type_: (Optional) The resource type. This can be any resource
@@ -178,7 +178,7 @@ class QueryAPI(BaseAPI):
             'namevar' in the Puppet Manifests. This parameter requires the\
             `type_` parameter be set.
         :type title: :obj:`string`
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
             to the _query function
 
         :returns: A generator yielding Resources
@@ -212,12 +212,12 @@ class QueryAPI(BaseAPI):
         return next(catalog for catalog in catalogs)
 
     def catalogs(self, **kwargs):
-        """Get the catalog information from the infrastructure based on path
+        r"""Get the catalog information from the infrastructure based on path
         and/or query results. It is strongly recommended to include query
         and/or paging parameters for this endpoint to prevent large result
         sets or PuppetDB performance bottlenecks.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A generator yielding Catalogs
@@ -233,13 +233,13 @@ class QueryAPI(BaseAPI):
             yield Catalog.create_from_dict(catalog)
 
     def events(self, **kwargs):
-        """A report is made up of events which can be queried either
+        r"""A report is made up of events which can be queried either
         individually or based on their associated report hash. It is strongly
         recommended to include query and/or paging parameters for this
         endpoint to prevent large result sets or PuppetDB performance
         bottlenecks.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
         :returns: A generator yielding Events
@@ -250,7 +250,7 @@ class QueryAPI(BaseAPI):
             yield Event.create_from_dict(event)
 
     def event_counts(self, summarize_by, **kwargs):
-        """Get event counts from puppetdb.
+        r"""Get event counts from puppetdb.
 
         :param summarize_by: (Required) The object type to be counted on.
                              Valid values are 'containing_class', 'resource'
@@ -267,7 +267,7 @@ class QueryAPI(BaseAPI):
                              `<`, `>=`, and `<=`. Supported fields are
                              `failures`, `successes`, `noops`, and `skips`.
         :type count_filter: :obj:`string`
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A list of dictionaries containing the results.
@@ -313,12 +313,12 @@ class QueryAPI(BaseAPI):
         return self._query('fact-names')
 
     def reports(self, **kwargs):
-        """Get reports for our infrastructure. It is strongly recommended
+        r"""Get reports for our infrastructure. It is strongly recommended
         to include query and/or paging parameters for this endpoint to
         prevent large result sets and potential PuppetDB performance
         bottlenecks.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function
 
         :returns: A generating yielding Reports
@@ -329,11 +329,11 @@ class QueryAPI(BaseAPI):
             yield Report.create_from_dict(self, report)
 
     def inventory(self, **kwargs):
-        """Get Node and Fact information with an alternative query syntax
+        r"""Get Node and Fact information with an alternative query syntax
         for structured facts instead of using the facts, fact-contents and
         factsets endpoints for many fact-related queries.
 
-        :param **kwargs: The rest of the keyword arguments are passed
+        :param \**kwargs: The rest of the keyword arguments are passed
                            to the _query function.
 
         :returns: A generator yielding Inventory
