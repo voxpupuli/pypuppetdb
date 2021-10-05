@@ -4,6 +4,12 @@ Changelog
 Development
 -----------
 
+2.5.0
+-----
+
+  - Python 3.10 added as a supported version
+    ([#213](https://github.com/voxpupuli/pypuppetdb/pull/213))
+
 2.4.0
 -----
 
