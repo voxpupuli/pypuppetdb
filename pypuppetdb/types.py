@@ -93,7 +93,7 @@ class Report(object):
     def __init__(self, api, node: str, hash_: str, start: str, end: str, received: str,
                  version: str, format_: int, agent_version: str, transaction: str,
                  environment: str = None, status: str = None, noop: bool = False,
-                 noop_pending: bool = False, metrics: List[dict] = [{}], logs: List[dict] = [{}],
+                 noop_pending: bool = False, metrics: List[dict] = None, logs: List[dict] = None,
                  code_id: str = None, catalog_uuid: str = None, cached_catalog_status: str = None,
                  producer: str = None):
         """Creates a Report object.
@@ -129,6 +129,11 @@ class Report(object):
         :param producer: (Optional) The certname of the Puppet Master that\
             sent the report to PuppetDB
         """
+
+        if logs is None:
+            logs = [{}]
+        if metrics is None:
+            metrics = [{}]
 
         self.node = node
         self.hash_ = hash_
