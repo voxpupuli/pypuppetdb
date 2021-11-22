@@ -100,13 +100,13 @@ class Report(object):
 
         :param api: API object (for subqueries)
         :param node: The hostname of the node this report originated on.
-        :param hash\_: A string uniquely identifying this report.
+        :param hash_: A string uniquely identifying this report.
         :param start: The start time of the agent run. Formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
         :param end: The time the agent finished its run. Formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
         :param received: The time PuppetDB received the report.
                Formatted as ``%Y-%m-%dT%H:%M:%S.%fZ``
         :param version: The catalog / configuration version.
-        :param format\_: The catalog format version.
+        :param format_: The catalog format version.
         :param agent_version: The Puppet agent version.
         :param transaction: The UUID of this transaction.
         :param environment: (Optional) The environment assigned to the node that\
