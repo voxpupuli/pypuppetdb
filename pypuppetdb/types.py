@@ -234,6 +234,12 @@ class Fact(object):
 
     @staticmethod
     def create_from_dict(fact: dict) -> 'Fact':
+        """Create a Fact object from a JSON object (dict) representing a Fact
+        returned by PuppetDB API facts endpoint:
+        https://puppet.com/docs/puppetdb/5.2/api/query/v4/facts.html#response-format .
+
+        :param fact: JSON object (dict) representing a Fact
+        """
         return Fact(
             node=fact['certname'],
             name=fact['name'],
@@ -243,45 +249,31 @@ class Fact(object):
 
 
 class Resource(object):
-    """This object represents a resource. Unless otherwise specified all
-    parameters are required.
-
-    :param node: The hostname this resource is located on.
-    :type node: :obj:`string`
-    :param name: The name of the resource in the Puppet manifest.
-    :type name: :obj:`string`
-    :param type_: Type of the Puppet resource.
-    :type type_: :obj:`string`
-    :param tags: Tags associated with this resource.
-    :type tags: :obj:`list`
-    :param exported: If it's an exported resource.
-    :type exported: :obj:`bool`
-    :param sourcefile: The Puppet manifest this resource is declared in.
-    :type sourcefile: :obj:`string`
-    :param sourceline: The line this resource is declared at.
-    :type sourceline: :obj:`int`
-    :param parameters: (Optional) The parameters this resource has been\
-        declared with.
-    :type parameters: :obj:`dict`
-    :param environment: (Optional) The environment of the node associated\
-        with this resource.
-    :type environment: :obj:`string`
-
-    :ivar node: The hostname this resources is located on.
-    :ivar name: The name of the resource in the Puppet manifest.
-    :ivar type_: The type of Puppet resource.
-    :ivar exported: :obj:`bool` if the resource is exported.
-    :ivar sourcefile: The Puppet manifest this resource is declared in.
-    :ivar sourceline: The line this resource is declared at.
-    :ivar parameters: :obj:`dict` with key:value pairs of parameters.
-    :ivar relationships: :obj:`list` Contains all relationships to other\
-        resources
-    :ivar environment: :obj:`string` The environment of the node associated\
-        with this resource.
+    """This object represents a Resource.
     """
 
-    def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, environment=None, parameters={}):
+    def __init__(self, node: str, name: str, type_: str, tags: list[str], exported: bool,
+                 sourcefile: str, sourceline: int, environment: str = None,
+                 parameters: dict = None, relationships: list['Resource'] = None):
+        """
+        Creates a Resource object.
+
+        :param node: The hostname this resource is located on.
+        :param name: The name of the resource in the Puppet manifest.
+        :param type_: Type of the Puppet resource.
+        :param tags: Tags associated with this resource.
+        :param exported: If it's an exported resource.
+        :param sourcefile: The Puppet manifest this resource is declared in.
+        :param sourceline: The line this resource is declared at.
+        :param environment: (Optional) The environment of the node associated with this resource.
+        :param parameters: (Optional) The parameters this resource has been declared with.
+        :param relationships: (Optional) The relationships of this resource to other resources.
+        """
+        if parameters is None:
+            parameters = {}
+        if relationships is None:
+            relationships = []
+
         self.node = node
         self.name = name
         self.type_ = type_
@@ -289,9 +281,9 @@ class Resource(object):
         self.exported = exported
         self.sourcefile = sourcefile
         self.sourceline = sourceline
-        self.parameters = parameters
-        self.relationships = []
         self.environment = environment
+        self.parameters = parameters
+        self.relationships = relationships
         self.__string = '{0}[{1}]'.format(self.type_, self.name)
 
     def __repr__(self):
@@ -301,7 +293,13 @@ class Resource(object):
         return str('{0}').format(self.__string)
 
     @staticmethod
-    def create_from_dict(resource):
+    def create_from_dict(resource: dict) -> 'Resource':
+        """Create a Resource object from a JSON object (dict) representing a Resource
+        returned by PuppetDB API resources endpoint:
+        https://puppet.com/docs/puppetdb/5.2/api/query/v4/resources.html#response-format .
+
+        :param resource: JSON object (dict) representing a Resource
+        """
         return Resource(
             node=resource['certname'],
             name=resource['title'],
@@ -310,8 +308,9 @@ class Resource(object):
             exported=resource['exported'],
             sourcefile=resource['file'],
             sourceline=resource['line'],
-            parameters=resource['parameters'],
             environment=resource['environment'],
+            parameters=resource['parameters'],
+            # resource=resource['resource'], # what about this - "the resource's unique hash" ?
         )
 
 
