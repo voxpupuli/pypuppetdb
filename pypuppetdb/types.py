@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import logging
 from datetime import timedelta
 from pypuppetdb.QueryBuilder import (EqualsOperator, AndOperator)
-from typing import List
+from typing import List, Iterator, Union, Dict
 from pypuppetdb.utils import json_to_datetime
 
 log = logging.getLogger(__name__)
@@ -163,7 +163,7 @@ class Report(object):
     def __str__(self):
         return str('{0}').format(self.__string)
 
-    def events(self, **kwargs):
+    def events(self, **kwargs) -> Iterator[Event]:
         """Get all :class:`pypuppetdb.types.Event` for this report. Additional arguments may also be
         specified that will be passed to the query function.
         """
@@ -204,37 +204,22 @@ class Report(object):
         )
 
 
+FactValue = Union[str, int, bool, float, List, Dict]
+
+
 class Fact(object):
-    """This object represents a fact. Unless otherwise specified all
-    parameters are required.
-
-    :param node: The hostname this fact was collected from.
-    :type node: :obj:`string`
-    :param name: The fact's name, such as 'osfamily'
-    :type name: :obj:`string`
-    :param value: The fact's value, such as 'Debian'
-    :type value: :obj:`string` or :obj:`int` or :obj:`dict`
-    :param environment: (Optional) The fact's environment, such as\
-        'production'
-    :type environment: :obj:`string`
-
-    :ivar node: :obj:`string` holding the hostname.
-    :ivar name: :obj:`string` holding the fact's name.
-    :ivar value: :obj:`string` or :obj:`int` or :obj:`dict` holding the\
-        fact's value.
-    :ivar environment: :obj:`string` holding the fact's environment
+    """This object represents a Fact.
     """
 
-    @staticmethod
-    def create_from_dict(fact):
-        return Fact(
-            node=fact['certname'],
-            name=fact['name'],
-            value=fact['value'],
-            environment=fact['environment']
-        )
+    def __init__(self, node: str, name: str, value: FactValue, environment: str = None):
+        """Creates a Fact object.
 
-    def __init__(self, node, name, value, environment=None):
+        :param node: The hostname this fact was collected from.
+        :param name: The fact's name, such as 'osfamily'
+        :param value: The fact's value, such as 'Debian'
+        :param environment: (Optional) The fact's environment, such as 'production'
+        """
+
         self.node = node
         self.name = name
         self.value = value
@@ -246,6 +231,15 @@ class Fact(object):
 
     def __str__(self):
         return str('{0}').format(self.__string)
+
+    @staticmethod
+    def create_from_dict(fact: dict) -> 'Fact':
+        return Fact(
+            node=fact['certname'],
+            name=fact['name'],
+            value=fact['value'],
+            environment=fact['environment']
+        )
 
 
 class Resource(object):

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import logging
 from datetime import datetime
+from typing import Iterator
 
 from pypuppetdb.QueryBuilder import (EqualsOperator)
 from pypuppetdb.api.base import BaseAPI
@@ -18,7 +19,7 @@ class QueryAPI(BaseAPI):
     """
 
     def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
-              **kwargs):
+              **kwargs) -> Iterator[Node]:
         r"""Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also (optionally) fetches the nodes status and (optionally)
@@ -211,7 +212,7 @@ class QueryAPI(BaseAPI):
         catalogs = self.catalogs(path=node)
         return next(catalog for catalog in catalogs)
 
-    def catalogs(self, **kwargs):
+    def catalogs(self, **kwargs) -> Iterator[Catalog]:
         r"""Get the catalog information from the infrastructure based on path
         and/or query results. It is strongly recommended to include query
         and/or paging parameters for this endpoint to prevent large result
@@ -232,7 +233,7 @@ class QueryAPI(BaseAPI):
         for catalog in catalogs:
             yield Catalog.create_from_dict(catalog)
 
-    def events(self, **kwargs):
+    def events(self, **kwargs) -> Iterator[Event]:
         r"""A report is made up of events which can be queried either
         individually or based on their associated report hash. It is strongly
         recommended to include query and/or paging parameters for this
