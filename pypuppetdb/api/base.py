@@ -325,10 +325,12 @@ class BaseAPI(object):
         :rtype: :obj:`dict` or :obj:`list`
         """
 
-        log.debug("_query called with ",
+        # inside the list comprehension the locals() value change so we need a function's local() copy
+        function_locals = locals().copy()
+        log.debug("_query called with: " +
                   # comma-separated list of method arguments with their values
-                  ", ".join([f"{arg}: {locals().get(arg, 'None')}"
-                             for arg in locals().keys() if arg != 'self'])
+                  ", ".join([f"{arg}={function_locals.get(arg, 'None')}"
+                             for arg in function_locals.keys() if arg != 'self'])
                   )
 
         if not endpoint:
