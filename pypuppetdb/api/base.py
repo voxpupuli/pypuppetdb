@@ -325,7 +325,8 @@ class BaseAPI(object):
         :rtype: :obj:`dict` or :obj:`list`
         """
 
-        # inside the list comprehension the locals() value change so we need a function's local() copy
+        # inside the list comprehension the locals()'s value changes
+        # so we need to make a copy of the function's local() to use it there
         function_locals = locals().copy()
         log.debug("_query called with: " +
                   # comma-separated list of method arguments with their values
