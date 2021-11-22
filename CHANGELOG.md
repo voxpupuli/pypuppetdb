@@ -4,6 +4,13 @@ Changelog
 Development
 -----------
 
+2.5.1
+-----
+
+  - Fix TypeError exception thrown by `BaseAPI._query()` when using debug logging.
+
+Thanks to Ben Roberts for his contribution!
+
 2.5.0
 -----
 
