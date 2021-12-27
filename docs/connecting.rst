@@ -54,7 +54,7 @@ Pypuppetdb can handle this easily for you. It requires two things:
 Generate keypair
 """"""""""""""""
 
-On your Puppet Master or dedicated Puppet CA server:
+On your Puppet Server or dedicated Puppet CA Server:
 
 .. code-block:: console
 
