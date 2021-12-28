@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+  - Remove harmful terminology, following [the Puppetlabs components name changes](https://puppet.com/blog/removing-harmful-terminology-from-our-products/).
+
 2.5.1
 -----
 
