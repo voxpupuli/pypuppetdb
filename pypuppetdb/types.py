@@ -151,7 +151,7 @@ class Report(object):
         error. Can be one of 'explicitly_requested', 'on_failure',\
         'not_used' not 'null'.
     :type cached_catalog_status: :obj:`string`
-    :param producer: (Optional) The certname of the Puppet Master that\
+    :param producer: (Optional) The certname of the Puppet Server that\
         sent the report to PuppetDB
     :type producer: :obj:`string`
 
@@ -180,7 +180,7 @@ class Report(object):
         used a cached catalog, if so weather it was a result of an error or\
         otherwise.
     :ivar producer: :obj:`string` representing the certname of the Puppet\
-        Master that sent the report to PuppetDB
+        Server that sent the report to PuppetDB
     """
 
     def __init__(self, api, node, hash_, start, end, received, version,
@@ -671,7 +671,7 @@ class Catalog(object):
     :type code_id: :obj:`string`
     :param catalog_uuid: Universally unique identifier of this catalog.
     :type catalog_uuid: :obj:`string`
-    :param producer: The certname of the Puppet Master that sent the catalog\
+    :param producer: The certname of the Puppet Server that sent the catalog\
         to PuppetDB
     :type producer: :obj:`string`
 
@@ -687,7 +687,7 @@ class Catalog(object):
     :ivar code_id: :obj:`string` ties the catalog to the Puppet code that\
         generated the catalog
     :ivar catalog_uuid: :obj:`string` uniquely identifying this catalog.
-    :ivar producer: :obj:`string` of the Puppet Master that sent the catalog\
+    :ivar producer: :obj:`string` of the Puppet Server that sent the catalog\
         to PuppetDB
     """
 
