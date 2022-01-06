@@ -1,0 +1,27 @@
+# Uncomment this if your project is hosted on GitHub:
+github_url = "https://github.com/voxpupuli/pypuppetdb/"
+
+[version]
+current = "2.5.1"
+
+# Example of a semver regexp.
+# Make sure this matches current_version before
+# using tbump
+regex = '''
+  (?P<major>\d+)
+  \.
+  (?P<minor>\d+)
+  \.
+  (?P<patch>\d+)
+  (.*)
+  '''
+
+[git]
+message_template = "Release v{new_version}"
+tag_template = "{new_version}"
+
+# For each file to patch, add a [[file]] config
+# section containing the path of the file, relative to the
+# tbump.toml location.
+[[file]]
+src = "version"
