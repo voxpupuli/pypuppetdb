@@ -6,7 +6,6 @@ import logging
 from urllib.parse import quote
 
 import requests
-from requests import HTTPError
 
 from pypuppetdb.errors import (APIError, EmptyResponseError)
 
