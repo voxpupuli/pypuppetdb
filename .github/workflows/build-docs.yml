@@ -1,0 +1,23 @@
+name: build docs
+
+on: [push, pull_request]
+
+jobs:
+  build-docs:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          pip install --upgrade -r docs/requirements.txt
+          python setup.py develop
+      - name: Build docs
+        run: |
+          cd docs
+          make html
