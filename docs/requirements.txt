@@ -13,7 +13,7 @@ pyparsing~=3.0
 pytz  # we always want the latest time zone info
 requests~=2.27
 snowballstemmer~=2.2
-Sphinx~=4.3
+Sphinx~=4.4
 sphinx-rtd-theme~=1.0
 sphinxcontrib-applehelp~=1.0
 sphinxcontrib-devhelp~=1.0
