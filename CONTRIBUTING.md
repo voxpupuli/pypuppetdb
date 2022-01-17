@@ -72,3 +72,11 @@ pip install --upgrade -r docs/requirements.txt
 cd docs
 make html
 ```
+
+## Preparing a release
+
+This project is using [tbump](https://github.com/dmerejkowsky/tbump) for releases.
+
+1. Add entry to the `CHANGELOG.md` / verify that it contains all the changes.
+2. Run `tbump <new_version>`
+3. Edit the release created in GitHub - if needed correct the type (final/prerelease), update the description with a changelog fragment.
