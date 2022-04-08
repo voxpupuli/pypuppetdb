@@ -2,9 +2,10 @@ import base64
 import json
 
 import httpretty
-import mock
 import pytest
 import requests
+
+from unittest import mock
 
 import pypuppetdb
 
