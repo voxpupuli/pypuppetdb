@@ -1,29 +1,20 @@
-attrs>=21.4.0,<22
-bandit>=1.7.4,<2
-cov-core>=1.15.0,<2
-coverage>=6.3.2,<7
-filelock>=3.6.0,<4
-flake8>=4.0.1,<5
-gitdb>=4.0.9,<5
-GitPython>=3.1.27,<4
-httpretty>=1.1.4,<2
-iniconfig>=1.1.1,<2
-mccabe>=0.6.1,<1
-mypy>=0.942,<1
-mypy-extensions>=0.4.3,<1
-packaging==21.3
-pbr>=5.8.1,<6
-pluggy>=1.0.0,<2
-py>=1.11.0,<2
-pyflakes>=2.4.0,<3
-pyparsing>=3.0.7,<4
-pytest>=7.1.1,<8
-pytest-cov>=3.0.0,<4
-pytest-flake8>=1.1.1,<2
-pytest-mock>=3.7.0,<4
-pytest-mypy>=0.9.1,<1
-PyYAML>=6.0,<7
-smmap>=5.0.0,<6
-stevedore>=3.5.0,<4
-tomli>=2.0.1,<3
-typing_extensions>=4.1.1,<5
+-r requirements.txt
+
+# DON'T pin these to specific versions as we run tests on a range of Python versions
+# and some of the below packages drop support for EOL Python version in their minor
+# or patch releases, sooner that we want to drop them. Maintaining specific versions
+# here will be a hell and it's not worth it.
+
+# testing tools
+bandit
+coverage
+flake8
+pytest<8
+pytest-cov
+pytest-flake8
+pytest-mypy
+cov-core
+mypy
+
+# modules used in our tests
+httpretty
