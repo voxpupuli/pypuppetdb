@@ -1,10 +1,13 @@
 Changelog
 =========
 
-Development
------------
+2.5.2
+-----
+  - Remove harmful terminology, following [the Puppetlabs components name changes](https://puppet.com/blog/removing-harmful-terminology-from-our-products/) ([#216](https://github.com/voxpupuli/pypuppetdb/pull/216))
+  - Use built-in unittest.mock instead of mock ([#228](https://github.com/voxpupuli/pypuppetdb/pull/228))
+  - Build and test dependencies updates. 
 
-  - Remove harmful terminology, following [the Puppetlabs components name changes](https://puppet.com/blog/removing-harmful-terminology-from-our-products/).
+Thanks to the following contributors of this release: [@pgajdos](https://github.com/pgajdos).
 
 2.5.1
 -----
