@@ -52,3 +52,10 @@ docs/_build
 
 # private test data
 private/
+
+# local dev caches
+.mypy_cache/
+.pytest_cache/
+
+# IntelliJ IDEA (IDE) config
+.idea/
