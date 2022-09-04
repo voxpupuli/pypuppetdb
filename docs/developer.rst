@@ -211,4 +211,3 @@ into their own :mod:`utils` module.
 
 .. autoclass::    pypuppetdb.utils.UTC
 .. autofunction:: pypuppetdb.utils.json_to_datetime
-.. autofunction:: pypuppetdb.utils.versioncmp
