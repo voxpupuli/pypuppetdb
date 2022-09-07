@@ -62,7 +62,7 @@ set to "Debian":
    {'certname': 'foo.example.com'}
    {'certname': 'bar.example.com'}
 
-Please see `the official PQL documentation <https://puppet.com/docs/puppetdb/latest/api/query/v4/pql.html>`_
+Please see `the official PQL documentation <https://puppet.com/docs/puppetdb/7/api/query/v4/pql.html>`_
 for more examples.
 
 
@@ -95,7 +95,7 @@ An example of the same query as above but rewritten in AST:
    foo.example.com
    bar.example.com
 
-Please see `the official AST documentation <https://puppet.com/docs/puppetdb/latest/api/query/v4/ast.html>`_
+Please see `the official AST documentation <https://puppet.com/docs/puppetdb/7/api/query/v4/ast.html>`_
 for more examples .
 
 AST QueryBuilder
