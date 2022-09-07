@@ -23,7 +23,7 @@ class BinaryOperator(object):
     to that operator.
 
     See
-    https://docs.puppet.com/puppetdb/4.0/api/query/v4/ast.html#binary-operators
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#binary-operators
     for more information.
 
     :param operator: The binary query operation performed. There is
@@ -62,7 +62,7 @@ class BooleanOperator(object):
     added via :func:`~pypuppetdb.QueryBuilder.BooleanOperator.add`
 
     See
-    https://docs.puppet.com/puppetdb/4.0/api/query/v4/ast.html#binary-operators
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#binary-operators
     for more information.
 
     :param operator: The boolean query operation to perform.
@@ -102,7 +102,7 @@ class ExtractOperator(object):
     """
     Queries that either do not or cannot require all the key-value pairs
     from an endpoint can use the Extract Operator as described in
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#projection-operators.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#projection-operators.
 
     The syntax of this operator requires a function and/or a list of fields,
     an optional standard query and an optional group by clause including a
@@ -179,7 +179,7 @@ class FunctionOperator(object):
     """
     Performs an aggregate function on the result of a subquery, full
     documentation is available at
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#function.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#function.
     This object can only be used in the field list or group by list of
     an ExtractOperator object.
 
@@ -221,7 +221,7 @@ class SubqueryOperator(object):
     """
     Performs a subquery to another puppetDB object, full
     documentation is available at
-    https://docs.puppet.com/puppetdb/3.2/api/query/v4/operators.html#subquery-operators
+    https://docs.puppet.com/puppetdb/7/api/query/v4/operators.html#subquery-operators
     This object must be used in combination with the InOperator according
     to documentation.
 
@@ -258,7 +258,7 @@ class SubqueryOperator(object):
 class InOperator(object):
     """
     Performs boolean compare between a field a subquery result
-    https://docs.puppet.com/puppetdb/3.2/api/query/v4/operators.html#subquery-operators
+    https://docs.puppet.com/puppetdb/7/api/query/v4/operators.html#subquery-operators
     This object must be used in combination with the SubqueryOperator according
     to documentation.
 
@@ -317,7 +317,7 @@ class FromOperator(object):
     """
     From contextual operator that allows for queries on the root endpoint
     or subqueries into other entities:
-    https://puppet.com/docs/puppetdb/5.1/api/query/v4/ast.html#from
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#from
 
     Ex.)
     fr = FromOperator("facts")
@@ -413,7 +413,7 @@ class EqualsOperator(BinaryOperator):
     """
     Builds an equality filter based on the supplied field-value pair as
     described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#equality.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#equality.
 
     In order to create the following query:
 
@@ -438,7 +438,7 @@ class GreaterOperator(BinaryOperator):
     """
     Builds a greater-than filter based on the supplied field-value pair as
     described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#greater-than.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#greater-than.
 
     In order to create the following query:
 
@@ -463,7 +463,7 @@ class LessOperator(BinaryOperator):
     """
     Builds a less-than filter based on the supplied field-value pair as
     described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#less-than.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#less-than.
 
     In order to create the following query:
 
@@ -488,7 +488,7 @@ class GreaterEqualOperator(BinaryOperator):
     """
     Builds a greater-than or equal-to filter based on the supplied
     field-value pair as described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#greater-than-or-equal-to.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#greater-than-or-equal-to.
 
     In order to create the following query:
 
@@ -514,7 +514,7 @@ class LessEqualOperator(BinaryOperator):
     """
     Builds a less-than or equal-to filter based on the supplied
     field-value pair as described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#less-than-or-equal-to.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#less-than-or-equal-to.
 
     In order to create the following query:
 
@@ -540,7 +540,7 @@ class RegexOperator(BinaryOperator):
     """
     Builds a regular expression filter based on the supplied field-value
     pair as described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#regexp-match.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#regexp-match.
 
     In order to create the following query:
 
@@ -566,7 +566,7 @@ class RegexArrayOperator(BinaryOperator):
     Builds a regular expression array filter based on the supplied
     field-value pair. This query only works on fields with paths as
     described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#regexp-array-match.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#regexp-array-match.
 
     In order to create the following query:
 
@@ -591,7 +591,7 @@ class NullOperator(BinaryOperator):
     """
     Builds a null filter based on the field and boolean value pair as
     described
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#null-is-null.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#null-is-null.
     This filter only works on field that may be null. Value may only
     be True or False.
 
@@ -623,7 +623,7 @@ class AndOperator(BooleanOperator):
     Builds an AND boolean filter. Only results that match ALL
     criteria from the included query strings will be returned
     from PuppetDB. Full documentation is available
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#and
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#and
 
     In order to create the following query:
 
@@ -647,7 +647,7 @@ class OrOperator(BooleanOperator):
     Builds an OR boolean filter. Only results that match ANY
     criteria from the included query strings will be returned
     from PuppetDB. Full documentation is available
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#or.
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#or.
 
     In order to create the following query:
 
@@ -669,7 +669,7 @@ class NotOperator(BooleanOperator):
     Builds a NOT boolean filter. Only results that DO NOT match
     criteria from the included query strings will be returned
     from PuppetDB. Full documentation is available
-    https://docs.puppet.com/puppetdb/4.1/api/query/v4/ast.html#not
+    https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html#not
 
     Unlike the other Boolean Operator objects this operator only
     accepts a single query string.

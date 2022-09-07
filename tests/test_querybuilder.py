@@ -482,7 +482,7 @@ class TestInOperator(object):
             '["certname", "facts"]], ["offset", 10]]]'
 
         # last example on page
-        # https://puppet.com/docs/puppetdb/5.1/api/query/v4/ast.html
+        # https://docs.puppet.com/puppetdb/7/api/query/v4/ast.html
 
         op = InOperator('certname')
         ex = ExtractOperator()
