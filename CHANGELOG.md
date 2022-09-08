@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.0.0
+-----
+This is a maintenance release.
+
+The major version is bumped because of:
+  - dropped support for PuppetDBs < 5.2.0 (Puppet 4 has reached its end-of-life in October 2018),
+  - dropped support for Python 3.6 (end-of-life in December 2021).
+
 2.5.2
 -----
   - Remove harmful terminology, following [the Puppetlabs components name changes](https://puppet.com/blog/removing-harmful-terminology-from-our-products/) ([#216](https://github.com/voxpupuli/pypuppetdb/pull/216))
