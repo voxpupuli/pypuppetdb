@@ -7,7 +7,8 @@ This is a maintenance release.
 
 The major version is bumped because of:
   - dropped support for PuppetDBs < 5.2.0 (Puppet 4 has reached its end-of-life in October 2018),
-  - dropped support for Python 3.6 (end-of-life in December 2021).
+  - dropped support for Python 3.6 (end-of-life in December 2021),
+  - the required [Requests](https://requests.readthedocs.io/en/latest/) version bumped to the current latest.
 
 2.5.2
 -----
