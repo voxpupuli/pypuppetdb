@@ -172,7 +172,7 @@ class QueryAPI(BaseAPI):
 
         :param type_: (Optional) The resource type. This can be any resource
             type referenced in\
-            'https://docs.puppetlabs.com/references/latest/type.html'
+            https://puppet.com/docs/puppet/7/type.html
         :type type_: :obj:`string`
         :param title: (Optional) The name of the resource as declared as the
             'namevar' in the Puppet Manifests. This parameter requires the\
