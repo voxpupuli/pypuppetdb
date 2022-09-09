@@ -1,5 +1,4 @@
-Changelog
-=========
+## Changelog
 
 3.0.0
 -----
