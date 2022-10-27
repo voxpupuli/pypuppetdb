@@ -1,8 +1,8 @@
 ## Changelog
 
-unreleased
-----------
-* Confirm support for Python 3.11 (final).
+3.1.0
+-----
+ - Confirm support for Python 3.11 (final).
 
 3.0.0
 -----
