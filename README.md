@@ -15,7 +15,7 @@ PuppetDB.
 ## Requirements
 
 * PuppetDB 5.2 or newer
-* Python 3.7-3.10
+* Python 3.7-3.11
 
 (For support of the older PuppetDB or Python versions please check previous library version.)
 

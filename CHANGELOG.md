@@ -1,5 +1,9 @@
 ## Changelog
 
+unreleased
+----------
+* Confirm support for Python 3.11 (final).
+
 3.0.0
 -----
 This is a maintenance release.
