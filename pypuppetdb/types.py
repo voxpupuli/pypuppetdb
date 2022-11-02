@@ -1,7 +1,7 @@
 import logging
 from datetime import timedelta
 
-from pypuppetdb.QueryBuilder import (EqualsOperator, AndOperator)
+from pypuppetdb.QueryBuilder import EqualsOperator, AndOperator
 from pypuppetdb.utils import json_to_datetime
 
 log = logging.getLogger(__name__)
@@ -52,49 +52,70 @@ class Event:
         event was triggered for.
     """
 
-    def __init__(self, node, status, timestamp, hash_, title, property_,
-                 message, new_value, old_value, type_, class_, execution_path,
-                 source_file, line_number):
+    def __init__(
+        self,
+        node,
+        status,
+        timestamp,
+        hash_,
+        title,
+        property_,
+        message,
+        new_value,
+        old_value,
+        type_,
+        class_,
+        execution_path,
+        source_file,
+        line_number,
+    ):
         self.node = node
         self.status = status
-        if self.status == 'failure':
+        if self.status == "failure":
             self.failed = True
         else:
             self.failed = False
         self.timestamp = json_to_datetime(timestamp)
         self.hash_ = hash_
-        self.item = {'title': title, 'type': type_, 'property': property_,
-                     'message': message, 'old': old_value,
-                     'new': new_value, 'class': class_,
-                     'execution_path': execution_path, 'source_file': source_file,
-                     'line_number': line_number}
-        self.__string = '{}[{}]/{}'.format(self.item['type'],
-                                              self.item['title'],
-                                              self.hash_)
+        self.item = {
+            "title": title,
+            "type": type_,
+            "property": property_,
+            "message": message,
+            "old": old_value,
+            "new": new_value,
+            "class": class_,
+            "execution_path": execution_path,
+            "source_file": source_file,
+            "line_number": line_number,
+        }
+        self.__string = "{}[{}]/{}".format(
+            self.item["type"], self.item["title"], self.hash_
+        )
 
     def __repr__(self):
-        return str(f'Event: {self.__string}')
+        return str(f"Event: {self.__string}")
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
     @staticmethod
     def create_from_dict(event):
         return Event(
-            node=event['certname'],
-            status=event['status'],
-            timestamp=event['timestamp'],
-            hash_=event['report'],
-            title=event['resource_title'],
-            property_=event['property'],
-            message=event['message'],
-            new_value=event['new_value'],
-            old_value=event['old_value'],
-            type_=event['resource_type'],
-            class_=event['containing_class'],
-            execution_path=event['containment_path'],
-            source_file=event['file'],
-            line_number=event['line'],
+            node=event["certname"],
+            status=event["status"],
+            timestamp=event["timestamp"],
+            hash_=event["report"],
+            title=event["resource_title"],
+            property_=event["property"],
+            message=event["message"],
+            new_value=event["new_value"],
+            old_value=event["old_value"],
+            type_=event["resource_type"],
+            class_=event["containing_class"],
+            execution_path=event["containment_path"],
+            source_file=event["file"],
+            line_number=event["line"],
         )
 
 
@@ -180,12 +201,29 @@ class Report:
         Server that sent the report to PuppetDB
     """
 
-    def __init__(self, api, node, hash_, start, end, received, version,
-                 format_, agent_version, transaction, status=None,
-                 metrics={}, logs={}, environment=None,
-                 noop=False, noop_pending=False, code_id=None,
-                 catalog_uuid=None, cached_catalog_status=None,
-                 producer=None):
+    def __init__(
+        self,
+        api,
+        node,
+        hash_,
+        start,
+        end,
+        received,
+        version,
+        format_,
+        agent_version,
+        transaction,
+        status=None,
+        metrics={},
+        logs={},
+        environment=None,
+        noop=False,
+        noop_pending=False,
+        code_id=None,
+        catalog_uuid=None,
+        cached_catalog_status=None,
+        producer=None,
+    ):
         self.node = node
         self.hash_ = hash_
         self.start = json_to_datetime(start)
@@ -197,52 +235,51 @@ class Report:
         self.run_time = self.end - self.start
         self.transaction = transaction
         self.environment = environment
-        self.status = 'noop' if noop and noop_pending else status
+        self.status = "noop" if noop and noop_pending else status
         self.metrics = metrics
         self.logs = logs
         self.code_id = code_id
         self.catalog_uuid = catalog_uuid
         self.cached_catalog_status = cached_catalog_status
         self.producer = producer
-        self.__string = f'{self.hash_}'
+        self.__string = f"{self.hash_}"
 
         self.__api = api
 
     def __repr__(self):
-        return str(f'Report: {self.__string}')
+        return str(f"Report: {self.__string}")
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be
         specified that will be passed to the query function.
         """
-        return self.__api.events(query=EqualsOperator("report", self.hash_),
-                                 **kwargs)
+        return self.__api.events(query=EqualsOperator("report", self.hash_), **kwargs)
 
     @staticmethod
     def create_from_dict(query_api, report):
         return Report(
             api=query_api,
-            node=report['certname'],
-            hash_=report['hash'],
-            start=report['start_time'],
-            end=report['end_time'],
-            received=report['receive_time'],
-            version=report['configuration_version'],
-            format_=report['report_format'],
-            agent_version=report['puppet_version'],
-            transaction=report['transaction_uuid'],
-            environment=report['environment'],
-            status=report['status'],
-            noop=report.get('noop'),
-            noop_pending=report.get('noop_pending'),
-            metrics=report['metrics']['data'],
-            logs=report['logs']['data'],
-            code_id=report.get('code_id'),
-            catalog_uuid=report.get('catalog_uuid'),
-            cached_catalog_status=report.get('cached_catalog_status')
+            node=report["certname"],
+            hash_=report["hash"],
+            start=report["start_time"],
+            end=report["end_time"],
+            received=report["receive_time"],
+            version=report["configuration_version"],
+            format_=report["report_format"],
+            agent_version=report["puppet_version"],
+            transaction=report["transaction_uuid"],
+            environment=report["environment"],
+            status=report["status"],
+            noop=report.get("noop"),
+            noop_pending=report.get("noop_pending"),
+            metrics=report["metrics"]["data"],
+            logs=report["logs"]["data"],
+            code_id=report.get("code_id"),
+            catalog_uuid=report.get("catalog_uuid"),
+            cached_catalog_status=report.get("cached_catalog_status"),
         )
 
 
@@ -270,10 +307,10 @@ class Fact:
     @staticmethod
     def create_from_dict(fact):
         return Fact(
-            node=fact['certname'],
-            name=fact['name'],
-            value=fact['value'],
-            environment=fact['environment']
+            node=fact["certname"],
+            name=fact["name"],
+            value=fact["value"],
+            environment=fact["environment"],
         )
 
     def __init__(self, node, name, value, environment=None):
@@ -281,13 +318,13 @@ class Fact:
         self.name = name
         self.value = value
         self.environment = environment
-        self.__string = f'{self.name}/{self.node}'
+        self.__string = f"{self.name}/{self.node}"
 
     def __repr__(self):
-        return str(f'Fact: {self.__string}')
+        return str(f"Fact: {self.__string}")
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
 
 class Resource:
@@ -328,8 +365,18 @@ class Resource:
         with this resource.
     """
 
-    def __init__(self, node, name, type_, tags, exported, sourcefile,
-                 sourceline, environment=None, parameters={}):
+    def __init__(
+        self,
+        node,
+        name,
+        type_,
+        tags,
+        exported,
+        sourcefile,
+        sourceline,
+        environment=None,
+        parameters={},
+    ):
         self.node = node
         self.name = name
         self.type_ = type_
@@ -340,26 +387,26 @@ class Resource:
         self.parameters = parameters
         self.relationships = []
         self.environment = environment
-        self.__string = f'{self.type_}[{self.name}]'
+        self.__string = f"{self.type_}[{self.name}]"
 
     def __repr__(self):
-        return '<Resource: {}>'.format(self.__string)
+        return "<Resource: {}>".format(self.__string)
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
     @staticmethod
     def create_from_dict(resource):
         return Resource(
-            node=resource['certname'],
-            name=resource['title'],
-            type_=resource['type'],
-            tags=resource['tags'],
-            exported=resource['exported'],
-            sourcefile=resource['file'],
-            sourceline=resource['line'],
-            parameters=resource['parameters'],
-            environment=resource['environment'],
+            node=resource["certname"],
+            name=resource["title"],
+            type_=resource["type"],
+            tags=resource["tags"],
+            exported=resource["exported"],
+            sourcefile=resource["file"],
+            sourceline=resource["line"],
+            parameters=resource["parameters"],
+            environment=resource["environment"],
         )
 
 
@@ -440,15 +487,27 @@ class Node:
             catalog from the last puppet run.
     """
 
-    def __init__(self, api, name, deactivated=None, expired=None,
-                 report_timestamp=None, catalog_timestamp=None,
-                 facts_timestamp=None, status_report=None,
-                 noop=False, noop_pending=False, events=None,
-                 unreported=False, unreported_time=None,
-                 report_environment='production',
-                 catalog_environment='production',
-                 facts_environment='production',
-                 latest_report_hash=None, cached_catalog_status=None):
+    def __init__(
+        self,
+        api,
+        name,
+        deactivated=None,
+        expired=None,
+        report_timestamp=None,
+        catalog_timestamp=None,
+        facts_timestamp=None,
+        status_report=None,
+        noop=False,
+        noop_pending=False,
+        events=None,
+        unreported=False,
+        unreported_time=None,
+        report_environment="production",
+        catalog_environment="production",
+        facts_environment="production",
+        latest_report_hash=None,
+        cached_catalog_status=None,
+    ):
         self.name = name
         self.events = events
         self.unreported_time = unreported_time
@@ -462,9 +521,9 @@ class Node:
         self.cached_catalog_status = cached_catalog_status
 
         if unreported:
-            self.status = 'unreported'
+            self.status = "unreported"
         elif noop and noop_pending:
-            self.status = 'noop'
+            self.status = "noop"
         else:
             self.status = status_report
 
@@ -493,10 +552,10 @@ class Node:
         self.__string = self.name
 
     def __repr__(self):
-        return '<Node: {}>'.format(self.__string)
+        return "<Node: {}>".format(self.__string)
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
     def facts(self, query=None, **kwargs):
         """Get all facts of this node. Additional arguments may also be
@@ -522,19 +581,19 @@ class Node:
         """
         if type_ is None:
             resources = self.__api.resources(
-                query=EqualsOperator("certname", self.name),
-                **kwargs)
+                query=EqualsOperator("certname", self.name), **kwargs
+            )
         elif type_ is not None and title is None:
             resources = self.__api.resources(
-                type_=type_,
-                query=EqualsOperator("certname", self.name),
-                **kwargs)
+                type_=type_, query=EqualsOperator("certname", self.name), **kwargs
+            )
         else:
             resources = self.__api.resources(
                 type_=type_,
                 title=title,
                 query=EqualsOperator("certname", self.name),
-                **kwargs)
+                **kwargs,
+            )
         return resources
 
     def resource(self, type_, title, **kwargs):
@@ -546,99 +605,102 @@ class Node:
             type_=type_,
             title=title,
             query=EqualsOperator("certname", self.name),
-            **kwargs)
+            **kwargs,
+        )
         return next(resource for resource in resources)
 
     def reports(self, **kwargs):
         """Get all reports for this node. Additional arguments may also be
         specified that will be passed to the query function.
         """
-        return self.__api.reports(
-            query=EqualsOperator("certname", self.name),
-            **kwargs)
+        return self.__api.reports(query=EqualsOperator("certname", self.name), **kwargs)
 
     @staticmethod
-    def create_from_dict(query_api, node, with_status, with_event_numbers, latest_events, now,
-                         unreported):
+    def create_from_dict(
+        query_api, node, with_status, with_event_numbers, latest_events, now, unreported
+    ):
 
-        node['status_report'] = None
-        node['events'] = None
+        node["status_report"] = None
+        node["events"] = None
 
         if with_status:
             if with_event_numbers:
-                status = [s for s in latest_events
-                          if s['subject']['title'] == node['certname']]
+                status = [
+                    s
+                    for s in latest_events
+                    if s["subject"]["title"] == node["certname"]
+                ]
 
                 try:
-                    node['status_report'] = node['latest_report_status']
+                    node["status_report"] = node["latest_report_status"]
 
                     if status:
-                        node['events'] = status[0]
+                        node["events"] = status[0]
                 except KeyError:
                     if status:
-                        node['events'] = status = status[0]
-                        if status['successes'] > 0:
-                            node['status_report'] = 'changed'
-                        if status['noops'] > 0:
-                            node['status_report'] = 'noop'
-                        if status['failures'] > 0:
-                            node['status_report'] = 'failed'
+                        node["events"] = status = status[0]
+                        if status["successes"] > 0:
+                            node["status_report"] = "changed"
+                        if status["noops"] > 0:
+                            node["status_report"] = "noop"
+                        if status["failures"] > 0:
+                            node["status_report"] = "failed"
                     else:
-                        node['status_report'] = 'unchanged'
+                        node["status_report"] = "unchanged"
             else:
-                node['status_report'] = node['latest_report_status']
-                node['events'] = {
-                    'successes': 0,
-                    'failures': 0,
-                    'noops': 0,
+                node["status_report"] = node["latest_report_status"]
+                node["events"] = {
+                    "successes": 0,
+                    "failures": 0,
+                    "noops": 0,
                 }
-                if node['status_report'] == 'changed':
-                    node['events']['successes'] = 'some'
-                elif node['status_report'] == 'noop':
-                    node['events']['noops'] = 'some'
-                elif node['status_report'] == 'failed':
-                    node['events']['failures'] = 'some'
+                if node["status_report"] == "changed":
+                    node["events"]["successes"] = "some"
+                elif node["status_report"] == "noop":
+                    node["events"]["noops"] = "some"
+                elif node["status_report"] == "failed":
+                    node["events"]["failures"] = "some"
 
             # node report age
-            if node['report_timestamp'] is not None:
+            if node["report_timestamp"] is not None:
                 try:
-                    last_report = json_to_datetime(
-                        node['report_timestamp'])
+                    last_report = json_to_datetime(node["report_timestamp"])
                     last_report = last_report.replace(tzinfo=None)
                     unreported_border = now - timedelta(hours=unreported)
                     if last_report < unreported_border:
-                        delta = (now - last_report)
-                        node['unreported'] = True
-                        node['unreported_time'] = '{}d {}h {}m'.format(
+                        delta = now - last_report
+                        node["unreported"] = True
+                        node["unreported_time"] = "{}d {}h {}m".format(
                             delta.days,
                             int(delta.seconds / 3600),
-                            int((delta.seconds % 3600) / 60)
+                            int((delta.seconds % 3600) / 60),
                         )
                 except AttributeError:
-                    node['unreported'] = True
+                    node["unreported"] = True
 
-            if not node['report_timestamp']:
-                node['unreported'] = True
+            if not node["report_timestamp"]:
+                node["unreported"] = True
 
-        return Node(query_api,
-                    name=node['certname'],
-                    deactivated=node['deactivated'],
-                    expired=node['expired'],
-                    report_timestamp=node['report_timestamp'],
-                    catalog_timestamp=node['catalog_timestamp'],
-                    facts_timestamp=node['facts_timestamp'],
-                    status_report=node['status_report'],
-                    noop=node.get('latest_report_noop'),
-                    noop_pending=node.get('latest_report_noop_pending'),
-                    events=node['events'],
-                    unreported=node.get('unreported'),
-                    unreported_time=node.get('unreported_time'),
-                    report_environment=node['report_environment'],
-                    catalog_environment=node['catalog_environment'],
-                    facts_environment=node['facts_environment'],
-                    latest_report_hash=node.get('latest_report_hash'),
-                    cached_catalog_status=node.get('cached_catalog_status')
-                    )
+        return Node(
+            query_api,
+            name=node["certname"],
+            deactivated=node["deactivated"],
+            expired=node["expired"],
+            report_timestamp=node["report_timestamp"],
+            catalog_timestamp=node["catalog_timestamp"],
+            facts_timestamp=node["facts_timestamp"],
+            status_report=node["status_report"],
+            noop=node.get("latest_report_noop"),
+            noop_pending=node.get("latest_report_noop_pending"),
+            events=node["events"],
+            unreported=node.get("unreported"),
+            unreported_time=node.get("unreported_time"),
+            report_environment=node["report_environment"],
+            catalog_environment=node["catalog_environment"],
+            facts_environment=node["facts_environment"],
+            latest_report_hash=node.get("latest_report_hash"),
+            cached_catalog_status=node.get("cached_catalog_status"),
+        )
 
 
 class Catalog:
@@ -688,9 +750,18 @@ class Catalog:
         to PuppetDB
     """
 
-    def __init__(self, node, edges, resources, version, transaction_uuid,
-                 environment=None, code_id=None, catalog_uuid=None,
-                 producer=None):
+    def __init__(
+        self,
+        node,
+        edges,
+        resources,
+        version,
+        transaction_uuid,
+        environment=None,
+        code_id=None,
+        catalog_uuid=None,
+        producer=None,
+    ):
 
         self.node = node
         self.version = version
@@ -702,46 +773,51 @@ class Catalog:
 
         self.resources = dict()
         for resource in resources:
-            if 'file' not in resource:
-                resource['file'] = None
-            if 'line' not in resource:
-                resource['line'] = None
-            identifier = resource['type'] + '[' + resource['title'] + ']'
-            res = Resource(node=node, name=resource['title'],
-                           type_=resource['type'], tags=resource['tags'],
-                           exported=resource['exported'],
-                           sourcefile=resource['file'],
-                           sourceline=resource['line'],
-                           parameters=resource['parameters'],
-                           environment=self.environment)
+            if "file" not in resource:
+                resource["file"] = None
+            if "line" not in resource:
+                resource["line"] = None
+            identifier = resource["type"] + "[" + resource["title"] + "]"
+            res = Resource(
+                node=node,
+                name=resource["title"],
+                type_=resource["type"],
+                tags=resource["tags"],
+                exported=resource["exported"],
+                sourcefile=resource["file"],
+                sourceline=resource["line"],
+                parameters=resource["parameters"],
+                environment=self.environment,
+            )
             self.resources[identifier] = res
 
         self.edges = []
         for edge in edges:
-            identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
-            identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
-            e = Edge(source=self.resources[identifier_source],
-                     target=self.resources[identifier_target],
-                     relationship=edge['relationship'],
-                     node=self.node)
+            identifier_source = edge["source_type"] + "[" + edge["source_title"] + "]"
+            identifier_target = edge["target_type"] + "[" + edge["target_title"] + "]"
+            e = Edge(
+                source=self.resources[identifier_source],
+                target=self.resources[identifier_target],
+                relationship=edge["relationship"],
+                node=self.node,
+            )
             self.edges.append(e)
             self.resources[identifier_source].relationships.append(e)
             self.resources[identifier_target].relationships.append(e)
 
-        self.__string = f'{self.node}/{self.transaction_uuid}'
+        self.__string = f"{self.node}/{self.transaction_uuid}"
 
     def __repr__(self):
-        return '<Catalog: {}>'.format(self.__string)
+        return "<Catalog: {}>".format(self.__string)
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
     def get_resources(self):
         return self.resources.values()
 
     def get_resource(self, resource_type, resource_title):
-        identifier = resource_type + \
-                     '[' + resource_title + ']'
+        identifier = resource_type + "[" + resource_title + "]"
         return self.resources[identifier]
 
     def get_edges(self):
@@ -749,14 +825,16 @@ class Catalog:
 
     @staticmethod
     def create_from_dict(catalog):
-        return Catalog(node=catalog['certname'],
-                       edges=catalog['edges']['data'],
-                       resources=catalog['resources']['data'],
-                       version=catalog['version'],
-                       transaction_uuid=catalog['transaction_uuid'],
-                       environment=catalog['environment'],
-                       code_id=catalog.get('code_id'),
-                       catalog_uuid=catalog.get('catalog_uuid'))
+        return Catalog(
+            node=catalog["certname"],
+            edges=catalog["edges"]["data"],
+            resources=catalog["resources"]["data"],
+            version=catalog["version"],
+            transaction_uuid=catalog["transaction_uuid"],
+            environment=catalog["environment"],
+            code_id=catalog.get("code_id"),
+            catalog_uuid=catalog.get("catalog_uuid"),
+        )
 
 
 class Edge:
@@ -784,24 +862,26 @@ class Edge:
         self.target = target
         self.relationship = relationship
         self.node = node
-        self.__string = '{} - {} - {}'.format(self.source,
-                                                 self.relationship,
-                                                 self.target)
+        self.__string = "{} - {} - {}".format(
+            self.source, self.relationship, self.target
+        )
 
     def __repr__(self):
-        return '<Edge: {}>'.format(self.__string)
+        return "<Edge: {}>".format(self.__string)
 
     def __str__(self):
-        return '{}'.format(self.__string)
+        return "{}".format(self.__string)
 
     @staticmethod
     def create_from_dict(edge):
-        identifier_source = edge['source_type'] + '[' + edge['source_title'] + ']'
-        identifier_target = edge['target_type'] + '[' + edge['target_title'] + ']'
-        return Edge(source=identifier_source,
-                    target=identifier_target,
-                    relationship=edge['relationship'],
-                    node=edge['certname'])
+        identifier_source = edge["source_type"] + "[" + edge["source_title"] + "]"
+        identifier_target = edge["target_type"] + "[" + edge["target_title"] + "]"
+        return Edge(
+            source=identifier_source,
+            target=identifier_target,
+            relationship=edge["relationship"],
+            node=edge["certname"],
+        )
 
 
 class Inventory:
@@ -841,7 +921,7 @@ class Inventory:
         self.__string = self.node
 
     def __repr__(self):
-        return '<Inventory: {}>'.format(self.__string)
+        return "<Inventory: {}>".format(self.__string)
 
     def __str__(self):
         return "{}".format(self.__string)
@@ -849,9 +929,9 @@ class Inventory:
     @staticmethod
     def create_from_dict(inv):
         return Inventory(
-            node=inv['certname'],
-            time=inv['timestamp'],
-            environment=inv['environment'],
-            facts=inv['facts'],
-            trusted=inv['trusted']
+            node=inv["certname"],
+            time=inv["timestamp"],
+            environment=inv["environment"],
+            facts=inv["facts"],
+            trusted=inv["trusted"],
         )

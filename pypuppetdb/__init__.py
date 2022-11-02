@@ -60,9 +60,19 @@ from pypuppetdb.api import API
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
-def connect(host='localhost', port=8080, ssl_verify=False, ssl_key=None,
-            ssl_cert=None, timeout=10, protocol=None, url_path='/',
-            username=None, password=None, token=None):
+def connect(
+    host="localhost",
+    port=8080,
+    ssl_verify=False,
+    ssl_key=None,
+    ssl_cert=None,
+    timeout=10,
+    protocol=None,
+    url_path="/",
+    username=None,
+    password=None,
+    token=None,
+):
     """Connect with PuppetDB. This will return an object allowing you
     to query the API through its methods.
 
@@ -106,7 +116,16 @@ def connect(host='localhost', port=8080, ssl_verify=False, ssl_key=None,
     :param token: (optional) The x-auth token to use for X-Authentication
     :type token: :obj:`None` or :obj:`string`
     """
-    return API(host=host, port=port,
-               timeout=timeout, ssl_verify=ssl_verify, ssl_key=ssl_key,
-               ssl_cert=ssl_cert, protocol=protocol, url_path=url_path,
-               username=username, password=password, token=token)
+    return API(
+        host=host,
+        port=port,
+        timeout=timeout,
+        ssl_verify=ssl_verify,
+        ssl_key=ssl_key,
+        ssl_cert=ssl_cert,
+        protocol=protocol,
+        url_path=url_path,
+        username=username,
+        password=password,
+        token=token,
+    )

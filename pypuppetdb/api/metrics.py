@@ -1,7 +1,7 @@
 import logging
 
 from pypuppetdb.api.base import BaseAPI
-from pypuppetdb.errors import (DoesNotComputeError)
+from pypuppetdb.errors import DoesNotComputeError
 
 log = logging.getLogger(__name__)
 
@@ -24,20 +24,23 @@ class MetricsAPI(BaseAPI):
         :returns: The return of :meth:`~pypuppetdb.api.BaseAPI._query`.
         """
         version = version if version else self.metric_api_version
-        if version is None or version == 'v2':
+        if version is None or version == "v2":
             if metric is None:
-                res = self._query('metrics-list')
+                res = self._query("metrics-list")
             else:
-                res = self._query('metrics', path=self._escape_metric_name(metric))
+                res = self._query("metrics", path=self._escape_metric_name(metric))
 
-            if 'error' in res:
-                raise DoesNotComputeError(res['error'])
-            return res['value']
-        elif version == 'v1':
-            return self._query('mbean', path=metric)
+            if "error" in res:
+                raise DoesNotComputeError(res["error"])
+            return res["value"]
+        elif version == "v1":
+            return self._query("mbean", path=metric)
         else:
-            raise ValueError("Version specified must be 'v1' or 'v2', was given: '{}'"
-                             .format(version))
+            raise ValueError(
+                "Version specified must be 'v1' or 'v2', was given: '{}'".format(
+                    version
+                )
+            )
 
     @staticmethod
     def _escape_metric_name(metric):
@@ -51,7 +54,7 @@ class MetricsAPI(BaseAPI):
 
         :returns: The escaped version of the metric name, safe for use in metric GET queries.
         """
-        metric = metric.replace('!', r'!!')
-        metric = metric.replace('/', r'!/')
+        metric = metric.replace("!", r"!!")
+        metric = metric.replace("/", r"!/")
         metric = metric.replace('"', r'!"')
         return metric

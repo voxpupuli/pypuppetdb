@@ -10,19 +10,19 @@ class UTC(datetime.tzinfo):
         return datetime.timedelta(0)
 
     def tzname(self, dt):
-        return 'UTC'
+        return "UTC"
 
     def dst(self, dt):
         return datetime.timedelta(0)
 
     def __repr__(self):
-        return '<UTC>'
+        return "<UTC>"
 
     def __str__(self):
-        return 'UTC'
+        return "UTC"
 
     def __unicode__(self):
-        return 'UTC'
+        return "UTC"
 
 
 def json_to_datetime(date):
@@ -35,5 +35,6 @@ def json_to_datetime(date):
     :returns: A timezone aware datetime object.
     :rtype: :class:`datetime.datetime`
     """
-    return datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(
-        tzinfo=UTC())
+    return datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+        tzinfo=UTC()
+    )

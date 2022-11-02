@@ -4,62 +4,62 @@ from urllib.parse import quote
 
 import requests
 
-from pypuppetdb.errors import (APIError, EmptyResponseError)
+from pypuppetdb.errors import APIError, EmptyResponseError
 
 log = logging.getLogger(__name__)
 
 ENDPOINTS = {
-    'facts': 'pdb/query/v4/facts',
-    'fact-names': 'pdb/query/v4/fact-names',
-    'nodes': 'pdb/query/v4/nodes',
-    'resources': 'pdb/query/v4/resources',
-    'catalogs': 'pdb/query/v4/catalogs',
-    'mbean': 'metrics/v1/mbeans',
+    "facts": "pdb/query/v4/facts",
+    "fact-names": "pdb/query/v4/fact-names",
+    "nodes": "pdb/query/v4/nodes",
+    "resources": "pdb/query/v4/resources",
+    "catalogs": "pdb/query/v4/catalogs",
+    "mbean": "metrics/v1/mbeans",
     # metrics v2 endpoint is now the jolokia library and all of its operations
     # https://jolokia.org/reference/html/protocol.html#jolokia-operations
-    'metrics': 'metrics/v2/read',
-    'metrics-base': 'metrics/v2',
-    'metrics-exec': 'metrics/v2/exec',
-    'metrics-list': 'metrics/v2/list',
-    'metrics-search': 'metrics/v2/search',
-    'metrics-write': 'metrics/v2/write',
-    'metrics-version': 'metrics/v2/version',
-    'reports': 'pdb/query/v4/reports',
-    'events': 'pdb/query/v4/events',
-    'event-counts': 'pdb/query/v4/event-counts',
-    'aggregate-event-counts': 'pdb/query/v4/aggregate-event-counts',
-    'server-time': 'pdb/meta/v1/server-time',
-    'version': 'pdb/meta/v1/version',
-    'environments': 'pdb/query/v4/environments',
-    'factsets': 'pdb/query/v4/factsets',
-    'fact-paths': 'pdb/query/v4/fact-paths',
-    'fact-contents': 'pdb/query/v4/fact-contents',
-    'edges': 'pdb/query/v4/edges',
-    'pql': 'pdb/query/v4',
-    'inventory': 'pdb/query/v4/inventory',
-    'status': 'status/v1/services/puppetdb-status',
-    'cmd': 'pdb/cmd/v1'
+    "metrics": "metrics/v2/read",
+    "metrics-base": "metrics/v2",
+    "metrics-exec": "metrics/v2/exec",
+    "metrics-list": "metrics/v2/list",
+    "metrics-search": "metrics/v2/search",
+    "metrics-write": "metrics/v2/write",
+    "metrics-version": "metrics/v2/version",
+    "reports": "pdb/query/v4/reports",
+    "events": "pdb/query/v4/events",
+    "event-counts": "pdb/query/v4/event-counts",
+    "aggregate-event-counts": "pdb/query/v4/aggregate-event-counts",
+    "server-time": "pdb/meta/v1/server-time",
+    "version": "pdb/meta/v1/version",
+    "environments": "pdb/query/v4/environments",
+    "factsets": "pdb/query/v4/factsets",
+    "fact-paths": "pdb/query/v4/fact-paths",
+    "fact-contents": "pdb/query/v4/fact-contents",
+    "edges": "pdb/query/v4/edges",
+    "pql": "pdb/query/v4",
+    "inventory": "pdb/query/v4/inventory",
+    "status": "status/v1/services/puppetdb-status",
+    "cmd": "pdb/cmd/v1",
 }
 
 PARAMETERS = {
-    'order_by': 'order_by',
-    'include_total': 'include_total',
-    'count_by': 'count_by',
-    'counts_filter': 'counts_filter',
-    'summarize_by': 'summarize_by',
-    'server_time': 'server_time',
+    "order_by": "order_by",
+    "include_total": "include_total",
+    "count_by": "count_by",
+    "counts_filter": "counts_filter",
+    "summarize_by": "summarize_by",
+    "server_time": "server_time",
 }
 
 COMMAND_VERSION = {
     "deactivate node": 3,
     "replace catalog": 9,
     "replace facts": 5,
-    "store report": 8
+    "store report": 8,
 }
 
 ERROR_STRINGS = {
-    'timeout': 'Connection to PuppetDB timed out on',
-    'refused': 'Could not reach PuppetDB on',
+    "timeout": "Connection to PuppetDB timed out on",
+    "refused": "Could not reach PuppetDB on",
 }
 
 
@@ -122,19 +122,32 @@ class BaseAPI:
     :raises: :class:`~pypuppetdb.errors.ImproperlyConfiguredError`
     """
 
-    def __init__(self, host='localhost', port=8080, ssl_verify=True,
-                 ssl_key=None, ssl_cert=None, timeout=10, protocol=None,
-                 url_path=None, username=None, password=None, token=None,
-                 metric_api_version=None):
+    def __init__(
+        self,
+        host="localhost",
+        port=8080,
+        ssl_verify=True,
+        ssl_key=None,
+        ssl_cert=None,
+        timeout=10,
+        protocol=None,
+        url_path=None,
+        username=None,
+        password=None,
+        token=None,
+        metric_api_version=None,
+    ):
         """Initialises our BaseAPI object passing the parameters needed in
         order to be able to create the connection strings, set up SSL and
         timeouts and so forth."""
 
-        self.api_version = 'v4'
-        if metric_api_version is not None and metric_api_version not in ['v1', 'v2']:
-            raise ValueError("metric_api_version specified must be None, 'v1' or 'v2',"
-                             " was given: '{}'".format(metric_api_version))
-        self.metric_api_version = metric_api_version if metric_api_version else 'v2'
+        self.api_version = "v4"
+        if metric_api_version is not None and metric_api_version not in ["v1", "v2"]:
+            raise ValueError(
+                "metric_api_version specified must be None, 'v1' or 'v2',"
+                " was given: '{}'".format(metric_api_version)
+            )
+        self.metric_api_version = metric_api_version if metric_api_version else "v2"
         self.host = host
         self.port = port
         self.ssl_verify = ssl_verify
@@ -145,12 +158,12 @@ class BaseAPI:
 
         # Standardise the URL path to a format similar to /puppetdb
         if url_path:
-            if not url_path.startswith('/'):
-                url_path = '/' + url_path
-            if url_path.endswith('/'):
+            if not url_path.startswith("/"):
+                url_path = "/" + url_path
+            if url_path.endswith("/"):
                 url_path = url_path[:-1]
         else:
-            url_path = ''
+            url_path = ""
 
         self.url_path = url_path
 
@@ -160,25 +173,25 @@ class BaseAPI:
             self.session.auth = (username, password)
 
         self.session.headers = {
-            'content-type': 'application/json',
-            'accept': 'application/json',
-            'accept-charset': 'utf-8'
+            "content-type": "application/json",
+            "accept": "application/json",
+            "accept-charset": "utf-8",
         }
 
         if self.token:
-            self.session.headers['X-Authentication'] = self.token
+            self.session.headers["X-Authentication"] = self.token
 
         if protocol is not None:
             protocol = protocol.lower()
-            if protocol not in ['http', 'https']:
-                raise ValueError('Protocol specified must be http or https')
+            if protocol not in ["http", "https"]:
+                raise ValueError("Protocol specified must be http or https")
             self.protocol = protocol
         elif self.ssl_key is not None and self.ssl_cert is not None:
-            self.protocol = 'https'
+            self.protocol = "https"
         elif self.token is not None:
-            self.protocol = 'https'
+            self.protocol = "https"
         else:
-            self.protocol = 'http'
+            self.protocol = "http"
 
     def disconnect(self):
         """Close all connections that this class opened up."""
@@ -213,7 +226,7 @@ class BaseAPI:
         :returns: A URL of the form: ``proto://host:port``.
         :rtype: :obj:`string`
         """
-        return '{proto}://{host}:{port}{url_path}'.format(
+        return "{proto}://{host}:{port}{url_path}".format(
             proto=self.protocol,
             host=self.host,
             port=self.port,
@@ -240,7 +253,7 @@ class BaseAPI:
         user -> User
 
         """
-        return '::'.join([s.capitalize() for s in type_.split('::')])
+        return "::".join([s.capitalize() for s in type_.split("::")])
 
     def _url(self, endpoint, path=None):
         """The complete URL we will end up querying. Depending on the
@@ -259,8 +272,7 @@ class BaseAPI:
         :rtype: :obj:`string`
         """
 
-        log.debug('_url called with endpoint: {} and path: {}'.format(
-            endpoint, path))
+        log.debug("_url called with endpoint: {} and path: {}".format(endpoint, path))
 
         try:
             endpoint = ENDPOINTS[endpoint]
@@ -269,20 +281,31 @@ class BaseAPI:
             # exist. This shouldn't happen unless someone made a booboo.
             raise APIError
 
-        url = '{base_url}/{endpoint}'.format(
+        url = "{base_url}/{endpoint}".format(
             base_url=self.base_url,
             endpoint=endpoint,
         )
 
         if path is not None:
-            url = f'{url}/{quote(path)}'
+            url = f"{url}/{quote(path)}"
 
         return url
 
-    def _query(self, endpoint=None, path=None, query=None,
-               order_by=None, limit=None, offset=None, include_total=False,
-               summarize_by=None, count_by=None, count_filter=None,
-               payload=None, request_method='GET'):
+    def _query(
+        self,
+        endpoint=None,
+        path=None,
+        query=None,
+        order_by=None,
+        limit=None,
+        offset=None,
+        include_total=False,
+        summarize_by=None,
+        count_by=None,
+        count_filter=None,
+        payload=None,
+        request_method="GET",
+    ):
         """This method prepares a non-PQL query to PuppetDB. Actual making
         the HTTP request is done by _make_request().
 
@@ -325,11 +348,18 @@ class BaseAPI:
         # inside the list comprehension the locals()'s value changes
         # so we need to make a copy of the function's local() to use it there
         function_locals = locals().copy()
-        log.debug("_query called with: " +
-                  # comma-separated list of method arguments with their values
-                  ", ".join([f"{arg}={function_locals.get(arg, 'None')}"
-                             for arg in function_locals.keys() if arg != 'self'])
-                  )
+        log.debug(
+            "_query called with: "
+            +
+            # comma-separated list of method arguments with their values
+            ", ".join(
+                [
+                    f"{arg}={function_locals.get(arg, 'None')}"
+                    for arg in function_locals.keys()
+                    if arg != "self"
+                ]
+            )
+        )
 
         if not endpoint:
             log.error("Endpoint is required!")
@@ -340,22 +370,21 @@ class BaseAPI:
 
         url = self._url(endpoint, path=path)
         if query is not None:
-            payload['query'] = query
+            payload["query"] = query
         if order_by is not None:
-            payload[PARAMETERS['order_by']] = order_by
+            payload[PARAMETERS["order_by"]] = order_by
         if limit is not None:
-            payload['limit'] = limit
+            payload["limit"] = limit
         if include_total is True:
-            payload[PARAMETERS['include_total']] = \
-                json.dumps(include_total)
+            payload[PARAMETERS["include_total"]] = json.dumps(include_total)
         if offset is not None:
-            payload['offset'] = offset
+            payload["offset"] = offset
         if summarize_by is not None:
-            payload[PARAMETERS['summarize_by']] = summarize_by
+            payload[PARAMETERS["summarize_by"]] = summarize_by
         if count_by is not None:
-            payload[PARAMETERS['count_by']] = count_by
+            payload[PARAMETERS["count_by"]] = count_by
         if count_filter is not None:
-            payload[PARAMETERS['counts_filter']] = count_filter
+            payload[PARAMETERS["counts_filter"]] = count_filter
 
         return self._make_request(url, request_method, payload)
 
@@ -372,31 +401,34 @@ class BaseAPI:
                  or raises an EmptyResponseError exception if it's empty
         """
 
-        if request_method.upper() not in ['GET', 'POST']:
+        if request_method.upper() not in ["GET", "POST"]:
             log.error(f"Only GET or POST supported, {request_method} unsupported")
             raise APIError
 
         try:
-            if request_method.upper() == 'GET':
-                r = self.session.get(url, params=payload,
-                                     verify=self.ssl_verify,
-                                     cert=(self.ssl_cert, self.ssl_key),
-                                     timeout=self.timeout,
-                                     )
+            if request_method.upper() == "GET":
+                r = self.session.get(
+                    url,
+                    params=payload,
+                    verify=self.ssl_verify,
+                    cert=(self.ssl_cert, self.ssl_key),
+                    timeout=self.timeout,
+                )
             else:
-                r = self.session.post(url,
-                                      data=json.dumps(payload, default=str),
-                                      verify=self.ssl_verify,
-                                      cert=(self.ssl_cert, self.ssl_key),
-                                      timeout=self.timeout,
-                                      )
+                r = self.session.post(
+                    url,
+                    data=json.dumps(payload, default=str),
+                    verify=self.ssl_verify,
+                    cert=(self.ssl_cert, self.ssl_key),
+                    timeout=self.timeout,
+                )
 
             r.raise_for_status()
 
             # get total number of results if requested with include-total
             # just a quick hack - needs improvement
-            if 'X-Records' in r.headers:
-                self.last_total = r.headers['X-Records']
+            if "X-Records" in r.headers:
+                self.last_total = r.headers["X-Records"]
             else:
                 self.last_total = None
 
@@ -408,19 +440,31 @@ class BaseAPI:
                 raise EmptyResponseError
 
         except requests.exceptions.Timeout:
-            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['timeout'],
-                                                     self.host, self.port,
-                                                     self.protocol.upper()))
+            log.error(
+                "{} {}:{} over {}.".format(
+                    ERROR_STRINGS["timeout"],
+                    self.host,
+                    self.port,
+                    self.protocol.upper(),
+                )
+            )
             raise
 
         except requests.exceptions.ConnectionError:
-            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['refused'],
-                                                     self.host, self.port,
-                                                     self.protocol.upper()))
+            log.error(
+                "{} {}:{} over {}.".format(
+                    ERROR_STRINGS["refused"],
+                    self.host,
+                    self.port,
+                    self.protocol.upper(),
+                )
+            )
             raise
 
         except requests.exceptions.HTTPError as err:
-            log.error("{} {}:{} over {}.".format(err.response.text,
-                                                     self.host, self.port,
-                                                     self.protocol.upper()))
+            log.error(
+                "{} {}:{} over {}.".format(
+                    err.response.text, self.host, self.port, self.protocol.upper()
+                )
+            )
             raise

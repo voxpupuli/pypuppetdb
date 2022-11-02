@@ -10,7 +10,7 @@ def api():
 
 @pytest.fixture
 def token_api():
-    return pypuppetdb.api.API(token='tokenstring')
+    return pypuppetdb.api.API(token="tokenstring")
 
 
 @pytest.fixture
