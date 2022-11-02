@@ -3,10 +3,10 @@ import re
 from datetime import datetime
 
 import pypuppetdb
-from pypuppetdb.QueryBuilder import (EqualsOperator)
+from pypuppetdb.QueryBuilder import EqualsOperator
 from pypuppetdb.api.base import BaseAPI
-from pypuppetdb.errors import (APIError)
-from pypuppetdb.types import (Node, Report)
+from pypuppetdb.errors import APIError
+from pypuppetdb.types import Node, Report
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class PqlAPI(BaseAPI):
     PuppetDB API endpoint.
     """
 
-    def _pql(self, pql, request_method='GET'):
+    def _pql(self, pql, request_method="GET"):
         """This method prepares a PQL query to PuppetDB. Actual making
         the HTTP request is done by _make_request().
 
@@ -41,8 +41,8 @@ class PqlAPI(BaseAPI):
         payload = {}
 
         # PQL queries are made to the same endpoint regardless of the queried entities
-        url = self._url('pql')
-        payload['query'] = pql
+        url = self._url("pql")
+        payload["query"] = pql
 
         return self._make_request(url, request_method, payload)
 
@@ -75,9 +75,13 @@ class PqlAPI(BaseAPI):
 
         type_class = self._get_type_from_query(pql)
 
-        if type_class == Node and (with_status or unreported != 2 or not with_event_numbers):
-            log.error("with_status, unreported and with_event_numbers are used only"
-                      " for queries for nodes!")
+        if type_class == Node and (
+            with_status or unreported != 2 or not with_event_numbers
+        ):
+            log.error(
+                "with_status, unreported and with_event_numbers are used only"
+                " for queries for nodes!"
+            )
             raise APIError
 
         for element in self._pql(pql=pql):
@@ -90,13 +94,20 @@ class PqlAPI(BaseAPI):
                 latest_events = None
                 if with_status and with_event_numbers:
                     latest_events = self._query(
-                        'event-counts',
+                        "event-counts",
                         query=EqualsOperator("latest_report?", True),
-                        summarize_by='certname',
+                        summarize_by="certname",
                     )
 
-                yield Node.create_from_dict(self, element, with_status, with_event_numbers,
-                                            latest_events, now, unreported)
+                yield Node.create_from_dict(
+                    self,
+                    element,
+                    with_status,
+                    with_event_numbers,
+                    latest_events,
+                    now,
+                    unreported,
+                )
 
             elif type_class == Report:
                 yield Report.create_from_dict(self, element)
@@ -124,7 +135,7 @@ class PqlAPI(BaseAPI):
 
         # in PQL the beginning of the query is the type of returned entities
         # but only if the projection is empty ([]) or there is no projection
-        pattern = re.compile(r'([a-z]*?)\s*(\[])?\s*{')
+        pattern = re.compile(r"([a-z]*?)\s*(\[])?\s*{")
         match = pattern.match(pql)
 
         if match:
@@ -144,8 +155,10 @@ class PqlAPI(BaseAPI):
                 type_class = getattr(pypuppetdb.types, type_name_singular)
                 return type_class
             except AttributeError:
-                log.debug(f"PQL returns entities of a type {type_name_singular},"
-                          f" but it is not supported by this library yet.")
+                log.debug(
+                    f"PQL returns entities of a type {type_name_singular},"
+                    f" but it is not supported by this library yet."
+                )
                 return None
         else:
             log.debug("No match!")

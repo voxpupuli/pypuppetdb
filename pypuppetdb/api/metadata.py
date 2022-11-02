@@ -15,7 +15,7 @@ class MetadataAPI(BaseAPI):
         :returns: An ISO-8091 formatting timestamp.
         :rtype: :obj:`string`
         """
-        return self._query('server-time')[self.parameters['server_time']]
+        return self._query("server-time")[self.parameters["server_time"]]
 
     def current_version(self):
         """Get version information about the running PuppetDB server.
@@ -23,4 +23,4 @@ class MetadataAPI(BaseAPI):
         :returns: A string representation of the PuppetDB version.
         :rtype: :obj:`string`
         """
-        return self._query('version')['version']
+        return self._query("version")["version"]

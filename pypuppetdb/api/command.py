@@ -5,7 +5,7 @@ import logging
 import requests
 
 from pypuppetdb.api.base import BaseAPI, COMMAND_VERSION, ERROR_STRINGS
-from pypuppetdb.errors import (APIError, EmptyResponseError)
+from pypuppetdb.errors import APIError, EmptyResponseError
 
 log = logging.getLogger(__name__)
 
@@ -35,32 +35,34 @@ class CommandAPI(BaseAPI):
         :returns: The decoded response from PuppetDB
         :rtype: :obj:`dict` or :obj:`list`
         """
-        log.debug('_cmd called with command: {}, data: {}'.format(
-            command, payload))
+        log.debug("_cmd called with command: {}, data: {}".format(command, payload))
 
-        url = self._url('cmd')
+        url = self._url("cmd")
 
         if command not in COMMAND_VERSION:
-            log.error("Only {} supported, {} unsupported".format(
-                list(COMMAND_VERSION.keys()), command))
+            log.error(
+                "Only {} supported, {} unsupported".format(
+                    list(COMMAND_VERSION.keys()), command
+                )
+            )
             raise APIError
 
         params = {
             "command": command,
             "version": COMMAND_VERSION[command],
-            "certname": payload['certname'],
-            "checksum": hashlib.sha1(str(payload)  # nosec
-                                     .encode('utf-8')).hexdigest()
+            "certname": payload["certname"],
+            "checksum": hashlib.sha1(str(payload).encode("utf-8")).hexdigest(),  # nosec
         }
 
         try:
-            r = self.session.post(url,
-                                  params=params,
-                                  data=json.dumps(payload, default=str),
-                                  verify=self.ssl_verify,
-                                  cert=(self.ssl_cert, self.ssl_key),
-                                  timeout=self.timeout,
-                                  )
+            r = self.session.post(
+                url,
+                params=params,
+                data=json.dumps(payload, default=str),
+                verify=self.ssl_verify,
+                cert=(self.ssl_cert, self.ssl_key),
+                timeout=self.timeout,
+            )
 
             r.raise_for_status()
 
@@ -72,17 +74,29 @@ class CommandAPI(BaseAPI):
                 raise EmptyResponseError
 
         except requests.exceptions.Timeout:
-            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['timeout'],
-                                                     self.host, self.port,
-                                                     self.protocol.upper()))
+            log.error(
+                "{} {}:{} over {}.".format(
+                    ERROR_STRINGS["timeout"],
+                    self.host,
+                    self.port,
+                    self.protocol.upper(),
+                )
+            )
             raise
         except requests.exceptions.ConnectionError:
-            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['refused'],
-                                                     self.host, self.port,
-                                                     self.protocol.upper()))
+            log.error(
+                "{} {}:{} over {}.".format(
+                    ERROR_STRINGS["refused"],
+                    self.host,
+                    self.port,
+                    self.protocol.upper(),
+                )
+            )
             raise
         except requests.exceptions.HTTPError as err:
-            log.error("{} {}:{} over {}.".format(err.response.text,
-                                                     self.host, self.port,
-                                                     self.protocol.upper()))
+            log.error(
+                "{} {}:{} over {}.".format(
+                    err.response.text, self.host, self.port, self.protocol.upper()
+                )
+            )
             raise

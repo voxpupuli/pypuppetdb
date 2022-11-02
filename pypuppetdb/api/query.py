@@ -1,10 +1,18 @@
 import logging
 from datetime import datetime
 
-from pypuppetdb.QueryBuilder import (EqualsOperator)
+from pypuppetdb.QueryBuilder import EqualsOperator
 from pypuppetdb.api.base import BaseAPI
-from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory,
-                              Node, Report, Resource)
+from pypuppetdb.types import (
+    Catalog,
+    Edge,
+    Event,
+    Fact,
+    Inventory,
+    Node,
+    Report,
+    Resource,
+)
 
 log = logging.getLogger(__name__)
 
@@ -14,8 +22,7 @@ class QueryAPI(BaseAPI):
     PuppetDB API endpoints.
     """
 
-    def nodes(self, unreported=2, with_status=False, with_event_numbers=True,
-              **kwargs):
+    def nodes(self, unreported=2, with_status=False, with_event_numbers=True, **kwargs):
         r"""Query for nodes by either name or query. If both aren't
         provided this will return a list of all nodes. This method
         also (optionally) fetches the nodes status and (optionally)
@@ -41,26 +48,35 @@ class QueryAPI(BaseAPI):
         :returns: A generator yieling Nodes.
         :rtype: :class:`pypuppetdb.types.Node`
         """
-        nodes = self._query('nodes', **kwargs)
+        nodes = self._query("nodes", **kwargs)
         now = datetime.utcnow()
 
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
         if type(nodes) == dict:
-            nodes = [nodes, ]
+            nodes = [
+                nodes,
+            ]
 
         latest_events = None
         if with_status and with_event_numbers:
             latest_events = self._query(
-                'event-counts',
+                "event-counts",
                 query=EqualsOperator("latest_report?", True),
-                summarize_by='certname',
+                summarize_by="certname",
             )
 
         for node in nodes:
-            yield Node.create_from_dict(self, node, with_status, with_event_numbers, latest_events,
-                                        now, unreported)
+            yield Node.create_from_dict(
+                self,
+                node,
+                with_status,
+                with_event_numbers,
+                latest_events,
+                now,
+                unreported,
+            )
 
     def node(self, name):
         """Gets a single node from PuppetDB.
@@ -83,7 +99,7 @@ class QueryAPI(BaseAPI):
         :returns: A generating yielding Edges.
         :rtype: :class:`pypuppetdb.types.Edge`
         """
-        edges = self._query('edges', **kwargs)
+        edges = self._query("edges", **kwargs)
 
         for edge in edges:
             yield Edge.create_from_dict(edge)
@@ -97,7 +113,7 @@ class QueryAPI(BaseAPI):
         :returns: A list of dictionaries containing the results.
         :rtype: :obj:`list` of :obj:`dict`
         """
-        return self._query('environments', **kwargs)
+        return self._query("environments", **kwargs)
 
     def facts(self, name=None, value=None, **kwargs):
         r"""Query for facts limited by either name, value and/or query.
@@ -115,13 +131,13 @@ class QueryAPI(BaseAPI):
         :rtype: :class:`pypuppetdb.types.Fact`
         """
         if name is not None and value is not None:
-            path = f'{name}/{value}'
+            path = f"{name}/{value}"
         elif name is not None and value is None:
             path = name
         else:
             path = None
 
-        facts = self._query('facts', path=path, **kwargs)
+        facts = self._query("facts", path=path, **kwargs)
         for fact in facts:
             yield Fact.create_from_dict(fact)
 
@@ -134,7 +150,7 @@ class QueryAPI(BaseAPI):
         :returns: A list of dictionaries containg the results.
         :rtype: :obj:`list` of :obj:`dict`
         """
-        return self._query('factsets', **kwargs)
+        return self._query("factsets", **kwargs)
 
     def fact_contents(self, **kwargs):
         r"""To complement fact_paths(), this endpoint provides the capability
@@ -147,7 +163,7 @@ class QueryAPI(BaseAPI):
         :returns: A list of dictionaries containg the results.
         :rtype: :obj:`list` of :obj:`dict`
         """
-        return self._query('fact-contents', **kwargs)
+        return self._query("fact-contents", **kwargs)
 
     def fact_paths(self, **kwargs):
         r"""Fact Paths are intended to be a counter-part of the fact-names
@@ -161,7 +177,7 @@ class QueryAPI(BaseAPI):
         :returns: A list of dictionaries containg the results.
         :rtype: :obj:`list` of :obj:`dict`
         """
-        return self._query('fact-paths', **kwargs)
+        return self._query("fact-paths", **kwargs)
 
     def resources(self, type_=None, title=None, **kwargs):
         r"""Query for resources limited by either type and/or title or query.
@@ -188,11 +204,11 @@ class QueryAPI(BaseAPI):
             type_ = self._normalize_resource_type(type_)
 
             if title is not None:
-                path = f'{type_}/{title}'
+                path = f"{type_}/{title}"
             elif title is None:
                 path = type_
 
-        resources = self._query('resources', path=path, **kwargs)
+        resources = self._query("resources", path=path, **kwargs)
         for resource in resources:
             yield Resource.create_from_dict(resource)
 
@@ -221,10 +237,12 @@ class QueryAPI(BaseAPI):
         :rtype: :class:`pypuppetdb.types.Catalog`
         """
 
-        catalogs = self._query('catalogs', **kwargs)
+        catalogs = self._query("catalogs", **kwargs)
 
         if type(catalogs) == dict:
-            catalogs = [catalogs, ]
+            catalogs = [
+                catalogs,
+            ]
 
         for catalog in catalogs:
             yield Catalog.create_from_dict(catalog)
@@ -242,7 +260,7 @@ class QueryAPI(BaseAPI):
         :returns: A generator yielding Events
         :rtype: :class:`pypuppetdb.types.Event`
         """
-        events = self._query('events', **kwargs)
+        events = self._query("events", **kwargs)
         for event in events:
             yield Event.create_from_dict(event)
 
@@ -270,12 +288,11 @@ class QueryAPI(BaseAPI):
         :returns: A list of dictionaries containing the results.
         :rtype: :obj:`list`
         """
-        return self._query('event-counts',
-                           summarize_by=summarize_by,
-                           **kwargs)
+        return self._query("event-counts", summarize_by=summarize_by, **kwargs)
 
-    def aggregate_event_counts(self, summarize_by, query=None,
-                               count_by=None, count_filter=None):
+    def aggregate_event_counts(
+        self, summarize_by, query=None, count_by=None, count_filter=None
+    ):
         """Get event counts from puppetdb aggregated into a single map.
 
         :param summarize_by: (Required) The object type to be counted on.
@@ -301,13 +318,17 @@ class QueryAPI(BaseAPI):
         :returns: A dictionary of name/value results.
         :rtype: :obj:`dict`
         """
-        return self._query('aggregate-event-counts',
-                           query=query, summarize_by=summarize_by,
-                           count_by=count_by, count_filter=count_filter)
+        return self._query(
+            "aggregate-event-counts",
+            query=query,
+            summarize_by=summarize_by,
+            count_by=count_by,
+            count_filter=count_filter,
+        )
 
     def fact_names(self):
         """Get a list of all known facts."""
-        return self._query('fact-names')
+        return self._query("fact-names")
 
     def reports(self, **kwargs):
         r"""Get reports for our infrastructure. It is strongly recommended
@@ -321,7 +342,7 @@ class QueryAPI(BaseAPI):
         :returns: A generating yielding Reports
         :rtype: :class:`pypuppetdb.types.Report`
         """
-        reports = self._query('reports', **kwargs)
+        reports = self._query("reports", **kwargs)
         for report in reports:
             yield Report.create_from_dict(self, report)
 
@@ -336,6 +357,6 @@ class QueryAPI(BaseAPI):
         :returns: A generator yielding Inventory
         :rtype: :class:`pypuppetdb.types.Inventory`
         """
-        inventory = self._query('inventory', **kwargs)
+        inventory = self._query("inventory", **kwargs)
         for inv in inventory:
             yield Inventory.create_from_dict(inv)

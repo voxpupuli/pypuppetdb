@@ -6,7 +6,6 @@ from pypuppetdb.types import Node, Inventory, Fact
 
 
 class TestPqlAPI:
-
     def test_pql_casting(self, api):
         pql_query = """
           nodes {
@@ -31,7 +30,7 @@ class TestPqlAPI:
                 "latest_report_noop_pending": None,
                 "latest_report_status": "changed",
                 "report_environment": "production",
-                "report_timestamp": "2016-08-15T11:06:18.393Z"
+                "report_timestamp": "2016-08-15T11:06:18.393Z",
             },
             {
                 "cached_catalog_status": "not_used",
@@ -47,14 +46,13 @@ class TestPqlAPI:
                 "latest_report_noop_pending": None,
                 "latest_report_status": "changed",
                 "report_environment": "production",
-                "report_timestamp": "2016-08-15T11:06:18.393Z"
-            }
+                "report_timestamp": "2016-08-15T11:06:18.393Z",
+            },
         ]
-        pql_url = 'http://localhost:8080/pdb/query/v4'
+        pql_url = "http://localhost:8080/pdb/query/v4"
 
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, pql_url,
-                               body=json.dumps(pql_body))
+        httpretty.register_uri(httpretty.GET, pql_url, body=json.dumps(pql_body))
 
         nodes = list(api.pql(pql_query))
 
@@ -74,19 +72,18 @@ class TestPqlAPI:
           }
         """
         pql_body = [
-            {'certname': 'foo.example.com'},
-            {'certname': 'bar.example.com'},
+            {"certname": "foo.example.com"},
+            {"certname": "bar.example.com"},
         ]
-        pql_url = 'http://localhost:8080/pdb/query/v4'
+        pql_url = "http://localhost:8080/pdb/query/v4"
 
         httpretty.enable()
-        httpretty.register_uri(httpretty.GET, pql_url,
-                               body=json.dumps(pql_body))
+        httpretty.register_uri(httpretty.GET, pql_url, body=json.dumps(pql_body))
 
         elements = list(api.pql(pql_query))
 
-        assert httpretty.last_request().path.startswith('/pdb/query/v4')
-        assert elements[0]["certname"] == 'foo.example.com'
+        assert httpretty.last_request().path.startswith("/pdb/query/v4")
+        assert elements[0]["certname"] == "foo.example.com"
 
         httpretty.disable()
         httpretty.reset()

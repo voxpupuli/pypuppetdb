@@ -16,4 +16,4 @@ class StatusAPI(BaseAPI):
         :returns: A dict with the PuppetDB status information
         :rtype: :obj:`dict`
         """
-        return self._query('status')
+        return self._query("status")

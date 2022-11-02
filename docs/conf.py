@@ -45,8 +45,8 @@ latex_documents = [
     (
         "index",
         "pypuppetdb.tex",
-        u"pypuppetdb Documentation",
-        u"Vox Pupuli",
+        "pypuppetdb Documentation",
+        "Vox Pupuli",
         "manual",
     ),
 ]
@@ -58,8 +58,8 @@ man_pages = [
     (
         "index",
         "pypuppetdb",
-        u"pypuppetdb Documentation",
-        [u"Daniele Sluijters"],
+        "pypuppetdb Documentation",
+        ["Daniele Sluijters"],
         1,
     )
 ]
@@ -70,8 +70,8 @@ texinfo_documents = [
     (
         "index",
         "pypuppetdb",
-        u"pypuppetdb Documentation",
-        u"Daniele Sluijters",
+        "pypuppetdb Documentation",
+        "Daniele Sluijters",
         "pypuppetdb",
         "Library to work with the PuppetDB REST API.",
         "Miscellaneous",
