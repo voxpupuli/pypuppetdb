@@ -5,7 +5,7 @@ import httpretty
 from pypuppetdb.types import Node, Inventory, Fact
 
 
-class TestPqlAPI(object):
+class TestPqlAPI:
 
     def test_pql_casting(self, api):
         pql_query = """

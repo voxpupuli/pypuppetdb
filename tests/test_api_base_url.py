@@ -3,7 +3,7 @@ import pytest
 import pypuppetdb
 
 
-class TestBaseAPIURL(object):
+class TestBaseAPIURL:
 
     def test_without_path(self, api):
         assert api._url('nodes') == \

@@ -14,7 +14,7 @@ def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
     if data is None:
         body = '[]'
     else:
-        with open(data, 'r') as d:
+        with open(data) as d:
             body = json.load(d.read())
     return httpretty.register_uri(method, url, body=body, status=status,
                                   **kwargs)
@@ -25,12 +25,12 @@ def query(request):
     key = 'certname'
     value = 'node1'
     if request.param == 'string':
-        return '["{0}", "=", "{1}"]'.format(key, value)
+        return f'["{key}", "=", "{value}"]'
     elif request.param == 'QueryBuilder':
         return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
 
 
-class TestBaseAPIQuery(object):
+class TestBaseAPIQuery:
     @mock.patch.object(requests.Session, 'request')
     def test_timeout(self, get, api):
         get.side_effect = requests.exceptions.Timeout
@@ -111,10 +111,10 @@ class TestBaseAPIQuery(object):
         api.session.auth = ('puppetdb', 'password123')
         api._query('nodes')
         assert httpretty.last_request().path == '/pdb/query/v4/nodes'
-        encoded_cred = 'puppetdb:password123'.encode('utf-8')
+        encoded_cred = b'puppetdb:password123'
         bs_authheader = base64.b64encode(encoded_cred).decode('utf-8')
         assert httpretty.last_request().headers['Authorization'] == \
-            'Basic {0}'.format(bs_authheader)
+            f'Basic {bs_authheader}'
         httpretty.disable()
         httpretty.reset()
 

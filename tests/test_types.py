@@ -2,7 +2,7 @@ from pypuppetdb.types import (Catalog, Edge, Event, Fact, Inventory, Node, Repor
 from pypuppetdb.utils import json_to_datetime
 
 
-class TestNode(object):
+class TestNode:
     """Test the Node object."""
     def test_without_status(self):
         node = Node('_', 'node',
@@ -19,9 +19,9 @@ class TestNode(object):
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_with_status_unreported(self):
         node = Node('_', 'node',
@@ -43,9 +43,9 @@ class TestNode(object):
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unreported'
         assert node.unreported_time == '0d 5h 20m'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_with_status_unreported_from_noop(self):
         node = Node('_', 'node',
@@ -67,9 +67,9 @@ class TestNode(object):
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unreported'
         assert node.unreported_time == '0d 5h 20m'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_with_status_unreported_from_failed(self):
         node = Node('_', 'node',
@@ -91,9 +91,9 @@ class TestNode(object):
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unreported'
         assert node.unreported_time == '0d 5h 20m'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_apiv4_with_failed_status(self):
         node = Node('_', 'node',
@@ -119,9 +119,9 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'failed'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_apiv4_with_unchanged_status(self):
         node = Node('_', 'node',
@@ -147,9 +147,9 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unchanged'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_apiv4_with_unchanged_noop_status(self):
         node = Node('_', 'node',
@@ -177,9 +177,9 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'unchanged'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_apiv4_with_pending_noop_status(self):
         node = Node('_', 'node',
@@ -207,9 +207,9 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'noop'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_apiv4_with_failed_noop_status(self):
         node = Node('_', 'node',
@@ -237,9 +237,9 @@ class TestNode(object):
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.status == 'failed'
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_apiv4_without_status(self):
         node = Node('_', 'node',
@@ -262,9 +262,9 @@ class TestNode(object):
             json_to_datetime('2013-08-01T09:57:00.000Z')
         assert node.catalog_timestamp == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_deactivated(self):
         node = Node('_', 'node',
@@ -272,18 +272,18 @@ class TestNode(object):
         assert node.name == 'node'
         assert node.deactivated == \
             json_to_datetime('2013-08-01T09:57:00.000Z')
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_expired(self):
         node = Node('_', 'node',
                     expired='2013-08-01T09:57:00.000Z',)
         assert node.name == 'node'
         assert node.expired == json_to_datetime('2013-08-01T09:57:00.000Z')
-        assert str(node) == str('node')
-        assert str(node) == str('node')
-        assert repr(node) == str('<Node: node>')
+        assert str(node) == 'node'
+        assert str(node) == 'node'
+        assert repr(node) == '<Node: node>'
 
     def test_with_latest_report_hash(self):
         node = Node('_', 'node',
@@ -303,7 +303,7 @@ class TestNode(object):
         assert node3.cached_catalog_status == 'not_used'
 
 
-class TestFact(object):
+class TestFact:
     """Test the Fact object."""
     def test_fact(self):
         fact = Fact('node', 'osfamily', 'Debian', 'production')
@@ -312,12 +312,12 @@ class TestFact(object):
         assert fact.name == 'osfamily'
         assert fact.value == 'Debian'
         assert fact.environment == 'production'
-        assert str(fact) == str('osfamily/node')
-        assert str(fact) == str('osfamily/node')
-        assert repr(fact) == str('Fact: osfamily/node')
+        assert str(fact) == 'osfamily/node'
+        assert str(fact) == 'osfamily/node'
+        assert repr(fact) == 'Fact: osfamily/node'
 
 
-class TestResource(object):
+class TestResource:
     "Test the Resource object."""
 
     def test_resource(self):
@@ -342,13 +342,13 @@ class TestResource(object):
         assert resource.parameters['owner'] == 'root'
         assert resource.parameters['group'] == 'root'
         assert resource.parameters['mode'] == '0600'
-        assert str(resource) == str('file[/etc/ssh/sshd_config]')
-        assert str(resource) == str('file[/etc/ssh/sshd_config]')
+        assert str(resource) == 'file[/etc/ssh/sshd_config]'
+        assert str(resource) == 'file[/etc/ssh/sshd_config]'
         assert repr(resource) == str(
             '<Resource: file[/etc/ssh/sshd_config]>')
 
 
-class TestReport(object):
+class TestReport:
     """Test the Report object."""
     def test_report(self):
         report = Report('_', 'node1.puppet.board', 'hash#',
@@ -370,9 +370,9 @@ class TestReport(object):
         assert report.run_time == report.end - report.start
         assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
         assert report.status == 'success'
-        assert str(report) == str('hash#')
-        assert str(report) == str('hash#')
-        assert repr(report) == str('Report: hash#')
+        assert str(report) == 'hash#'
+        assert str(report) == 'hash#'
+        assert repr(report) == 'Report: hash#'
 
     def test_report_with_noop(self):
         report = Report('_', 'node2.puppet.board', 'hash#',
@@ -396,9 +396,9 @@ class TestReport(object):
         assert report.run_time == report.end - report.start
         assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
         assert report.status == 'unchanged'
-        assert str(report) == str('hash#')
-        assert str(report) == str('hash#')
-        assert repr(report) == str('Report: hash#')
+        assert str(report) == 'hash#'
+        assert str(report) == 'hash#'
+        assert repr(report) == 'Report: hash#'
 
     def test_report_with_failed_noop(self):
         report = Report('_', 'node2.puppet.board', 'hash#',
@@ -422,9 +422,9 @@ class TestReport(object):
         assert report.run_time == report.end - report.start
         assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
         assert report.status == 'failed'
-        assert str(report) == str('hash#')
-        assert str(report) == str('hash#')
-        assert repr(report) == str('Report: hash#')
+        assert str(report) == 'hash#'
+        assert str(report) == 'hash#'
+        assert repr(report) == 'Report: hash#'
 
     def test_report_with_pending_noop(self):
         report = Report('_', 'node2.puppet.board', 'hash#',
@@ -448,9 +448,9 @@ class TestReport(object):
         assert report.run_time == report.end - report.start
         assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
         assert report.status == 'noop'
-        assert str(report) == str('hash#')
-        assert str(report) == str('hash#')
-        assert repr(report) == str('Report: hash#')
+        assert str(report) == 'hash#'
+        assert str(report) == 'hash#'
+        assert repr(report) == 'Report: hash#'
 
     def test_report_with_cataloguuid_codeid(self):
         report = Report('_', 'node2.puppet.board', 'hash#',
@@ -475,9 +475,9 @@ class TestReport(object):
         assert report.transaction == 'af9f16e3-75f6-4f90-acc6-f83d6524a6f3'
         assert report.catalog_uuid == "0b3a4943-a164-4cea-bbf0-91d0ee931326"
         assert report.cached_catalog_status == "not_used"
-        assert str(report) == str('hash#')
-        assert str(report) == str('hash#')
-        assert repr(report) == str('Report: hash#')
+        assert str(report) == 'hash#'
+        assert str(report) == 'hash#'
+        assert repr(report) == 'Report: hash#'
 
     def test_report_with_producer(self):
         report = Report('_', "test.test.com", "hash#",
@@ -498,12 +498,12 @@ class TestReport(object):
         assert report.agent_version == '4.2.1'
         assert report.run_time == report.end - report.start
         assert report.producer == "puppet01.test.com"
-        assert str(report) == str('hash#')
-        assert str(report) == str('hash#')
-        assert repr(report) == str('Report: hash#')
+        assert str(report) == 'hash#'
+        assert str(report) == 'hash#'
+        assert repr(report) == 'Report: hash#'
 
 
-class TestEvent(object):
+class TestEvent:
     """Test the Event object."""
     def test_event(self):
         event = Event('node', 'failure', '2013-08-01T10:57:00.000Z',
@@ -525,9 +525,9 @@ class TestEvent(object):
         assert event.item['message'] == 'Nothing to say'
         assert event.item['old'] == 'absent'
         assert event.item['new'] == 'present'
-        assert str(event) == str('file[/etc/ssh/sshd_config]/hash#')
-        assert str(event) == str('file[/etc/ssh/sshd_config]/hash#')
-        assert repr(event) == str('Event: file[/etc/ssh/sshd_config]/hash#')
+        assert str(event) == 'file[/etc/ssh/sshd_config]/hash#'
+        assert str(event) == 'file[/etc/ssh/sshd_config]/hash#'
+        assert repr(event) == 'Event: file[/etc/ssh/sshd_config]/hash#'
 
     def test_event_failed(self):
         event = Event('node', 'success', '2013-08-01T10:57:00.000Z',
@@ -542,7 +542,7 @@ class TestEvent(object):
         assert event.failed is False
 
 
-class TestCatalog(object):
+class TestCatalog:
     """Test the Catalog object."""
     def test_catalog(self):
         catalog = Catalog('node', [], [], 'unique', None)
@@ -551,8 +551,8 @@ class TestCatalog(object):
         assert catalog.transaction_uuid is None
         assert catalog.resources == {}
         assert catalog.edges == []
-        assert str(catalog) == str('node/None')
-        assert str(catalog) == str('node/None')
+        assert str(catalog) == 'node/None'
+        assert str(catalog) == 'node/None'
         assert repr(catalog) == str(
             '<Catalog: node/None>')
 
@@ -564,8 +564,8 @@ class TestCatalog(object):
         assert catalog.transaction_uuid is None
         assert catalog.resources == {}
         assert catalog.edges == []
-        assert str(catalog) == str('node/None')
-        assert str(catalog) == str('node/None')
+        assert str(catalog) == 'node/None'
+        assert str(catalog) == 'node/None'
         assert repr(catalog) == str(
             '<Catalog: node/None>')
         assert catalog.code_id == 'somecodeid'
@@ -578,8 +578,8 @@ class TestCatalog(object):
         assert catalog.transaction_uuid is None
         assert catalog.resources == {}
         assert catalog.edges == []
-        assert str(catalog) == str('node/None')
-        assert str(catalog) == str('node/None')
+        assert str(catalog) == 'node/None'
+        assert str(catalog) == 'node/None'
         assert repr(catalog) == str(
             '<Catalog: node/None>')
         assert catalog.catalog_uuid == 'univerallyuniqueidentifier'
@@ -593,13 +593,13 @@ class TestCatalog(object):
         assert catalog.resources == {}
         assert catalog.edges == []
         assert catalog.producer == 'puppet01.test.com'
-        assert str(catalog) == str('node/None')
-        assert str(catalog) == str('node/None')
+        assert str(catalog) == 'node/None'
+        assert str(catalog) == 'node/None'
         assert repr(catalog) == str(
             '<Catalog: node/None>')
 
 
-class TestEdge(object):
+class TestEdge:
     """Test the Edge object."""
     def test_edge(self):
         resource_a = Resource('node', '/etc/ssh/sshd_config', 'file',
@@ -625,7 +625,7 @@ class TestEdge(object):
             '<Edge: file[/etc/ssh/sshd_config] - notify - service[sshd]>')
 
 
-class TestInventory(object):
+class TestInventory:
     def test_inventory(self):
         inv = Inventory(node="test1.test.com",
                         environment="production",
@@ -659,6 +659,6 @@ class TestInventory(object):
             "hostname": "test1"
         }
 
-        assert str(inv) == str("test1.test.com")
-        assert str(inv) == str("test1.test.com")
-        assert repr(inv) == str("<Inventory: test1.test.com>")
+        assert str(inv) == "test1.test.com"
+        assert str(inv) == "test1.test.com"
+        assert repr(inv) == "<Inventory: test1.test.com>"

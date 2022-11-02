@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
 from datetime import datetime
 
@@ -118,7 +115,7 @@ class QueryAPI(BaseAPI):
         :rtype: :class:`pypuppetdb.types.Fact`
         """
         if name is not None and value is not None:
-            path = '{0}/{1}'.format(name, value)
+            path = f'{name}/{value}'
         elif name is not None and value is None:
             path = name
         else:
@@ -191,7 +188,7 @@ class QueryAPI(BaseAPI):
             type_ = self._normalize_resource_type(type_)
 
             if title is not None:
-                path = '{0}/{1}'.format(type_, title)
+                path = f'{type_}/{title}'
             elif title is None:
                 path = type_
 

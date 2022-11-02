@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import hashlib
 import json
 import logging
@@ -38,13 +35,13 @@ class CommandAPI(BaseAPI):
         :returns: The decoded response from PuppetDB
         :rtype: :obj:`dict` or :obj:`list`
         """
-        log.debug('_cmd called with command: {0}, data: {1}'.format(
+        log.debug('_cmd called with command: {}, data: {}'.format(
             command, payload))
 
         url = self._url('cmd')
 
         if command not in COMMAND_VERSION:
-            log.error("Only {0} supported, {1} unsupported".format(
+            log.error("Only {} supported, {} unsupported".format(
                 list(COMMAND_VERSION.keys()), command))
             raise APIError
 
@@ -75,17 +72,17 @@ class CommandAPI(BaseAPI):
                 raise EmptyResponseError
 
         except requests.exceptions.Timeout:
-            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['timeout'],
+            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['timeout'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
         except requests.exceptions.ConnectionError:
-            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['refused'],
+            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['refused'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
         except requests.exceptions.HTTPError as err:
-            log.error("{0} {1}:{2} over {3}.".format(err.response.text,
+            log.error("{} {}:{} over {}.".format(err.response.text,
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise

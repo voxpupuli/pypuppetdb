@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import datetime
 
 
@@ -13,16 +10,16 @@ class UTC(datetime.tzinfo):
         return datetime.timedelta(0)
 
     def tzname(self, dt):
-        return str('UTC')
+        return 'UTC'
 
     def dst(self, dt):
         return datetime.timedelta(0)
 
     def __repr__(self):
-        return str('<UTC>')
+        return '<UTC>'
 
     def __str__(self):
-        return str('UTC')
+        return 'UTC'
 
     def __unicode__(self):
         return 'UTC'

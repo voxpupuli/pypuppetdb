@@ -10,7 +10,7 @@ from pypuppetdb.QueryBuilder import (AndOperator, EqualsOperator, ExtractOperato
 from pypuppetdb.errors import APIError
 
 
-class TestBinaryOperator(object):
+class TestBinaryOperator:
     """
     Test the BinaryOperator object and all sub-classes.
     """
@@ -29,7 +29,7 @@ class TestBinaryOperator(object):
             == '["=", "bios_version", ["6.00", 5.0]]'
         assert str(EqualsOperator(['parameter', 'ensure'], "present"))\
             == '["=", ["parameter", "ensure"], "present"]'
-        assert str(EqualsOperator(u"latest_report?", True))\
+        assert str(EqualsOperator("latest_report?", True))\
             == '["=", "latest_report?", true]'
         assert str(EqualsOperator("report_timestamp",
                                   datetime.datetime(2016, 6, 11)))\
@@ -104,7 +104,7 @@ class TestBinaryOperator(object):
             NullOperator("environment", "test")
 
 
-class TestBooleanOperator(object):
+class TestBooleanOperator:
     """
     Test the BooleanOperator object and all sub-classes.
     """
@@ -200,7 +200,7 @@ class TestBooleanOperator(object):
                         EqualsOperator('facterversion', '3.2.0')]))
 
 
-class TestExtractOperator(object):
+class TestExtractOperator:
     """
     Test the ExtractOperator object and all sub-classes.
     """
@@ -301,7 +301,7 @@ class TestExtractOperator(object):
             '["function", "to_string", "producer_timestamp", "FMDAY"]]]'
 
 
-class TestFunctionOperator(object):
+class TestFunctionOperator:
     """
     Test the FunctionOperator object and all sub-classes.
     """
@@ -387,7 +387,7 @@ class TestFunctionOperator(object):
             FunctionOperator("last")
 
 
-class TestSubqueryOperator(object):
+class TestSubqueryOperator:
     """
     Test the SubqueryOperator object
     """
@@ -412,7 +412,7 @@ class TestSubqueryOperator(object):
             SubqueryOperator('cats')
 
 
-class TestInOperator(object):
+class TestInOperator:
     """
     Test the InOperator object
     """
@@ -503,7 +503,7 @@ class TestInOperator(object):
             '["=", "value", "aa:bb:cc:dd:ee:00"]]]]]'
 
 
-class TestFromOperator(object):
+class TestFromOperator:
     """
     Test the FromOperator object
     """
