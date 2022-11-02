@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import datetime
 import json
 import logging
@@ -10,7 +7,7 @@ from pypuppetdb.errors import APIError
 log = logging.getLogger(__name__)
 
 
-class BinaryOperator(object):
+class BinaryOperator:
     """
     This is a parent helper class used to create PuppetDB AST queries
     for single key-value pairs for the available operators.
@@ -42,7 +39,7 @@ class BinaryOperator(object):
         self.data = [operator, field, value]
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -51,7 +48,7 @@ class BinaryOperator(object):
         return self.data
 
 
-class BooleanOperator(object):
+class BooleanOperator:
     """
     This is a parent helper class used to create PuppetDB AST queries
     for available boolean queries.
@@ -87,7 +84,7 @@ class BooleanOperator(object):
                            "or operator objects")
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -98,7 +95,7 @@ class BooleanOperator(object):
         return [self.operator] + self.operations
 
 
-class ExtractOperator(object):
+class ExtractOperator:
     """
     Queries that either do not or cannot require all the key-value pairs
     from an endpoint can use the Extract Operator as described in
@@ -156,7 +153,7 @@ class ExtractOperator(object):
                            "lists, strings, and FunctionOperator objects")
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -175,7 +172,7 @@ class ExtractOperator(object):
         return arr
 
 
-class FunctionOperator(object):
+class FunctionOperator:
     """
     Performs an aggregate function on the result of a subquery, full
     documentation is available at
@@ -192,9 +189,9 @@ class FunctionOperator(object):
 
     def __init__(self, function, field=None, fmt=None):
         if function not in ['count', 'avg', 'sum', 'min', 'max', 'to_string']:
-            raise APIError("Unsupport function: {0}".format(function))
+            raise APIError(f"Unsupport function: {function}")
         elif function != "count" and field is None:
-            raise APIError("Function {0} requires a field value".format(
+            raise APIError("Function {} requires a field value".format(
                 function))
         elif function == 'to_string' and fmt is None:
             raise APIError("Function {0} requires an extra 'fmt' parameter")
@@ -208,7 +205,7 @@ class FunctionOperator(object):
             self.arr.append(fmt)
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -217,7 +214,7 @@ class FunctionOperator(object):
         return self.arr
 
 
-class SubqueryOperator(object):
+class SubqueryOperator:
     """
     Performs a subquery to another puppetDB object, full
     documentation is available at
@@ -233,10 +230,10 @@ class SubqueryOperator(object):
         if endpoint not in ['catalogs', 'edges', 'environments', 'events',
                             'facts', 'fact_contents', 'fact_paths', 'nodes',
                             'reports', 'resources']:
-            raise APIError("Unsupported endpoint: {0}".format(endpoint))
+            raise APIError(f"Unsupported endpoint: {endpoint}")
 
         self.query = None
-        self.arr = ['select_{0}'.format(endpoint)]
+        self.arr = [f'select_{endpoint}']
 
     def add_query(self, query):
         if self.query is not None:
@@ -246,7 +243,7 @@ class SubqueryOperator(object):
             self.arr.append(query.json_data())
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -255,7 +252,7 @@ class SubqueryOperator(object):
         return self.arr
 
 
-class InOperator(object):
+class InOperator:
     """
     Performs boolean compare between a field a subquery result
     https://puppet.com/docs/puppetdb/7/api/query/v4/ast.html#subquery-operators
@@ -304,7 +301,7 @@ class InOperator(object):
                            "['array', [<array values>]]")
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -313,7 +310,7 @@ class InOperator(object):
         return self.arr
 
 
-class FromOperator(object):
+class FromOperator:
     """
     From contextual operator that allows for queries on the root endpoint
     or subqueries into other entities:
@@ -388,7 +385,7 @@ class FromOperator(object):
             raise APIError("ExtractOperator.add_offset only supports ints")
 
     def __repr__(self):
-        return 'Query: {0}'.format(self)
+        return f'Query: {self}'
 
     def __str__(self):
         return json.dumps(self.json_data())
@@ -431,7 +428,7 @@ class EqualsOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(EqualsOperator, self).__init__("=", field, value)
+        super().__init__("=", field, value)
 
 
 class GreaterOperator(BinaryOperator):
@@ -456,7 +453,7 @@ class GreaterOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(GreaterOperator, self).__init__(">", field, value)
+        super().__init__(">", field, value)
 
 
 class LessOperator(BinaryOperator):
@@ -481,7 +478,7 @@ class LessOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(LessOperator, self).__init__("<", field, value)
+        super().__init__("<", field, value)
 
 
 class GreaterEqualOperator(BinaryOperator):
@@ -507,7 +504,7 @@ class GreaterEqualOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(GreaterEqualOperator, self).__init__(">=", field, value)
+        super().__init__(">=", field, value)
 
 
 class LessEqualOperator(BinaryOperator):
@@ -533,7 +530,7 @@ class LessEqualOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(LessEqualOperator, self).__init__("<=", field, value)
+        super().__init__("<=", field, value)
 
 
 class RegexOperator(BinaryOperator):
@@ -558,7 +555,7 @@ class RegexOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(RegexOperator, self).__init__("~", field, value)
+        super().__init__("~", field, value)
 
 
 class RegexArrayOperator(BinaryOperator):
@@ -584,7 +581,7 @@ class RegexArrayOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        super(RegexArrayOperator, self).__init__("~>", field, value)
+        super().__init__("~>", field, value)
 
 
 class NullOperator(BinaryOperator):
@@ -615,7 +612,7 @@ class NullOperator(BinaryOperator):
         if type(value) != bool:
             raise APIError("NullOperator value must be boolean")
 
-        super(NullOperator, self).__init__("null?", field, value)
+        super().__init__("null?", field, value)
 
 
 class AndOperator(BooleanOperator):
@@ -639,7 +636,7 @@ class AndOperator(BooleanOperator):
     """
 
     def __init__(self):
-        super(AndOperator, self).__init__("and")
+        super().__init__("and")
 
 
 class OrOperator(BooleanOperator):
@@ -661,7 +658,7 @@ class OrOperator(BooleanOperator):
     """
 
     def __init__(self):
-        super(OrOperator, self).__init__("or")
+        super().__init__("or")
 
 
 class NotOperator(BooleanOperator):
@@ -685,11 +682,11 @@ class NotOperator(BooleanOperator):
     """
 
     def __init__(self):
-        super(NotOperator, self).__init__("not")
+        super().__init__("not")
 
     def add(self, query):
         if len(self.operations) > 0:
             raise APIError("This operator only accept one query string")
         elif isinstance(query, list) and len(query) > 1:
             raise APIError("This operator only accept one query string")
-        super(NotOperator, self).add(query)
+        super().add(query)

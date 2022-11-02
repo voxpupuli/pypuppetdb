@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 
 import pytest
@@ -7,29 +5,29 @@ import pytest
 import pypuppetdb
 
 
-class TestUTC(object):
+class TestUTC:
     """Test the UTC class."""
 
     def test_utc_offset(self, utc):
         assert datetime.timedelta(0) == utc.utcoffset(300)
 
     def test_tzname(self, utc):
-        assert str('UTC') == utc.tzname(300)
+        assert 'UTC' == utc.tzname(300)
 
     def test_dst(self, utc):
         assert datetime.timedelta(0) == utc.dst(300)
 
     def test_magic_str(self, utc):
-        assert str('UTC') == str(utc)
+        assert 'UTC' == str(utc)
 
     def test_magic_unicode(self, utc):
         assert 'UTC' == str(utc)
 
     def test_magic_repr(self, utc):
-        assert str('<UTC>') == repr(utc)
+        assert '<UTC>' == repr(utc)
 
 
-class TestJSONToDateTime(object):
+class TestJSONToDateTime:
     """Test the json_to_datetime function."""
 
     def test_json_to_datetime(self):

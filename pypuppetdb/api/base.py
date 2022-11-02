@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import json
 import logging
 from urllib.parse import quote
@@ -66,7 +63,7 @@ ERROR_STRINGS = {
 }
 
 
-class BaseAPI(object):
+class BaseAPI:
     """This is a Base or Abstract class and is not meant to be instantiated
     or used directly.
 
@@ -262,7 +259,7 @@ class BaseAPI(object):
         :rtype: :obj:`string`
         """
 
-        log.debug('_url called with endpoint: {0} and path: {1}'.format(
+        log.debug('_url called with endpoint: {} and path: {}'.format(
             endpoint, path))
 
         try:
@@ -278,7 +275,7 @@ class BaseAPI(object):
         )
 
         if path is not None:
-            url = '{0}/{1}'.format(url, quote(path))
+            url = f'{url}/{quote(path)}'
 
         return url
 
@@ -411,19 +408,19 @@ class BaseAPI(object):
                 raise EmptyResponseError
 
         except requests.exceptions.Timeout:
-            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['timeout'],
+            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['timeout'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
 
         except requests.exceptions.ConnectionError:
-            log.error("{0} {1}:{2} over {3}.".format(ERROR_STRINGS['refused'],
+            log.error("{} {}:{} over {}.".format(ERROR_STRINGS['refused'],
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise
 
         except requests.exceptions.HTTPError as err:
-            log.error("{0} {1}:{2} over {3}.".format(err.response.text,
+            log.error("{} {}:{} over {}.".format(err.response.text,
                                                      self.host, self.port,
                                                      self.protocol.upper()))
             raise

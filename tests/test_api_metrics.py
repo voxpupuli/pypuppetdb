@@ -10,13 +10,13 @@ def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
     if data is None:
         body = '[]'
     else:
-        with open(data, 'r') as d:
+        with open(data) as d:
             body = json.load(d.read())
     return httpretty.register_uri(method, url, body=body, status=status,
                                   **kwargs)
 
 
-class TestMetricsAPI(object):
+class TestMetricsAPI:
     def test_metric_v1(self, api):
         httpretty.enable()
         httpretty.enable()

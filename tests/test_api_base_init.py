@@ -10,7 +10,7 @@ def stub_request(url, data=None, method=httpretty.GET, status=200, **kwargs):
     if data is None:
         body = '[]'
     else:
-        with open(data, 'r') as d:
+        with open(data) as d:
             body = json.load(d.read())
     return httpretty.register_uri(method, url, body=body, status=status,
                                   **kwargs)
@@ -21,18 +21,18 @@ def query(request):
     key = 'certname'
     value = 'node1'
     if request.param == 'string':
-        return '["{0}", "=", "{1}"]'.format(key, value)
+        return f'["{key}", "=", "{value}"]'
     elif request.param == 'QueryBuilder':
         return pypuppetdb.QueryBuilder.EqualsOperator(key, value)
 
 
-class TestBaseAPIVersion(object):
+class TestBaseAPIVersion:
     def test_init_defaults(self):
         v4 = pypuppetdb.api.API()
         assert v4.api_version == 'v4'
 
 
-class TestBaseAPIInitOptions(object):
+class TestBaseAPIInitOptions:
     def test_defaults(self, api):
         assert api.host == 'localhost'
         assert api.port == 8080
@@ -146,7 +146,7 @@ class TestBaseAPIInitOptions(object):
             pypuppetdb.api.API(metric_api_version='bad')
 
 
-class TestBaseAPIProperties(object):
+class TestBaseAPIProperties:
     def test_version(self, api):
         assert api.version == 'v4'
 

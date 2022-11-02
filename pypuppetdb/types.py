@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import logging
 from datetime import timedelta
 
@@ -10,7 +7,7 @@ from pypuppetdb.utils import json_to_datetime
 log = logging.getLogger(__name__)
 
 
-class Event(object):
+class Event:
     """This object represents an event. Unless otherwise specified all
     parameters are required.
 
@@ -71,15 +68,15 @@ class Event(object):
                      'new': new_value, 'class': class_,
                      'execution_path': execution_path, 'source_file': source_file,
                      'line_number': line_number}
-        self.__string = '{0}[{1}]/{2}'.format(self.item['type'],
+        self.__string = '{}[{}]/{}'.format(self.item['type'],
                                               self.item['title'],
                                               self.hash_)
 
     def __repr__(self):
-        return str('Event: {0}'.format(self.__string))
+        return str(f'Event: {self.__string}')
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
     @staticmethod
     def create_from_dict(event):
@@ -101,7 +98,7 @@ class Event(object):
         )
 
 
-class Report(object):
+class Report:
     """This object represents a report. Unless otherwise specified all
     parameters are required.
 
@@ -207,15 +204,15 @@ class Report(object):
         self.catalog_uuid = catalog_uuid
         self.cached_catalog_status = cached_catalog_status
         self.producer = producer
-        self.__string = '{0}'.format(self.hash_)
+        self.__string = f'{self.hash_}'
 
         self.__api = api
 
     def __repr__(self):
-        return str('Report: {0}'.format(self.__string))
+        return str(f'Report: {self.__string}')
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
     def events(self, **kwargs):
         """Get all events for this report. Additional arguments may also be
@@ -249,7 +246,7 @@ class Report(object):
         )
 
 
-class Fact(object):
+class Fact:
     """This object represents a fact. Unless otherwise specified all
     parameters are required.
 
@@ -284,16 +281,16 @@ class Fact(object):
         self.name = name
         self.value = value
         self.environment = environment
-        self.__string = '{0}/{1}'.format(self.name, self.node)
+        self.__string = f'{self.name}/{self.node}'
 
     def __repr__(self):
-        return str('Fact: {0}'.format(self.__string))
+        return str(f'Fact: {self.__string}')
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
 
-class Resource(object):
+class Resource:
     """This object represents a resource. Unless otherwise specified all
     parameters are required.
 
@@ -343,13 +340,13 @@ class Resource(object):
         self.parameters = parameters
         self.relationships = []
         self.environment = environment
-        self.__string = '{0}[{1}]'.format(self.type_, self.name)
+        self.__string = f'{self.type_}[{self.name}]'
 
     def __repr__(self):
-        return str('<Resource: {0}>').format(self.__string)
+        return '<Resource: {}>'.format(self.__string)
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
     @staticmethod
     def create_from_dict(resource):
@@ -366,7 +363,7 @@ class Resource(object):
         )
 
 
-class Node(object):
+class Node:
     """This object represents a node. It additionally has some helper methods
     so that you can query for resources or facts directly from the node scope.
     Unless otherwise specified all parameters are required.
@@ -496,10 +493,10 @@ class Node(object):
         self.__string = self.name
 
     def __repr__(self):
-        return str('<Node: {0}>').format(self.__string)
+        return '<Node: {}>'.format(self.__string)
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
     def facts(self, query=None, **kwargs):
         """Get all facts of this node. Additional arguments may also be
@@ -612,7 +609,7 @@ class Node(object):
                     if last_report < unreported_border:
                         delta = (now - last_report)
                         node['unreported'] = True
-                        node['unreported_time'] = '{0}d {1}h {2}m'.format(
+                        node['unreported_time'] = '{}d {}h {}m'.format(
                             delta.days,
                             int(delta.seconds / 3600),
                             int((delta.seconds % 3600) / 60)
@@ -644,7 +641,7 @@ class Node(object):
                     )
 
 
-class Catalog(object):
+class Catalog:
     """
     This object represents a compiled catalog from puppet. It contains\
     Resource and Edge object that represent the dependency graph. Unless\
@@ -731,13 +728,13 @@ class Catalog(object):
             self.resources[identifier_source].relationships.append(e)
             self.resources[identifier_target].relationships.append(e)
 
-        self.__string = '{0}/{1}'.format(self.node, self.transaction_uuid)
+        self.__string = f'{self.node}/{self.transaction_uuid}'
 
     def __repr__(self):
-        return str('<Catalog: {0}>').format(self.__string)
+        return '<Catalog: {}>'.format(self.__string)
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
     def get_resources(self):
         return self.resources.values()
@@ -762,7 +759,7 @@ class Catalog(object):
                        catalog_uuid=catalog.get('catalog_uuid'))
 
 
-class Edge(object):
+class Edge:
     """
     This object represents the connection between two Resource objects.
     Unless otherwise specified all parameters are required.
@@ -787,15 +784,15 @@ class Edge(object):
         self.target = target
         self.relationship = relationship
         self.node = node
-        self.__string = '{0} - {1} - {2}'.format(self.source,
+        self.__string = '{} - {} - {}'.format(self.source,
                                                  self.relationship,
                                                  self.target)
 
     def __repr__(self):
-        return str('<Edge: {0}>').format(self.__string)
+        return '<Edge: {}>'.format(self.__string)
 
     def __str__(self):
-        return str('{0}').format(self.__string)
+        return '{}'.format(self.__string)
 
     @staticmethod
     def create_from_dict(edge):
@@ -807,7 +804,7 @@ class Edge(object):
                     node=edge['certname'])
 
 
-class Inventory(object):
+class Inventory:
     """This object represents a Node Inventory entry returned from
     the Inventory endpoint.
 
@@ -844,10 +841,10 @@ class Inventory(object):
         self.__string = self.node
 
     def __repr__(self):
-        return str('<Inventory: {0}>').format(self.__string)
+        return '<Inventory: {}>'.format(self.__string)
 
     def __str__(self):
-        return str("{0}").format(self.__string)
+        return "{}".format(self.__string)
 
     @staticmethod
     def create_from_dict(inv):
