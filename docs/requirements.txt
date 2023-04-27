@@ -21,4 +21,4 @@ sphinxcontrib-htmlhelp>=2.0,<3.0
 sphinxcontrib-jsmath>=1.0,<2.0
 sphinxcontrib-qthelp>=1.0,<2.0
 sphinxcontrib-serializinghtml>=1.1,<2.0
-urllib3>=1.26,<2.0
+urllib3>=1.26,<3.0
