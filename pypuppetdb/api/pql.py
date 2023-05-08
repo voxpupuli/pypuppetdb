@@ -86,7 +86,6 @@ class PqlAPI(BaseAPI):
 
         for element in self._pql(pql=pql):
             if type_class == Node:
-
                 # TODO: deduplicate this - see QueryAPI.nodes()
 
                 now = datetime.utcnow()

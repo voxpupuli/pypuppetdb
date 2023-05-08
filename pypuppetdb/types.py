@@ -619,7 +619,6 @@ class Node:
     def create_from_dict(
         query_api, node, with_status, with_event_numbers, latest_events, now, unreported
     ):
-
         node["status_report"] = None
         node["events"] = None
 
@@ -762,7 +761,6 @@ class Catalog:
         catalog_uuid=None,
         producer=None,
     ):
-
         self.node = node
         self.version = version
         self.transaction_uuid = transaction_uuid
