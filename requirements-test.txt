@@ -8,7 +8,7 @@
 # testing tools
 bandit
 coverage
-flake8<5
+flake8<7
 pytest<8
 pytest-cov
 pytest-flake8
