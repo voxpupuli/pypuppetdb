@@ -30,3 +30,35 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: false
+
+  black-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Black Code Formatter
+        uses: psf/black@stable
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          pip install bandit
+      - name: Run bandit
+        run: |
+          bandit -r pypuppetdb
+  tests:
+    needs:
+      - test
+      - black-formatting
+      - security
+    runs-on: ubuntu-latest
+    name: Test suite
+    steps:
+      - run: echo Test suite completed
