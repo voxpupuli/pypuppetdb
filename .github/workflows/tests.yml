@@ -13,9 +13,9 @@ jobs:
         python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -27,6 +27,38 @@ jobs:
         run: |
           pytest --cov=. --cov-report=xml --flake8 --strict-markers --mypy pypuppetdb tests
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: false
+
+  black-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Black Code Formatter
+        uses: psf/black@stable
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          pip install bandit
+      - name: Run bandit
+        run: |
+          bandit -r pypuppetdb
+  tests:
+    needs:
+      - test
+      - black-formatting
+      - security
+    runs-on: ubuntu-latest
+    name: Test suite
+    steps:
+      - run: echo Test suite completed
