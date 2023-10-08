@@ -1,6 +1,11 @@
 name: tests (unit)
 
-on: [push, pull_request]
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+      - main
 
 jobs:
   test:
@@ -53,11 +58,29 @@ jobs:
       - name: Run bandit
         run: |
           bandit -r pypuppetdb
+
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          pip install --upgrade -r docs/requirements.txt
+          python setup.py develop
+      - name: Build docs
+        run: |
+          cd docs
+          make html
   tests:
     needs:
       - test
       - black-formatting
       - security
+      - build-docs
     runs-on: ubuntu-latest
     name: Test suite
     steps:
