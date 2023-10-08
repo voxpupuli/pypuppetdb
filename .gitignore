@@ -59,3 +59,7 @@ private/
 
 # IntelliJ IDEA (IDE) config
 .idea/
+
+Gemfile.lock
+.vendor
+.bundle
