@@ -1,6 +1,7 @@
 import base64
 import json
 from unittest import mock
+from urllib.parse import urlencode
 
 import httpretty
 import pytest
@@ -138,8 +139,23 @@ class TestBaseAPIQuery:
     def test_with_order(self, api):
         httpretty.enable()
         stub_request("http://localhost:8080/pdb/query/v4/nodes")
-        api._query("nodes", order_by="ted")
-        assert httpretty.last_request().querystring == {"order_by": ["ted"]}
+        order_by = [
+            {
+                "field": "certname",
+                "order": "desc",
+            },
+        ]
+        api._query(
+            endpoint="nodes",
+            order_by=order_by,
+        )
+        assert httpretty.last_request().body.decode() == urlencode(
+            query={
+                "order_by": json.dumps(
+                    obj=order_by,
+                ),
+            },
+        )
         httpretty.disable()
         httpretty.reset()
 
