@@ -318,7 +318,7 @@ class BaseAPI:
         :param query: (optional) An AST query to further narrow down the resultset.
         :type query: :obj:`string`
         :param order_by: (optional) Set the order parameters for the resultset.
-        :type order_by: :obj:`string`
+        :type order_by: :obj:`list[dict[str, str]]`
         :param limit: (optional) Tell PuppetDB to limit it's response to this\
                 number of objects.
         :type limit: :obj:`int`
@@ -407,12 +407,23 @@ class BaseAPI:
 
         try:
             if request_method.upper() == "GET":
+                order_by_param = PARAMETERS.get("order_by")
+                headers = request_body = None
+                if isinstance(payload, dict) and payload.get(order_by_param):
+                    headers = {}
+                    request_body = {}
+                    request_body["order_by"] = json.dumps(
+                        obj=payload.pop(order_by_param, None)
+                    )
+                    headers["Content-Type"] = "application/x-www-form-urlencoded"
                 r = self.session.get(
                     url,
                     params=payload,
                     verify=self.ssl_verify,
                     cert=(self.ssl_cert, self.ssl_key),
                     timeout=self.timeout,
+                    headers=headers,
+                    data=request_body,
                 )
             else:
                 r = self.session.post(
