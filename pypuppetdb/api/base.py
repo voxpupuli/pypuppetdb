@@ -327,7 +327,7 @@ class BaseAPI:
                 but is not supported just yet.
         :type offset: :obj:`string`
         :param include_total: (optional) Include the total number of results
-        :type order_by: :obj:`bool`
+        :type include_total: :obj:`bool`
         :param summarize_by: (optional) Specify what type of object you'd like\
                 to see counts at the event-counts and aggregate-event-counts \
                 endpoints
