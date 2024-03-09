@@ -53,6 +53,7 @@ Will return a generator object containing all file resources you're managing
 across your infrastructure. This is probably a bad idea if you have a big
 number of nodes as the response will be huge.
 """
+
 import logging
 
 from pypuppetdb.api import API
