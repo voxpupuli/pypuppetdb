@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-import pkg_resources
+import importlib.metadata
 import sys
 import os
 
@@ -22,7 +22,7 @@ master_doc = "index"
 
 project = "pypuppetdb"
 copyright = "2013-%s, Vox Pupuli" % datetime.now().year
-version = pkg_resources.get_distribution(project).version
+version = importlib.metadata.version("pypuppetdb")
 release = version
 
 language = "en"

@@ -56,7 +56,7 @@ class TestPqlAPI:
 
         nodes = list(api.pql(pql_query))
 
-        assert type(nodes[0]) == Node
+        assert isinstance(nodes[0], Node)
         assert nodes[0].name == "greenserver.vm"
 
         httpretty.disable()
