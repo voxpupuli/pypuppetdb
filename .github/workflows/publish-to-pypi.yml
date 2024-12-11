@@ -12,16 +12,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.13
       - name: Install dependencies
         run: |
-          pip install wheel
+          sudo apt install python3-poetry
       - name: Build
         run: |
-          python setup.py build sdist bdist_wheel
+          poetry build
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.14
         with:

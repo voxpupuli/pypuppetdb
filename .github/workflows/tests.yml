@@ -15,7 +15,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
+        python-version: [3.9, '3.10', 3.11, 3.12, 3.13]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,16 +25,19 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install --upgrade wheel setuptools
-          pip install -r requirements-test.txt
-          mypy --install-types --non-interactive pypuppetdb/ tests/
+          sudo apt install python3-poetry
+          poetry install --with test
+          poetry run mypy --install-types --non-interactive pypuppetdb/ tests/
       - name: Test
         run: |
-          pytest --cov=. --cov-report=xml --flake8 --strict-markers --mypy pypuppetdb tests
+          poetry run pytest --cov=. --cov-report=xml --flake8 --strict-markers --mypy pypuppetdb tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: false
+      - name: Build
+        run: |
+          poetry build -v
 
   black-formatting:
     runs-on: ubuntu-latest
@@ -48,33 +51,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.13
       - name: Install dependencies
         run: |
-          pip install bandit
+          sudo apt install python3-poetry
+          poetry install --with test
       - name: Run bandit
         run: |
-          bandit -r pypuppetdb
+          poetry run bandit -r pypuppetdb
 
   build-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.13
       - name: Install dependencies
         run: |
-          pip install --upgrade -r docs/requirements.txt
-          python setup.py develop
+          sudo apt install python3-poetry
+          poetry install --with docs
       - name: Build docs
         run: |
           cd docs
-          make html
+          poetry run make html
   tests:
     needs:
       - test
