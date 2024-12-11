@@ -54,7 +54,7 @@ class QueryAPI(BaseAPI):
         # If we happen to only get one node back it
         # won't be inside a list so iterating over it
         # goes boom. Therefor we wrap a list around it.
-        if type(nodes) == dict:
+        if isinstance(nodes, dict):
             nodes = [
                 nodes,
             ]
@@ -239,7 +239,7 @@ class QueryAPI(BaseAPI):
 
         catalogs = self._query("catalogs", **kwargs)
 
-        if type(catalogs) == dict:
+        if isinstance(catalogs, dict):
             catalogs = [
                 catalogs,
             ]

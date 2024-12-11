@@ -71,10 +71,10 @@ class BooleanOperator:
         self.operations = []
 
     def add(self, query):
-        if type(query) == list:
+        if isinstance(query, list):
             for i in query:
                 self.add(i)
-        elif type(query) == str:
+        elif isinstance(query, str):
             self.operations.append(json.loads(query))
         elif isinstance(query, (BinaryOperator, InOperator, BooleanOperator)):
             self.operations.append(query.json_data())
@@ -652,7 +652,7 @@ class NullOperator(BinaryOperator):
     """
 
     def __init__(self, field, value):
-        if type(value) != bool:
+        if not isinstance(value, bool):
             raise APIError("NullOperator value must be boolean")
 
         super().__init__("null?", field, value)
