@@ -9,7 +9,7 @@
 bandit
 coverage
 flake8<8
-pytest<8
+pytest<9
 pytest-cov
 pytest-flake8
 pytest-mypy
