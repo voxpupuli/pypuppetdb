@@ -52,7 +52,7 @@ pyparsing = "^3.2.0"
 pygments = "^2.18.0"
 idna = "^3.10"
 docutils = "^0.21.2"
-snowballstemmer = "^2.2.0"
+snowballstemmer = ">=2.2,<4.0"
 
 [build-system]
 requires = ["poetry-core"]
