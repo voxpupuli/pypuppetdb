@@ -7,6 +7,9 @@ on:
       - master
       - main
 
+permissions:
+  contents: read
+
 jobs:
   test:
 
@@ -79,13 +82,18 @@ jobs:
         run: |
           cd docs
           poetry run make html
+
   tests:
+    if: always()
     needs:
       - test
       - black-formatting
       - security
       - build-docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Test suite
     steps:
-      - run: echo Test suite completed
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
